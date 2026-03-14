@@ -1,159 +1,141 @@
 # OpenClaw Aionis Benchmark Summary
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-adapter`
+Package: `@aionis/openclaw-adapter`
 
-## One-line summary
+## Executive Summary
 
-`@aionis/openclaw-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, is proven active on a real `openclaw agent --local` turn, and now has a repeated Google runtime-backed completion A/B.
+`@aionis/openclaw-adapter` gives OpenClaw a control layer where it most often fails under cost and complexity pressure: the tool loop.
 
-## Best current public claim
+The current public evidence supports this product claim:
 
-The strongest accurate claim right now is:
+**Aionis reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, and handoff-resume slices, and is active on real OpenClaw runtime paths.**
 
-**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn and improve completion by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff. The installed adapter is also proven active on real OpenClaw local agent turns, including a repeated Google runtime-backed completion A/B.**
+That is the right claim to make today.
 
-## Evidence ladder
+It is strong enough to be useful, and narrow enough to stay true.
 
-### 1. Real plugin load works
+## What Aionis Is Actually Doing
 
-Artifact:
-- `evidence/openclaw-load-smoke/summary.json`
+Aionis is not improving OpenClaw by acting as a generic note store.
 
-Result:
-- `plugin_status = loaded`
-- `hook_count = 8`
+It changes the execution path in four concrete ways:
 
-Why it matters:
-- the adapter is not just a local library scaffold
-- OpenClaw can discover and load it as a real plugin
+1. **externalized context**
+   - runs begin with compact execution state instead of rediscovering the same task surface
+2. **policy gating**
+   - broad search, broad test, and repeated no-progress tool paths can be suppressed before they execute
+3. **replay dispatch**
+   - repeatable work can escape into a known path instead of starting from scratch
+4. **handoff fallback**
+   - degraded runs can stop cleanly and preserve a continuation point
+
+## The Best Evidence, In Order
+
+### 1. OpenClaw can install and load the adapter
+
+Evidence:
+
+- [Load smoke summary](../evidence/openclaw-load-smoke/summary.json)
+
+What this proves:
+
+- this is a real OpenClaw package, not only a local harness
+- OpenClaw can discover and register it on the real plugin path
 
 ### 2. Tool-loop churn goes down
 
-Artifact:
-- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
+Evidence:
 
-Result:
+- [Live-task benchmark summary](../evidence/openclaw-live-task-benchmark/20260314061733/summary.json)
+
+Headline result:
+
 - baseline `avg_executed_steps = 7.33`
 - treatment `avg_executed_steps = 3`
 - treatment `controlled_stop_rate = 0.6667`
 
-Why it matters:
-- Aionis is controlling the expensive part of OpenClaw failure: repeated tool churn
+What this proves:
 
-### 3. Token burn goes down
+- Aionis cuts repeated tool churn on scenario-backed OpenClaw tasks
+- Aionis suppresses broad search and broad test drift
+- Aionis can escape through replay or handoff instead of letting the run degrade indefinitely
 
-Artifacts:
-- direct semi-live:
-  - `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
-- loader-backed semi-live:
-  - `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+### 3. Token burn goes down on the current benchmark slices
 
-Results:
-- direct semi-live:
-  - baseline `avg_total_tokens = 1893`
-  - treatment `avg_total_tokens = 865.33`
-- loader-backed semi-live:
-  - baseline `avg_total_tokens = 1836`
-  - treatment `avg_total_tokens = 968.25`
+Evidence:
 
-Why it matters:
-- token reduction survives both direct benchmark execution and a stronger loader-backed path
+- [GLM-5 semi-live token summary](../evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json)
+- [Loader-backed semi-live token summary](../evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json)
+- [Hard-stop / replay token summary](../evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json)
 
-### 4. Hard-stop and replay are real, not only soft shaping
+Headline results:
 
-Artifact:
-- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+- direct semi-live: `1893 -> 865.33`
+- loader-backed semi-live: `1836 -> 968.25`
+- hard-stop / replay slice: `1659 -> 1267`
 
-Result:
-- treatment `controlled_stop_rate = 1`
-- treatment `replay_dispatch_rate = 1`
+What this proves:
 
-Why it matters:
-- Aionis is not only improving prompts or context
-- it can also stop and escape
+- token reduction is not limited to a single synthetic path
+- token reduction survives a stronger loader-backed install/discovery path
+- hard-stop and replay are part of the current savings story, not only soft context shaping
 
-### 5. Completion goes up on current slices
+### 4. Completion goes up on the current benchmark slices
 
-Artifact:
-- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
+Evidence:
 
-Result:
-- baseline `completed_rate = 0`
-- treatment `completed_rate = 1`
+- [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
+- [Google runtime case study](2026-03-14-openclaw-google-runtime-case-study.md)
 
-Included slices:
-1. replay-dispatch completion
-2. real-repo under-budget completion
-3. handoff-resume completion
+Headline results:
 
-Why it matters:
-- Aionis is not only reducing waste
-- on the current slices, it also improves final task completion
+- completion benchmark: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+- repeated Google runtime-backed A/B: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 
-### 6. Real agent-turn adapter activity is proven
+What this proves:
 
-Artifact:
-- `evidence/openclaw-adapter-activity-probe/20260314082034/summary.json`
+- on the current replay, focused-repo, and handoff-resume slices, Aionis improves completion
+- this is no longer only harness-only evidence; there is also repeated runtime-backed completion evidence on a second provider path
 
-Result:
-- `provider = zai`
-- `model = glm-5`
-- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
-- `outcome = adapter_active`
+### 5. The adapter is active on real OpenClaw runtime paths
 
-Why it matters:
-- the installed adapter is active inside a real `openclaw agent --local` turn
-- Aionis requests are emitted before the run finishes
-- degraded runtime turns can already trigger adapter-driven handoff fallback
+Evidence:
 
-### 7. A repeated second-provider runtime-backed completion A/B exists
+- [Adapter activity probe](../evidence/openclaw-adapter-activity-probe/20260314082034/summary.json)
+- [Gateway-backed feasibility summary](../evidence/openclaw-gateway-backed-feasibility/20260314080716/summary.json)
 
-Artifact:
-- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+What this proves:
 
-Result:
-- `provider = google`
-- `model = gemini-3-flash-preview`
-- baseline `completed_rate = 0`
-- treatment `completed_rate = 0.8`
-- `completion_gain = +0.8`
-- `avg_token_delta = -26.5`
+- the installed adapter emits real Aionis calls inside `openclaw agent --local`
+- the runtime path reaches actual provider/model execution
+- the remaining blocker on the `zai/glm-5` path is provider-side rate limiting, not missing adapter integration
 
-Why it matters:
-- runtime-backed live evidence is no longer only a `zai/glm-5` feasibility probe or a single run
-- adapter-driven externalized context is now shown to lift completion across repeated provider-backed OpenClaw local-agent runs
-- this slice should be framed as completion uplift first, with only mild token improvement
+## What This Does Not Yet Prove
 
-## What is proven
-
-1. OpenClaw can load the adapter.
-2. Aionis reduces tool-loop churn on scenario-backed live tasks.
-3. Aionis reduces `GLM-5` token burn on the current semi-live tasks.
-4. Aionis can save tokens through hard-stop and replay dispatch, not only through softer context shaping.
-5. Aionis improves completion on the current replay, focused real-repo, and handoff-resume slices.
-6. The installed adapter is active on a real OpenClaw local agent turn.
-7. Adapter-driven externalized context can lift completion on a repeated Google runtime-backed A/B.
-
-## What is not yet proven
+The current evidence does **not** prove:
 
 1. planner-internal reasoning control
-2. universal effect across all providers and models
-3. fully live gateway-backed end-to-end task evidence
+2. identical behavior across all providers and models
+3. that every complex OpenClaw failure mode is solved
+4. that token reduction is universal across all runtime-backed paths
 
-## Recommended public framing
+Those would be overclaims.
 
-Say:
+## Recommended Public Framing
 
-- `tool-loop control`
-- `policy enforcement`
-- `replay and handoff escape`
-- `lower token burn`
-- `higher completion on current slices`
-- `installed adapter activity on real local agent turns`
+Use language like:
 
-Do not say:
+- execution control for OpenClaw
+- policy, replay, and handoff around tool use
+- less uncontrolled tool churn
+- lower token burn on benchmarked slices
+- higher completion on current slices
 
-- `solves all ReAct failure modes`
-- `controls planner thoughts`
-- `works equally well on every model`
+Do not use language like:
+
+- solves all ReAct failure modes
+- controls planner thoughts
+- universally lowers tokens on every model
+- makes OpenClaw fully stable everywhere

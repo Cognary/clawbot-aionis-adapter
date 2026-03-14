@@ -1,230 +1,162 @@
 # Benchmark Evidence Overview
 
-Date: 2026-03-14
-Repo: `@aionis/openclaw-adapter`
-Status: current evidence snapshot
+Date: 2026-03-14  
+Package: `@aionis/openclaw-adapter`
+Status: current public evidence snapshot
 
-## What Is Already Proven
+## Reading This Page
 
-### 1. Real OpenClaw loader integration works
+This page separates three things:
 
-Artifact:
-- `evidence/openclaw-load-smoke/summary.json`
+1. **what is already proven**
+2. **what is partially proven**
+3. **what is not yet proven**
 
-Current result:
+That distinction matters.
+
+The value of this adapter is strongest when we stay precise about the claims.
+
+## Already Proven
+
+### 1. Real OpenClaw installation and loading work
+
+Evidence:
+
+- [Load smoke summary](../evidence/openclaw-load-smoke/summary.json)
+
+Current signal:
+
 - `plugin_status = loaded`
 - `hook_count = 8`
-- `plugin_source = dist/plugin.js`
 
-This proves:
-- the package is not only a library scaffold
-- real OpenClaw loader discovery and registration work
+Interpretation:
 
-### 2. Tool-loop churn can be reduced
+- OpenClaw can discover, install, and load the package as a real adapter
 
-Artifact:
-- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
+### 2. Tool-loop churn is reduced
 
-Current result:
-- baseline:
-  - `avg_executed_steps = 7.33`
-  - `controlled_stop_rate = 0`
-  - `avg_broad_tool_calls = 1.33`
-- treatment:
-  - `avg_executed_steps = 3`
-  - `controlled_stop_rate = 0.6667`
-  - `replay_dispatch_rate = 0.3333`
-  - `handoff_store_rate = 0.3333`
-  - `avg_broad_tool_calls = 0`
+Evidence:
 
-This proves:
-- Aionis reduces uncontrolled tool-loop churn in OpenClaw
+- [Live-task benchmark summary](../evidence/openclaw-live-task-benchmark/20260314061733/summary.json)
+
+Current signal:
+
+- baseline `avg_executed_steps = 7.33`
+- treatment `avg_executed_steps = 3`
+- treatment `controlled_stop_rate = 0.6667`
+- treatment `avg_broad_tool_calls = 0`
+
+Interpretation:
+
+- Aionis reduces repeated tool churn
 - Aionis suppresses broad search and broad test drift
-- Aionis can escape via replay or handoff
+- Aionis gives OpenClaw structured escape paths through replay or handoff
 
-### 3. GLM-5 token burn can be reduced on semi-live tasks
+### 3. Token reduction is proven on the current benchmark slices
 
-Artifact:
-- `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
+Evidence:
 
-Current result:
-- baseline:
-  - `avg_total_tokens = 1893`
-  - `avg_executed_steps = 5.67`
-  - `completed_rate = 0.3333`
-- treatment:
-  - `avg_total_tokens = 865.33`
-  - `avg_executed_steps = 2`
-  - `completed_rate = 0.3333`
-  - `avg_broad_tool_calls = 0`
+- [GLM-5 semi-live token summary](../evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json)
+- [Hard-stop / replay token summary](../evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json)
+- [Loader-backed semi-live token summary](../evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json)
 
-This proves:
-- Aionis can reduce token burn in OpenClaw on scenario-backed semi-live tasks
-- the current token win is driven by context shaping, policy shaping, and focused-path execution
+Current signal:
 
-### 4. Hard-stop and replay-driven token saving also works
+- `1893 -> 865.33`
+- `1659 -> 1267`
+- `1836 -> 968.25`
 
-Artifact:
-- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+Interpretation:
 
-Current result:
-- baseline:
-  - `avg_total_tokens = 1659`
-  - `avg_executed_steps = 6`
-  - `controlled_stop_rate = 0`
-- treatment:
-  - `avg_total_tokens = 1267`
-  - `avg_executed_steps = 3`
-  - `controlled_stop_rate = 1`
-  - `replay_dispatch_rate = 1`
+- current token wins are real
+- they survive both direct benchmark execution and a stronger loader-backed path
+- they come from a mix of context shaping, policy shaping, focused execution, and hard-stop/replay behavior
 
-This proves:
-- Aionis is not limited to soft context shaping
-- hard-stop plus replay-driven control can also reduce token burn
+### 4. Completion uplift is proven on the current benchmark slices
 
-### 5. Loader-backed semi-live token reduction also works
+Evidence:
 
-Artifact:
-- `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+- [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 
-Current result:
-- baseline:
-  - `avg_total_tokens = 1836`
-  - `avg_executed_steps = 5.75`
-  - `completed_rate = 0.25`
-- treatment:
-  - `avg_total_tokens = 968.25`
-  - `avg_executed_steps = 2.25`
-  - `completed_rate = 0.25`
-  - `controlled_stop_rate = 0.25`
-  - `replay_dispatch_rate = 0.25`
-  - `handoff_store_rate = 0.5`
-  - `avg_broad_tool_calls = 0`
+Current signal:
 
-This proves:
-- the token reduction result survives a real OpenClaw plugin install and discovery path
-- the adapter still reduces churn and token burn when executed from the installed plugin source path
+- completion benchmark: `0 -> 1`
+- repeated Google runtime-backed A/B: `0 -> 0.8`
 
-### 6. Completion uplift is now proven on the current three-slice benchmark
+Interpretation:
 
-Artifact:
-- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
+- Aionis improves completion on the current replay, focused-repo, and handoff-resume slices
+- there is now repeated runtime-backed completion evidence, not only harness-only evidence
 
-Current result:
-- baseline:
-  - `completed_rate = 0`
-  - `avg_executed_steps = 3.67`
-  - `avg_total_tokens = 1125`
-- treatment:
-  - `completed_rate = 1`
-  - `avg_executed_steps = 2`
-  - `avg_total_tokens = 882.67`
-  - `replay_dispatch_success_rate = 0.3333`
-  - `handoff_resume_success_rate = 0.3333`
+### 5. Real runtime activity is proven
 
-This proves:
-- Aionis can improve completion on replay-eligible repeated workflows
-- Aionis can improve completion on tight-budget focused real-repo tasks
-- Aionis can improve completion on interrupted handoff-resume tasks
+Evidence:
 
-### 7. Gateway-backed runtime feasibility is now proven
+- [Adapter activity probe](../evidence/openclaw-adapter-activity-probe/20260314082034/summary.json)
+- [Gateway-backed feasibility summary](../evidence/openclaw-gateway-backed-feasibility/20260314080716/summary.json)
 
-Artifact:
-- `evidence/openclaw-gateway-backed-feasibility/summary.json`
+Current signal:
 
-Current result:
-- `provider = zai`
-- `model = glm-5`
-- `runtime_path_reached_model = true`
-- `outcome = rate_limited_timeout`
+- runtime path reaches real provider/model execution
+- adapter emits real Aionis calls during `openclaw agent --local`
 
-This proves:
-- the real OpenClaw local agent runtime can be forced onto `zai/glm-5`
-- the earlier Anthropic default-model blocker is gone
-- the remaining blocker for a stronger gateway-backed benchmark is provider-side runtime rate limiting
+Interpretation:
 
-### 8. Adapter activity on a real agent turn is now probeable
+- the adapter is active on real runtime paths
+- remaining GLM runtime blockers are provider-side, not integration-side
 
-Artifact:
-- `evidence/openclaw-adapter-activity-probe/summary.json`
+## Partially Proven
 
-Current result:
-- `provider = zai`
-- `model = glm-5`
-- `runtime_path_reached_model = true`
-- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
-- `outcome = adapter_active`
+### 1. Runtime-backed token reduction
 
-This proves a narrower fact than a full runtime-backed benchmark:
+What we have:
 
-- the installed adapter is active inside a real `openclaw agent --local` turn
-- the runtime emits Aionis requests such as `/v1/memory/context/assemble`
-- the runtime can also trigger adapter-driven `handoff/store` on a degraded live turn
+- strong token evidence on scenario-backed and loader-backed paths
+- a repeated Google runtime-backed A/B with only mild token improvement
 
-This raises the evidence level even if the provider later rate-limits the run.
+What that means:
 
-### 9. A stable second-provider runtime-backed completion A/B now exists
+- runtime-backed completion uplift is already solid
+- runtime-backed token reduction exists in parts of the evidence set, but should still be framed carefully by provider and scenario
 
-Artifact:
-- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+### 2. Provider breadth
 
-Current result:
-- `provider = google`
-- `model = gemini-3-flash-preview`
-- baseline:
-  - `completed_rate = 0`
-  - `avg_total_tokens = 4319`
-  - `timed_out_count = 1`
-- treatment:
-  - `completed_rate = 0.8`
-  - `avg_total_tokens = 4287`
-  - `avg_mock_request_count = 1`
-  - `timed_out_count = 0`
-- delta:
-  - `completion_gain = +0.8`
-  - `avg_token_delta = -26.5`
-  - `token_win_rate = 0.5`
-  - `token_pair_count = 4`
+What we have:
 
-This proves:
-- a real OpenClaw local agent path now has a repeated `baseline vs adapter` runtime-backed benchmark
-- adapter-driven externalized context can lift completion on a provider-backed path
-- the current runtime-backed evidence is no longer only a feasibility probe or single lucky run
+- `GLM-5`
+- `gemini-3-flash-preview`
 
-This does not prove:
-- strong token reduction on this slice
+What that means:
 
-Case-study write-up:
-- `docs/2026-03-14-openclaw-google-runtime-case-study.md`
+- the adapter is no longer single-provider evidence
+- it is still not a universal provider claim
 
-## What Is Not Yet Proven
+## Not Yet Proven
 
 ### 1. Planner-internal reasoning control
 
 Not proven and not claimed.
 
-Reason:
-- OpenClaw hook coverage is strong at the tool boundary
-- it is not a native planner-thought-step control surface
+The adapter controls the tool-loop boundary, not planner thoughts that never emit tools.
 
-### 2. Universal effect across all models and providers
+### 2. Universal benefit across all providers and task shapes
 
 Not proven and not claimed.
 
-Current strongest provider-backed evidence is:
-- `GLM-5`
-- `gemini-3-flash-preview`
+The correct public claim is about the benchmarked slices, not every possible OpenClaw workload.
 
-### 3. A full gateway-backed baseline vs treatment benchmark is not yet complete
+### 3. A fully stable `zai/glm-5` runtime-backed A/B
 
-Not proven and not claimed.
+Not yet complete.
 
-Reason:
-- the runtime-backed path now reaches `zai/glm-5`
-- but the current live agent turn still rate-limits before a stable baseline vs treatment comparison can finish
+Current status:
 
-## Current Best Public Claim
+- the path reaches `zai/glm-5`
+- the current blocker is provider-side rate limiting
 
-The current strongest accurate claim is:
+## Best Public Claim Today
 
-**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff.**
+The strongest accurate public statement is:
+
+**Aionis gives OpenClaw an execution-control layer that reduces uncontrolled tool-loop churn, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, and handoff-resume slices, and is proven active on real OpenClaw runtime paths.**
