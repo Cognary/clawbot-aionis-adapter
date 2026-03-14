@@ -1,4 +1,4 @@
-# OpenClaw Aionis Adapter
+# Aionis OpenClaw Adapter
 
 A standalone adapter for connecting OpenClaw to Aionis execution control.
 
@@ -15,7 +15,7 @@ npx @aionis/sdk@0.2.19 health
 
 ```bash
 openclaw plugins install @aionis/openclaw-adapter
-openclaw plugins info openclaw-aionis-adapter --json
+openclaw plugins info openclaw-adapter --json
 ```
 
 3. Add the plugin config shown below.
@@ -34,9 +34,9 @@ Minimum plugin config:
 ```json
 {
   "plugins": {
-    "allow": ["openclaw-aionis-adapter"],
+    "allow": ["openclaw-adapter"],
     "entries": {
-      "openclaw-aionis-adapter": {
+      "openclaw-adapter": {
         "enabled": true,
         "config": {
           "baseUrl": "http://127.0.0.1:3321",
@@ -64,8 +64,8 @@ Current package metadata is prepared for publish:
 
 Current boundary:
 
-1. plugin id remains `openclaw-aionis-adapter` for compatibility
-2. publish workflow is not set up in this repo yet
+1. publish workflow is not set up in this repo yet
+2. registry users need `0.1.1` or later to get the aligned `openclaw-adapter` plugin id
 
 ## What it is
 

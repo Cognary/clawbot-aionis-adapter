@@ -97,7 +97,7 @@ Primary metrics:
 
 ### Treatment
 
-1. install and enable `openclaw-aionis-adapter`
+1. install and enable `openclaw-adapter`
 2. point adapter config at benchmark Aionis mock or Lite instance
 3. run the same local agent turn
 4. capture JSON result, logs, and usage

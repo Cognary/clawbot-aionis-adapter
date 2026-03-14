@@ -78,7 +78,7 @@
       "kind": "repo_drift",
       "description": "Broad grep and broad Node test drift on a real repo should be rerouted onto focused search and focused test paths.",
       "prompt": "Locate the adapter registration path and validate the plugin entry without broad repo scans or broad test sweeps.",
-      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter",
+      "repo_path": "/Volumes/ziel/openclaw-adapter",
       "plan": [
         {
           "toolName": "grep",
@@ -95,7 +95,7 @@
         {
           "toolName": "grep",
           "params": {
-            "command": "grep -R \"openclaw-aionis-adapter\" src ."
+            "command": "grep -R \"openclaw-adapter\" src ."
           }
         },
         {

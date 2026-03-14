@@ -56,7 +56,7 @@ function createReplayHintResolver(rawCfg: Record<string, unknown>): AdapterConfi
 function resolveConfig(rawCfg: Record<string, unknown>): AdapterConfig & { baseUrl: string; apiKey?: string; authBearer?: string } {
   const baseUrl = asString(rawCfg.baseUrl, process.env.AIONIS_BASE_URL ?? "http://127.0.0.1:3321");
   const tenantId = asString(rawCfg.tenantId, process.env.AIONIS_TENANT_ID ?? "default");
-  const actor = asString(rawCfg.actor, process.env.AIONIS_ACTOR ?? "openclaw-aionis-adapter");
+  const actor = asString(rawCfg.actor, process.env.AIONIS_ACTOR ?? "openclaw-adapter");
   const scopePrefix = asString(rawCfg.scopePrefix, process.env.AIONIS_SCOPE_PREFIX ?? "openclaw");
   const scopeMode = asString(rawCfg.scopeMode, "project") || "project";
   const fixedScope = asString(rawCfg.scope, `${scopePrefix}:default`);
@@ -85,10 +85,10 @@ function resolveConfig(rawCfg: Record<string, unknown>): AdapterConfig & { baseU
 }
 
 const plugin = {
-  id: "openclaw-aionis-adapter",
-  name: "OpenClaw Aionis Adapter",
+  id: "openclaw-adapter",
+  name: "Aionis OpenClaw Adapter",
   description: "Tool-loop control adapter for Aionis-backed policy, replay, handoff, and evidence capture.",
-  version: "0.1.0",
+  version: "0.1.1",
   register(api: OpenClawHostApi & { pluginConfig?: Record<string, unknown>; logger: { info: (msg: string) => void; warn: (msg: string) => void } }) {
     const rawCfg = asRecord((api as { pluginConfig?: unknown }).pluginConfig);
     const resolved = resolveConfig(rawCfg);
@@ -101,7 +101,7 @@ const plugin = {
     });
     const adapter = new AionisLoopControlAdapter(client, resolved);
     attachToOpenClawHost(api, adapter);
-    api.logger.info(`openclaw-aionis-adapter: registered base=${resolved.baseUrl} tenant=${resolved.tenantId} replayDispatch=${resolved.replayDispatchEnabled} handoffFallback=${resolved.handoffFallbackEnabled}`);
+    api.logger.info(`openclaw-adapter: registered base=${resolved.baseUrl} tenant=${resolved.tenantId} replayDispatch=${resolved.replayDispatchEnabled} handoffFallback=${resolved.handoffFallbackEnabled}`);
   },
 };
 

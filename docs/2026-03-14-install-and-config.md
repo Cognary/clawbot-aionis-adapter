@@ -31,12 +31,12 @@ openclaw plugins install @aionis/openclaw-adapter
 
 ```bash
 openclaw plugins list --json
-openclaw plugins info openclaw-aionis-adapter --json
+openclaw plugins info openclaw-adapter --json
 ```
 
 Expected:
 
-1. plugin id `openclaw-aionis-adapter` appears in the list
+1. plugin id `openclaw-adapter` appears in the list
 2. plugin source points at the installed package path
 
 ## Minimal OpenClaw Config
@@ -50,9 +50,9 @@ Core shape:
 ```json
 {
   "plugins": {
-    "allow": ["openclaw-aionis-adapter"],
+    "allow": ["openclaw-adapter"],
     "entries": {
-      "openclaw-aionis-adapter": {
+      "openclaw-adapter": {
         "enabled": true,
         "config": {
           "baseUrl": "http://127.0.0.1:3321",

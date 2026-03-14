@@ -1,6 +1,6 @@
 {
   "name": "@aionis/openclaw-adapter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Standalone OpenClaw adapter for Aionis execution control.",
   "repository": {
@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit false",
+    "prepack": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test test/*.test.mjs",
     "bench:anti-loop": "npm run build && node scripts/anti-loop-benchmark.mjs",

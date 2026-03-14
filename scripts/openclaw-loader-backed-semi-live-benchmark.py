@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = pathlib.Path('/Volumes/ziel/openclaw-aionis-adapter')
+ROOT = pathlib.Path('/Volumes/ziel/openclaw-adapter')
 ARTIFACT_ROOT = ROOT / 'artifacts' / 'openclaw-loader-backed-semi-live-token-benchmark'
 
 
@@ -49,7 +49,7 @@ def main() -> int:
         print(install.stderr, file=sys.stderr)
         raise RuntimeError(f'install failed: {install.returncode}')
 
-    info_cp = run(['openclaw', 'plugins', 'info', 'openclaw-aionis-adapter', '--json'], env, timeout=60)
+    info_cp = run(['openclaw', 'plugins', 'info', 'openclaw-adapter', '--json'], env, timeout=60)
     if info_cp.returncode != 0:
         print(info_cp.stdout)
         print(info_cp.stderr, file=sys.stderr)

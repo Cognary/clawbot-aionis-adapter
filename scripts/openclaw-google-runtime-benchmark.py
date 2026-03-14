@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ARTIFACT_ROOT = ROOT / "artifacts" / "openclaw-google-runtime-benchmark"
 PROFILE_BASE = "bench-google-runtime"
 MODEL = "google/gemini-3-flash-preview"
-PLUGIN_ID = "openclaw-aionis-adapter"
+PLUGIN_ID = "openclaw-adapter"
 QUESTION = (
     "Resume the previous run and reply with the exact resume token only. "
     "If the token is unknown from current context, reply UNKNOWN."

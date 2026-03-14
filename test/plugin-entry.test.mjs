@@ -73,6 +73,6 @@ test('plugin register attaches OpenClaw hook handlers', async () => {
     assert.equal(handlers.has('before_tool_call'), true);
     assert.equal(handlers.has('after_tool_call'), true);
     assert.equal(handlers.has('agent_end'), true);
-    assert.match(logs.join('\n'), /openclaw-aionis-adapter: registered/);
+    assert.match(logs.join('\n'), /openclaw-adapter: registered/);
   });
 });

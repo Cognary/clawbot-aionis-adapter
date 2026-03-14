@@ -31,7 +31,7 @@ What it does not prove by itself is:
 The probe does:
 
 1. install the adapter with `openclaw plugins install <repo> --link`
-2. write a temporary profile config enabling `plugins.entries.openclaw-aionis-adapter`
+2. write a temporary profile config enabling `plugins.entries.openclaw-adapter`
 3. point the adapter at a local mock Aionis HTTP server
 4. run `openclaw agent --local --json`
 5. record which Aionis endpoints the runtime actually hits

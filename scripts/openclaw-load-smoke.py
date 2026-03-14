@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = pathlib.Path('/Volumes/ziel/openclaw-aionis-adapter')
+ROOT = pathlib.Path('/Volumes/ziel/openclaw-adapter')
 ARTIFACT_DIR = ROOT / 'artifacts' / 'openclaw-load-smoke'
 
 
@@ -45,7 +45,7 @@ def main() -> int:
       raise RuntimeError(f'install failed: {install.returncode}')
 
     list_cp = run_openclaw(['plugins', 'list', '--json'], env)
-    info_cp = run_openclaw(['plugins', 'info', 'openclaw-aionis-adapter', '--json'], env)
+    info_cp = run_openclaw(['plugins', 'info', 'openclaw-adapter', '--json'], env)
     if list_cp.returncode != 0:
       print(list_cp.stdout)
       print(list_cp.stderr, file=sys.stderr)
@@ -57,12 +57,12 @@ def main() -> int:
 
     list_json = parse_json_with_leading_logs(list_cp.stdout)
     info_json = parse_json_with_leading_logs(info_cp.stdout)
-    plugin = next((item for item in list_json.get('plugins', []) if item.get('id') == 'openclaw-aionis-adapter'), None)
+    plugin = next((item for item in list_json.get('plugins', []) if item.get('id') == 'openclaw-adapter'), None)
     if not plugin:
         raise RuntimeError('plugin not discovered by openclaw plugins list')
     if plugin.get('status') != 'loaded':
         raise RuntimeError(f"expected plugin status=loaded, got {plugin.get('status')}")
-    if info_json.get('id') != 'openclaw-aionis-adapter':
+    if info_json.get('id') != 'openclaw-adapter':
         raise RuntimeError(f"unexpected plugin info id {info_json.get('id')}")
 
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)

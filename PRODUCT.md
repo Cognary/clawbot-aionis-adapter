@@ -1,6 +1,6 @@
-# OpenClaw Aionis Adapter
+# Aionis OpenClaw Adapter
 
-`openclaw-aionis-adapter` is a standalone OpenClaw integration layer for Aionis.
+`openclaw-adapter` is a standalone OpenClaw integration layer for Aionis.
 
 It is a dedicated adapter that uses OpenClaw's host hook surface to add:
 

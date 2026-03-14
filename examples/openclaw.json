@@ -8,9 +8,9 @@
     }
   },
   "plugins": {
-    "allow": ["openclaw-aionis-adapter"],
+    "allow": ["openclaw-adapter"],
     "entries": {
-      "openclaw-aionis-adapter": {
+      "openclaw-adapter": {
         "enabled": true,
         "config": {
           "baseUrl": "http://127.0.0.1:3321",

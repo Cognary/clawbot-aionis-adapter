@@ -15,7 +15,7 @@ ARTIFACT_ROOT = ROOT / "artifacts" / "openclaw-adapter-activity-probe"
 PROFILE = "bench-activity"
 SESSION_ID = "adapter-activity-1"
 MESSAGE = "Reply with ok only."
-PLUGIN_ID = "openclaw-aionis-adapter"
+PLUGIN_ID = "openclaw-adapter"
 
 
 def ts() -> str:

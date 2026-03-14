@@ -12,7 +12,7 @@ import { AionisLoopControlAdapter } from "../adapter/loop-control-adapter.js";
 
 export function attachToOpenClawHost(api: OpenClawHostApi, adapter: AionisLoopControlAdapter): void {
   if (typeof api.on !== "function") {
-    api.logger.warn("openclaw-aionis-adapter: host hook API unavailable; binding skipped");
+    api.logger.warn("openclaw-adapter: host hook API unavailable; binding skipped");
     return;
   }
 

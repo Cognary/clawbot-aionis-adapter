@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.1
+
+Manifest and install-surface alignment release.
+
+Included:
+
+1. plugin id unified to `openclaw-adapter`
+2. OpenClaw config examples updated to use `plugins.allow` and `plugins.entries.openclaw-adapter`
+3. install/verify docs updated to match the npm package and plugin id actually intended for users
+4. local install smoke verified against the packed tarball with no manifest/package name mismatch warning
+
 ## 0.1.0
 
 Initial standalone adapter release surface.

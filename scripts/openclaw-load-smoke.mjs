@@ -35,25 +35,25 @@ async function main() {
     OPENCLAW_STATE_DIR: stateDir,
   };
 
-  const install = await runOpenClaw(['plugins', 'install', '/Volumes/ziel/openclaw-aionis-adapter', '--link'], env);
+  const install = await runOpenClaw(['plugins', 'install', '/Volumes/ziel/openclaw-adapter', '--link'], env);
   const list = await runOpenClaw(['plugins', 'list', '--json'], env);
-  const info = await runOpenClaw(['plugins', 'info', 'openclaw-aionis-adapter', '--json'], env);
+  const info = await runOpenClaw(['plugins', 'info', 'openclaw-adapter', '--json'], env);
 
   const listJson = parseJsonWithLeadingLogs(list.stdout);
   const infoJson = parseJsonWithLeadingLogs(info.stdout);
   const plugin = Array.isArray(listJson.plugins)
-    ? listJson.plugins.find((item) => item.id === 'openclaw-aionis-adapter')
+    ? listJson.plugins.find((item) => item.id === 'openclaw-adapter')
     : undefined;
 
   if (!plugin) throw new Error('plugin not discovered by openclaw plugins list');
   if (plugin.status !== 'loaded') {
     throw new Error(`expected plugin status=loaded, got ${plugin.status}`);
   }
-  if (infoJson.id !== 'openclaw-aionis-adapter') {
+  if (infoJson.id !== 'openclaw-adapter') {
     throw new Error(`unexpected plugin info id ${infoJson.id}`);
   }
 
-  const artifactDir = path.join('/Volumes/ziel/openclaw-aionis-adapter', 'artifacts', 'openclaw-load-smoke');
+  const artifactDir = path.join('/Volumes/ziel/openclaw-adapter', 'artifacts', 'openclaw-load-smoke');
   await fs.mkdir(artifactDir, { recursive: true });
   await fs.writeFile(path.join(artifactDir, 'install.stdout.log'), install.stdout);
   await fs.writeFile(path.join(artifactDir, 'install.stderr.log'), install.stderr);
