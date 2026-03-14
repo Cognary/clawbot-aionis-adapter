@@ -3,10 +3,30 @@ import { Reveal } from "../components/reveal";
 import { TerminalDemo } from "../components/terminal-demo";
 
 const proofCards = [
-  { label: "Live-task steps", value: "7.33 -> 3", note: "Scenario-backed tool churn dropped materially." },
-  { label: "GLM-5 tokens", value: "1893 -> 865", note: "Semi-live token burn fell without lowering completion on that slice." },
-  { label: "Completion uplift", value: "0 -> 1", note: "Replay, focused-repo, and handoff-resume slices improved." },
-  { label: "Google runtime", value: "0 -> 0.8", note: "Repeated runtime-backed completion A/B is already in evidence." },
+  {
+    label: "Issue #10864",
+    value: "0 -> 1",
+    note: "One-prompt multi-agent completion uplift on orphan process triage.",
+    tag: "Strongest slice",
+  },
+  {
+    label: "Auth drift",
+    value: "0 -> 1",
+    note: "One-prompt multi-agent completion uplift on Control UI token mismatch drift.",
+    tag: "Strongest slice",
+  },
+  {
+    label: "Markdown fallback",
+    value: "0.33 -> 1",
+    note: "Positive completion uplift on a narrower UI rendering task.",
+    tag: "Supporting slice",
+  },
+  {
+    label: "GLM-5 tokens",
+    value: "1893 -> 865",
+    note: "Token burn still drops on the current semi-live control slices.",
+    tag: "Token slice",
+  },
 ];
 
 const capabilityCards = [
@@ -94,7 +114,7 @@ export default function HomePage() {
                     <li>Focused path selection</li>
                     <li>Structured replay escape</li>
                     <li>Clean handoff fallback</li>
-                    <li>Benchmark-backed token savings</li>
+                    <li>Benchmark-backed completion uplift</li>
                   </ul>
                 </div>
               </div>
@@ -138,13 +158,19 @@ export default function HomePage() {
         <section className="section">
           <Reveal>
             <p className="sectionLabel">What Is Proven</p>
-            <h2>The benchmark story is already product-grade.</h2>
+            <h2>The strongest public claim is now completion and continuity, not vague agent quality.</h2>
+            <p className="sectionBody proofPreamble">
+              The best current evidence comes from realistic one-prompt multi-agent OpenClaw workflows. Two slices are
+              strong headline proof. One slice is positive but supporting. Token reduction remains real on separate
+              semi-live control slices.
+            </p>
           </Reveal>
           <div className="proofGrid">
             {proofCards.map((item, idx) => (
               <Reveal key={item.label} delay={0.04 + idx * 0.04} variant="scale">
                 <article className="proofCard">
                   <span>{item.label}</span>
+                  <em>{item.tag}</em>
                   <strong>{item.value}</strong>
                   <p>{item.note}</p>
                 </article>
@@ -156,6 +182,8 @@ export default function HomePage() {
           </Reveal>
           <Reveal delay={0.22}>
             <div className="linkRail">
+              <a href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md" target="_blank" rel="noreferrer">Multi-agent case study</a>
+              <a href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md" target="_blank" rel="noreferrer">One-prompt benchmark</a>
               <a href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-openclaw-aionis-benchmark-summary.md" target="_blank" rel="noreferrer">Benchmark summary</a>
               <a href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-benchmark-evidence-overview.md" target="_blank" rel="noreferrer">Evidence overview</a>
               <a href="https://github.com/Cognary/clawbot-aionis-adapter/tree/aionis/bootstrap-v1/evidence" target="_blank" rel="noreferrer">Evidence files</a>

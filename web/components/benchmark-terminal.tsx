@@ -4,37 +4,47 @@ import { useEffect, useMemo, useState } from "react";
 
 type Scenario = {
   name: string;
-  baselineTokens: number;
-  treatmentTokens: number;
-  baselineSteps: number;
-  treatmentSteps: number;
+  baselineCompleted: string;
+  treatmentCompleted: string;
+  baselineTokens?: number;
+  treatmentTokens?: number;
+  baselineHandoffs?: number;
+  treatmentHandoffs?: number;
   outcome: string;
 };
 
 const scenarios: Scenario[] = [
   {
-    name: "live-task",
-    baselineTokens: 1893,
-    treatmentTokens: 865,
-    baselineSteps: 6,
-    treatmentSteps: 2,
-    outcome: "focused-path",
+    name: "issue-10864",
+    baselineCompleted: "0/3",
+    treatmentCompleted: "3/3",
+    baselineHandoffs: 0,
+    treatmentHandoffs: 4,
+    outcome: "completion-uplift",
   },
   {
-    name: "hard-stop-replay",
-    baselineTokens: 1659,
-    treatmentTokens: 1267,
-    baselineSteps: 6,
-    treatmentSteps: 3,
-    outcome: "replay-dispatch",
+    name: "auth-drift",
+    baselineCompleted: "0/3",
+    treatmentCompleted: "3/3",
+    baselineHandoffs: 0,
+    treatmentHandoffs: 4,
+    outcome: "continuity-win",
   },
   {
-    name: "google-runtime",
+    name: "markdown-fallback",
+    baselineCompleted: "1/3",
+    treatmentCompleted: "3/3",
+    baselineHandoffs: 0,
+    treatmentHandoffs: 4,
+    outcome: "supporting-slice",
+  },
+  {
+    name: "glm5-token",
+    baselineCompleted: "stable",
+    treatmentCompleted: "stable",
     baselineTokens: 4319,
     treatmentTokens: 4287,
-    baselineSteps: 5,
-    treatmentSteps: 3,
-    outcome: "completion-up",
+    outcome: "runtime-backed",
   },
 ];
 
@@ -44,19 +54,32 @@ export function BenchmarkTerminal() {
   const [charIndex, setCharIndex] = useState(0);
 
   const scenario = scenarios[scenarioIndex];
-  const tokenDelta = scenario.baselineTokens - scenario.treatmentTokens;
-  const stepDelta = scenario.baselineSteps - scenario.treatmentSteps;
 
   const lines = useMemo(
-    () => [
-      `$ openclaw adapter bench --case ${scenario.name} --json`,
-      `[baseline] tokens=${scenario.baselineTokens} steps=${scenario.baselineSteps}`,
-      `[treatment] tokens=${scenario.treatmentTokens} steps=${scenario.treatmentSteps}`,
-      `[delta] tokens_saved=${tokenDelta} steps_saved=${stepDelta}`,
-      `[result] outcome=${scenario.outcome}`,
-      "status: benchmark_evidence_recorded",
-    ],
-    [scenario, tokenDelta, stepDelta],
+    () => {
+      const base = [
+        `$ openclaw adapter bench --case ${scenario.name} --json`,
+        `[baseline] completed=${scenario.baselineCompleted}`,
+        `[treatment] completed=${scenario.treatmentCompleted}`,
+      ];
+
+      if (typeof scenario.baselineHandoffs === "number" && typeof scenario.treatmentHandoffs === "number") {
+        base.push(
+          `[continuity] baseline_handoffs=${scenario.baselineHandoffs} treatment_handoffs=${scenario.treatmentHandoffs}`,
+        );
+      }
+
+      if (typeof scenario.baselineTokens === "number" && typeof scenario.treatmentTokens === "number") {
+        base.push(
+          `[tokens] baseline=${scenario.baselineTokens} treatment=${scenario.treatmentTokens} delta=${scenario.baselineTokens - scenario.treatmentTokens}`,
+        );
+      }
+
+      base.push(`[result] outcome=${scenario.outcome}`);
+      base.push("status: benchmark_evidence_recorded");
+      return base;
+    },
+    [scenario],
   );
 
   useEffect(() => {
