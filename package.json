@@ -20,7 +20,8 @@
     "bench:openclaw-ab": "npm run build && node scripts/openclaw-anti-loop-ab-benchmark.mjs",
     "bench:live-task": "npm run build && node scripts/live-task-benchmark.mjs",
     "bench:semi-live-token": "npm run build && node scripts/semi-live-token-benchmark.mjs",
-    "bench:completion": "npm run build && node scripts/completion-benchmark.mjs"
+    "bench:completion": "npm run build && node scripts/completion-benchmark.mjs",
+    "bench:loader-backed-semi-live-token": "python3 scripts/openclaw-loader-backed-semi-live-benchmark.py"
   },
   "exports": {
     ".": "./dist/index.js",

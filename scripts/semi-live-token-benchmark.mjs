@@ -4,8 +4,7 @@ import http from 'node:http';
 import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
 import crypto from 'node:crypto';
-
-import plugin from '../dist/plugin.js';
+import { pathToFileURL } from 'node:url';
 
 const execFile = promisify(execFileCb);
 const ROOT = '/Volumes/ziel/openclaw-aionis-adapter';
@@ -16,6 +15,11 @@ const MODEL = process.env.GLM_MODEL ?? 'glm-5';
 const MAX_GLM_RETRIES = Number(process.env.GLM_MAX_RETRIES ?? 3);
 const GLM_REQUEST_TIMEOUT_MS = Number(process.env.GLM_REQUEST_TIMEOUT_MS ?? 30000);
 const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
+const PLUGIN_MODULE_PATH = process.env.PLUGIN_MODULE_PATH ?? path.join(ROOT, 'dist', 'plugin.js');
+const BENCHMARK_ID = process.env.BENCHMARK_ID ?? 'openclaw_semi_live_token_v1';
+const ARTIFACT_SUBDIR = process.env.BENCH_ARTIFACT_SUBDIR ?? 'openclaw-semi-live-token-benchmark';
+
+const { default: plugin } = await import(pathToFileURL(PLUGIN_MODULE_PATH).href);
 
 if (!API_KEY) {
   console.error('Missing ZHIPU_API_KEY or GLM_API_KEY');
@@ -563,9 +567,10 @@ function summarize(cases) {
   const baseline = cases.filter((item) => item.mode === 'baseline');
   const treatment = cases.filter((item) => item.mode === 'treatment');
   return {
-    benchmark: 'openclaw_semi_live_token_v1',
+    benchmark: BENCHMARK_ID,
     provider: 'glm',
     model: MODEL,
+    plugin_module_path: PLUGIN_MODULE_PATH,
     cases: treatment.length,
     baseline: {
       avg_total_tokens: mean(baseline, 'total_tokens'),
@@ -632,7 +637,7 @@ async function main() {
   }
 
   const summary = summarize(cases);
-  const artifactDir = path.join(ROOT, 'artifacts', 'openclaw-semi-live-token-benchmark', nowStamp());
+  const artifactDir = path.join(ROOT, 'artifacts', ARTIFACT_SUBDIR, nowStamp());
   await fs.mkdir(artifactDir, { recursive: true });
   await fs.writeFile(path.join(artifactDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
   await fs.writeFile(path.join(artifactDir, 'cases.jsonl'), `${cases.map((row) => JSON.stringify(row)).join('\n')}\n`);

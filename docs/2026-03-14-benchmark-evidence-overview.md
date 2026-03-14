@@ -82,7 +82,30 @@ This proves:
 - Aionis is not limited to soft context shaping
 - hard-stop plus replay-driven control can also reduce token burn
 
-### 5. Completion uplift is now proven on the current three-slice benchmark
+### 5. Loader-backed semi-live token reduction also works
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+
+Current result:
+- baseline:
+  - `avg_total_tokens = 1836`
+  - `avg_executed_steps = 5.75`
+  - `completed_rate = 0.25`
+- treatment:
+  - `avg_total_tokens = 968.25`
+  - `avg_executed_steps = 2.25`
+  - `completed_rate = 0.25`
+  - `controlled_stop_rate = 0.25`
+  - `replay_dispatch_rate = 0.25`
+  - `handoff_store_rate = 0.5`
+  - `avg_broad_tool_calls = 0`
+
+This proves:
+- the token reduction result survives a real OpenClaw plugin install and discovery path
+- the adapter still reduces churn and token burn when executed from the installed plugin source path
+
+### 6. Completion uplift is now proven on the current three-slice benchmark
 
 Artifact:
 - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`

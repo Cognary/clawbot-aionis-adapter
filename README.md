@@ -55,6 +55,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 3. `npm run bench:openclaw-ab`
 4. `npm run bench:live-task`
 5. `npm run bench:semi-live-token`
+6. `npm run bench:loader-backed-semi-live-token`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 
@@ -66,6 +67,8 @@ It does not control planner-internal reasoning steps that never emit tools.
 
 Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-benchmark-evidence-overview.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-completion-benchmark.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
 
 ### Live-task A/B
 
@@ -135,6 +138,31 @@ This currently supports:
 
 - Aionis can also save tokens through hard-stop and replay-driven control
 - the adapter is not limited to soft context shaping
+
+### Loader-Backed Semi-Live Token Benchmark
+
+Current artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+
+Current result:
+
+- baseline:
+  - `avg_total_tokens = 1836`
+  - `avg_executed_steps = 5.75`
+  - `completed_rate = 0.25`
+- treatment:
+  - `avg_total_tokens = 968.25`
+  - `avg_executed_steps = 2.25`
+  - `completed_rate = 0.25`
+  - `controlled_stop_rate = 0.25`
+  - `replay_dispatch_rate = 0.25`
+  - `handoff_store_rate = 0.5`
+  - `avg_broad_tool_calls = 0`
+
+This currently supports:
+
+- the token reduction result survives a real OpenClaw install/discovery path
+- the adapter still reduces churn and token burn when executed from the installed plugin source path
 
 ### Completion-Oriented Benchmark
 
