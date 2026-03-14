@@ -1,0 +1,204 @@
+{
+  "benchmark": "openclaw_multi_agent_issue10864_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "scenarios": [
+    {
+      "id": "glm_issue10864_planner_executor_reviewer",
+      "kind": "issue10864_process_leak",
+      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "#10864",
+      "issue_url": "https://github.com/openclaw/openclaw/issues/10864",
+      "issue_statement": "Investigate orphan openclaw-completion process accumulation, identify the most likely cleanup or lifecycle boundary responsible for the leak, propose a minimal fix or guard, define a focused regression validation path, and have a reviewer verify the patch targets the right boundary.",
+      "max_steps": {
+        "planner": 4,
+        "executor": 3,
+        "reviewer": 2
+      },
+      "expected": {
+        "boundary_files": [
+          "docs/gateway/background-process.md",
+          "scripts/recover-orphaned-processes.sh",
+          "src/entry.ts",
+          "src/node-host/invoke.ts"
+        ],
+        "validation_files": [
+          "docs/gateway/background-process.md",
+          "scripts/recover-orphaned-processes.sh",
+          "src/infra/restart-stale-pids.ts",
+          "src/infra/restart-stale-pids.test.ts"
+        ],
+        "boundary_terms": [
+          "entry.ts",
+          "invoke.ts",
+          "node-host/invoke.ts",
+          "child-process bridge",
+          "cleanup boundary",
+          "orphan"
+        ],
+        "validation_terms": [
+          "recover-orphaned",
+          "openclaw-completion",
+          "child process cleanup",
+          "orphan",
+          "SIGTERM",
+          "stale pid"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "multi-agent-bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 1,
+        "maxSameToolStreak": 2,
+        "maxDuplicateObservationStreak": 2,
+        "maxNoProgressStreak": 2,
+        "maxEstimatedTokenBurn": 24000
+      },
+      "aionis": {
+        "planner": {
+          "context_text": "Start with background-process.md and recover-orphaned-processes.sh, then inspect entry.ts and node-host/invoke.ts. Avoid rediscovery.",
+          "selection_map": {
+            "repo-grep-broad": "read-background-doc"
+          }
+        },
+        "executor": {
+          "context_text": "Use the planner handoff. Stay on entry.ts and node-host/invoke.ts. Validate with recover-orphaned-processes.sh or stale-pid paths only.",
+          "selection_map": {
+            "source-grep-broad": "read-node-invoke",
+            "validate-broad": "focused-signal-scan"
+          }
+        },
+        "reviewer": {
+          "context_text": "Review only whether the fix targets the cleanup boundary and whether validation is focused.",
+          "selection_map": {}
+        }
+      },
+      "stages": {
+        "planner": {
+          "prompt": "You are the planner. Localize the leak boundary, identify the smallest set of target files, and hand off a concise investigation plan to the executor.",
+          "toolset": [
+            {
+              "name": "repo-grep-broad",
+              "description": "Broad repo-wide search across docs, scripts, src, and tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"openclaw-completion|orphan|background process|child-process bridge|SIGTERM|SIGKILL|spawn\\(\" docs scripts src test | sed -n '1,140p'"
+              }
+            },
+            {
+              "name": "read-background-doc",
+              "description": "Read the background process doc that describes child-process bridge expectations.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/background-process.md"
+              }
+            },
+            {
+              "name": "read-recovery-script",
+              "description": "Read the orphan recovery script to see how the repo currently diagnoses the problem.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' scripts/recover-orphaned-processes.sh"
+              }
+            },
+            {
+              "name": "read-entry",
+              "description": "Read the CLI entry respawn path where a child-process bridge is attached.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,180p' src/entry.ts"
+              }
+            },
+            {
+              "name": "read-node-invoke",
+              "description": "Read the node-host invoke path where spawned processes are managed.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,320p' src/node-host/invoke.ts"
+              }
+            }
+          ]
+        },
+        "executor": {
+          "prompt": "You are the executor. Use the planner output to propose the smallest viable fix or guard and a focused validation path. Do not invent broad test sweeps unless the repo evidence forces you to.",
+          "toolset": [
+            {
+              "name": "source-grep-broad",
+              "description": "Broad scan for process lifecycle and signal handling paths across the codebase.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|spawn\\(|recover-orphaned-processes|background process\" src scripts docs | sed -n '1,160p'"
+              }
+            },
+            {
+              "name": "read-node-invoke",
+              "description": "Read the node-host invoke path where subprocess lifecycle may leak.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,320p' src/node-host/invoke.ts"
+              }
+            },
+            {
+              "name": "read-entry",
+              "description": "Read the CLI entry wrapper and child-process bridge attachment.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,180p' src/entry.ts"
+              }
+            },
+            {
+              "name": "read-recovery-script",
+              "description": "Read the orphan recovery script for expected failure shape and naming.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' scripts/recover-orphaned-processes.sh"
+              }
+            },
+            {
+              "name": "read-restart-stale-test",
+              "description": "Read the stale pid tests for a focused validation direction.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' src/infra/restart-stale-pids.test.ts"
+              }
+            },
+            {
+              "name": "validate-broad",
+              "description": "Broad validation scan over signals and process cleanup references.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"SIGTERM|SIGKILL|attachChildProcessBridge|orphan|background process\" docs/gateway/background-process.md scripts/recover-orphaned-processes.sh src/entry.ts src/node-host/invoke.ts src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "focused-signal-scan",
+              "description": "Focused validation scan over the likely cleanup boundary and stale pid helpers.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|orphan\" src/entry.ts src/node-host/invoke.ts scripts/recover-orphaned-processes.sh src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,200p'"
+              }
+            }
+          ]
+        },
+        "reviewer": {
+          "prompt": "You are the reviewer. Decide whether the executor's proposed fix really targets the right cleanup boundary and whether the validation path is focused and credible.",
+          "toolset": [
+            {
+              "name": "read-planner-artifact",
+              "description": "Read the saved planner handoff artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/planner.json"
+              }
+            },
+            {
+              "name": "read-executor-artifact",
+              "description": "Read the saved executor output artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/executor.json"
+              }
+            },
+            {
+              "name": "focused-signal-scan",
+              "description": "Read the focused boundary scan covering child-process bridge and stale pid cleanup references.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|orphan\" src/entry.ts src/node-host/invoke.ts scripts/recover-orphaned-processes.sh src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,200p'"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -38,7 +38,8 @@
     "smoke:gateway-backed-feasibility": "python3 scripts/openclaw-gateway-backed-feasibility.py",
     "smoke:adapter-activity": "python3 scripts/openclaw-adapter-activity-probe.py",
     "bench:google-runtime": "python3 scripts/openclaw-google-runtime-benchmark.py",
-    "bench:google-runtime-ab": "python3 scripts/openclaw-google-runtime-benchmark.py --repeats 5"
+    "bench:google-runtime-ab": "python3 scripts/openclaw-google-runtime-benchmark.py --repeats 5",
+    "bench:multi-agent": "npm run build && node scripts/multi-agent-benchmark.mjs"
   },
   "exports": {
     ".": "./dist/index.js",
