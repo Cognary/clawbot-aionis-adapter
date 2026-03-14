@@ -88,6 +88,7 @@ Evidence:
 - [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
 - [One-prompt multi-agent summary: issue #10864](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
 - [One-prompt multi-agent summary: dashboard auth drift](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
+- [One-prompt multi-agent summary: markdown fallback](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314130932/summary.json)
 - [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 - [Google runtime case study](2026-03-14-openclaw-google-runtime-case-study.md)
 - [One-prompt multi-agent benchmark](2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
@@ -97,12 +98,18 @@ Headline results:
 - completion benchmark: baseline `completed_rate = 0`, treatment `completed_rate = 1`
 - one-prompt multi-agent issue `#10864`: baseline `completed_rate = 0`, treatment `completed_rate = 1`
 - one-prompt multi-agent dashboard auth drift: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+- one-prompt multi-agent markdown fallback: baseline `completed_rate = 0.3333`, treatment `completed_rate = 1` (`supporting slice`)
 - repeated Google runtime-backed A/B: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 
 What this proves:
 
 - on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices, Aionis improves completion
 - this is no longer only harness-only evidence; there is also repeated runtime-backed completion evidence on a second provider path
+
+Important boundary:
+
+- the strongest one-prompt multi-agent claims still come from `#10864` and dashboard auth drift
+- markdown fallback is positive evidence, but weaker, so it should be treated as supporting evidence rather than headline evidence
 
 ### 5. The adapter is active on real OpenClaw runtime paths
 

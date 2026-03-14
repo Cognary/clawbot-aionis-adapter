@@ -51,6 +51,7 @@ Headline results:
 - **One-prompt multi-agent A/B**:
   - issue `#10864`: baseline `completed_rate = 0`, treatment `completed_rate = 1`
   - dashboard auth drift: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+  - markdown fallback: baseline `completed_rate = 0.3333`, treatment `completed_rate = 1` (`supporting slice`)
 - **Repeated Google runtime-backed A/B**: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 
 Supporting docs:
@@ -73,6 +74,7 @@ Public evidence files:
 - [Completion benchmark summary](evidence/openclaw-completion-benchmark/20260314072335/summary.json)
 - [One-prompt multi-agent summary: issue #10864](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
 - [One-prompt multi-agent summary: dashboard auth drift](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
+- [One-prompt multi-agent summary: markdown fallback](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314130932/summary.json)
 - [One-prompt multi-agent case study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 

@@ -79,6 +79,7 @@ Evidence:
 - [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
 - [One-prompt multi-agent summary: issue #10864](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
 - [One-prompt multi-agent summary: dashboard auth drift](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
+- [One-prompt multi-agent summary: markdown fallback](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314130932/summary.json)
 - [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 
 Current signal:
@@ -92,6 +93,16 @@ Interpretation:
 
 - Aionis improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices
 - there is now repeated runtime-backed completion evidence, not only harness-only evidence
+
+Supporting signal:
+
+- one-prompt multi-agent markdown fallback: `0.3333 -> 1`
+
+Interpretation:
+
+- this is positive completion evidence
+- but it is weaker than the two strongest one-prompt multi-agent slices
+- it should support the overall completion story, not define the headline claim by itself
 
 ### 5. Real runtime activity is proven
 
