@@ -163,6 +163,32 @@ This proves a narrower fact than a full runtime-backed benchmark:
 
 This raises the evidence level even if the provider later rate-limits the run.
 
+### 9. A stable second-provider runtime-backed completion slice now exists
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314083138/summary.json`
+
+Current result:
+- `provider = google`
+- `model = gemini-3-flash-preview`
+- baseline:
+  - `payload_text = UNKNOWN`
+  - `completed = false`
+  - `total_tokens = 4310`
+- treatment:
+  - `payload_text = resume-alpha-19`
+  - `completed = true`
+  - `total_tokens = 4311`
+  - `mock_paths = ["/v1/memory/context/assemble"]`
+
+This proves:
+- a real OpenClaw local agent turn can complete a provider-backed task with the installed adapter enabled
+- adapter-driven externalized context can lift completion on a runtime-backed path
+- the current runtime-backed evidence is no longer only a feasibility probe
+
+This does not prove:
+- token reduction on this slice
+
 ## What Is Not Yet Proven
 
 ### 1. Planner-internal reasoning control
@@ -179,6 +205,7 @@ Not proven and not claimed.
 
 Current strongest provider-backed evidence is:
 - `GLM-5`
+- `gemini-3-flash-preview`
 
 ### 3. A full gateway-backed baseline vs treatment benchmark is not yet complete
 

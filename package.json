@@ -23,7 +23,8 @@
     "bench:completion": "npm run build && node scripts/completion-benchmark.mjs",
     "bench:loader-backed-semi-live-token": "python3 scripts/openclaw-loader-backed-semi-live-benchmark.py",
     "smoke:gateway-backed-feasibility": "python3 scripts/openclaw-gateway-backed-feasibility.py",
-    "smoke:adapter-activity": "python3 scripts/openclaw-adapter-activity-probe.py"
+    "smoke:adapter-activity": "python3 scripts/openclaw-adapter-activity-probe.py",
+    "bench:google-runtime": "python3 scripts/openclaw-google-runtime-benchmark.py"
   },
   "exports": {
     ".": "./dist/index.js",

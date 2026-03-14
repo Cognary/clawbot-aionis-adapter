@@ -58,6 +58,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 6. `npm run bench:loader-backed-semi-live-token`
 7. `npm run smoke:gateway-backed-feasibility`
 8. `npm run smoke:adapter-activity`
+9. `npm run bench:google-runtime`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 
@@ -74,6 +75,7 @@ Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-benchmark.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
 ### Live-task A/B
@@ -212,6 +214,31 @@ This helps separate:
 
 - plugin activity proof
 - from the still-open provider-side rate-limit blocker on the live runtime path
+
+### Google Runtime-Backed Completion Slice
+
+Current artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314083138/summary.json`
+
+Current result:
+
+- provider:
+  - `google/gemini-3-flash-preview`
+- baseline:
+  - `payload_text = UNKNOWN`
+  - `completed = false`
+  - `total_tokens = 4310`
+- treatment:
+  - `payload_text = resume-alpha-19`
+  - `completed = true`
+  - `total_tokens = 4311`
+  - `mock_paths = ["/v1/memory/context/assemble"]`
+
+This currently supports:
+
+- a real OpenClaw local agent turn can complete a provider-backed task with the installed adapter enabled
+- adapter-driven externalized context can lift completion on a runtime-backed path
+- the repo now has a stable second-provider runtime slice even while the `zai/glm-5` path remains rate-limited
 
 ### Completion-Oriented Benchmark
 
