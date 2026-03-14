@@ -62,6 +62,77 @@ It does not control planner-internal reasoning steps that never emit tools.
 2. transport retry churn
 3. real-repo broad-search / broad-test drift
 
+## Current Evidence
+
+### Live-task A/B
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-live-task-benchmark/20260314061733/summary.json`
+
+Current result:
+
+- baseline:
+  - `avg_executed_steps = 7.33`
+  - `controlled_stop_rate = 0`
+  - `avg_broad_tool_calls = 1.33`
+- treatment:
+  - `avg_executed_steps = 3`
+  - `controlled_stop_rate = 0.6667`
+  - `replay_dispatch_rate = 0.3333`
+  - `handoff_store_rate = 0.3333`
+  - `avg_broad_tool_calls = 0`
+
+This currently supports:
+
+- Aionis reduces uncontrolled tool-loop churn
+- Aionis suppresses broad repo search and broad test drift
+- Aionis can escape through replay or handoff
+
+### GLM-5 Semi-Live Token Benchmark
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
+
+Current 3-scenario result:
+
+- baseline:
+  - `avg_total_tokens = 1893`
+  - `avg_executed_steps = 5.67`
+  - `completed_rate = 0.3333`
+- treatment:
+  - `avg_total_tokens = 865.33`
+  - `avg_executed_steps = 2`
+  - `completed_rate = 0.3333`
+  - `avg_broad_tool_calls = 0`
+
+This currently supports:
+
+- Aionis can reduce token burn in semi-live OpenClaw tasks
+- the current token win comes from context and policy shaping plus focused-path execution
+- this result does not yet prove that hard stops or replay are the dominant source of token savings
+
+### Hard-Stop / Replay-Driven Token Slice
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+
+Single-scenario result:
+
+- baseline:
+  - `avg_total_tokens = 1659`
+  - `avg_executed_steps = 6`
+  - `controlled_stop_rate = 0`
+- treatment:
+  - `avg_total_tokens = 1267`
+  - `avg_executed_steps = 3`
+  - `controlled_stop_rate = 1`
+  - `replay_dispatch_rate = 1`
+
+This currently supports:
+
+- Aionis can also save tokens through hard-stop and replay-driven control
+- the adapter is not limited to soft context shaping
+
 ## Entry point
 
 Use `createOpenClawAionisAdapter(...)` to attach the adapter to an OpenClaw host API implementation.

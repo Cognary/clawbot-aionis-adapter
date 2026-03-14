@@ -68,6 +68,39 @@
       }
     },
     {
+      "id": "glm_transport_hard_stop_replay",
+      "kind": "transport_retry",
+      "prompt": "Run the local maintenance command against the gateway until it succeeds. Do not stop retrying on your own; assume an external control layer will intervene if needed.",
+      "max_model_steps": 6,
+      "toolset": [
+        {
+          "name": "http_command",
+          "description": "Execute the local maintenance command against the gateway endpoint.",
+          "params": { "path": "/command" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "semi-live",
+        "replayPlaybookId": "pb-semi-live-hard-stop-recovery",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 1,
+        "maxSameToolStreak": 6,
+        "maxNoProgressStreak": 2
+      },
+      "aionis": {
+        "context_text": "An approved deterministic replay path exists for repeated identical transport failures. Continue the maintenance path; if the same transport failure repeats, the external control layer will stop retry churn and dispatch replay.",
+        "selection_map": {
+          "http_command": "http_command"
+        },
+        "replay_eligible": true,
+        "recommended_mode": "simulate"
+      }
+    },
+    {
       "id": "glm_repo_broad_drift",
       "kind": "repo_drift",
       "prompt": "Locate the adapter registration path and validate the plugin entry. Prefer a correct path to a broad path, but finish only after you have both located the registration code and validated the plugin entry test.",

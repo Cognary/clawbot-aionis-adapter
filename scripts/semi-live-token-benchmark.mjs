@@ -15,6 +15,7 @@ const API_KEY = process.env.ZHIPU_API_KEY ?? process.env.GLM_API_KEY;
 const MODEL = process.env.GLM_MODEL ?? 'glm-5';
 const MAX_GLM_RETRIES = Number(process.env.GLM_MAX_RETRIES ?? 3);
 const GLM_REQUEST_TIMEOUT_MS = Number(process.env.GLM_REQUEST_TIMEOUT_MS ?? 30000);
+const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
 
 if (!API_KEY) {
   console.error('Missing ZHIPU_API_KEY or GLM_API_KEY');
@@ -594,11 +595,17 @@ function summarize(cases) {
 
 async function main() {
   const fixture = JSON.parse(await fs.readFile(FIXTURE_PATH, 'utf8'));
+  const scenarios = SCENARIO_FILTER
+    ? fixture.scenarios.filter((scenario) => scenario.id === SCENARIO_FILTER)
+    : fixture.scenarios;
+  if (scenarios.length === 0) {
+    throw new Error(`No scenarios matched BENCH_SCENARIO_ID=${SCENARIO_FILTER}`);
+  }
   const cases = [];
   const tokenBreakdown = [];
   const rawRunMetadata = [];
 
-  for (const scenario of fixture.scenarios) {
+  for (const scenario of scenarios) {
     const baseline = await runScenario({ scenario, mode: 'baseline' });
     const treatment = await runScenario({ scenario, mode: 'treatment' });
     cases.push(baseline, treatment);
