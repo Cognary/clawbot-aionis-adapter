@@ -1,0 +1,30 @@
+{
+  "benchmark": "openclaw_one_prompt_multi_agent_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "repetitions": 3,
+  "cases": 3,
+  "baseline": {
+    "completed_rate": 0,
+    "avg_total_tokens": 4044,
+    "avg_tool_call_count": 4,
+    "avg_broad_tool_call_count": 1,
+    "avg_rediscovery_reads": 0,
+    "tokens_per_completed_task": null
+  },
+  "treatment": {
+    "completed_rate": 1,
+    "avg_total_tokens": 7480.666666666667,
+    "avg_tool_call_count": 5,
+    "avg_broad_tool_call_count": 0,
+    "avg_rediscovery_reads": 0,
+    "avg_handoff_store_count": 4,
+    "avg_context_assemble_count": 4,
+    "tokens_per_completed_task": 7480.666666666667
+  },
+  "delta": {
+    "completion_gain": 1,
+    "avg_token_delta": 3436.666666666667,
+    "avg_rediscovery_delta": 0
+  }
+}

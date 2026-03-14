@@ -9,7 +9,7 @@ Package: `@aionis/openclaw-adapter`
 
 The current public evidence supports this product claim:
 
-**Aionis reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, and handoff-resume slices, and is active on real OpenClaw runtime paths.**
+**Aionis reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices, and is active on real OpenClaw runtime paths.**
 
 That is the right claim to make today.
 
@@ -86,17 +86,22 @@ What this proves:
 Evidence:
 
 - [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [One-prompt multi-agent summary: issue #10864](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
+- [One-prompt multi-agent summary: dashboard auth drift](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
 - [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 - [Google runtime case study](2026-03-14-openclaw-google-runtime-case-study.md)
+- [One-prompt multi-agent benchmark](2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
 
 Headline results:
 
 - completion benchmark: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+- one-prompt multi-agent issue `#10864`: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+- one-prompt multi-agent dashboard auth drift: baseline `completed_rate = 0`, treatment `completed_rate = 1`
 - repeated Google runtime-backed A/B: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 
 What this proves:
 
-- on the current replay, focused-repo, and handoff-resume slices, Aionis improves completion
+- on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices, Aionis improves completion
 - this is no longer only harness-only evidence; there is also repeated runtime-backed completion evidence on a second provider path
 
 ### 5. The adapter is active on real OpenClaw runtime paths

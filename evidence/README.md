@@ -6,6 +6,7 @@ Included here:
 
 1. `summary.json` files for published benchmark slices
 2. `cases.jsonl` files only where the docs explicitly discuss per-case results
+3. one-prompt multi-agent A/B evidence for the published completion-oriented slices
 
 Not included here:
 

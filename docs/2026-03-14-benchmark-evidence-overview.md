@@ -77,16 +77,20 @@ Interpretation:
 Evidence:
 
 - [Completion benchmark summary](../evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [One-prompt multi-agent summary: issue #10864](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
+- [One-prompt multi-agent summary: dashboard auth drift](../evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
 - [Google runtime benchmark summary](../evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 
 Current signal:
 
 - completion benchmark: `0 -> 1`
+- one-prompt multi-agent issue `#10864`: `0 -> 1`
+- one-prompt multi-agent dashboard auth drift: `0 -> 1`
 - repeated Google runtime-backed A/B: `0 -> 0.8`
 
 Interpretation:
 
-- Aionis improves completion on the current replay, focused-repo, and handoff-resume slices
+- Aionis improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices
 - there is now repeated runtime-backed completion evidence, not only harness-only evidence
 
 ### 5. Real runtime activity is proven
@@ -159,4 +163,4 @@ Current status:
 
 The strongest accurate public statement is:
 
-**Aionis gives OpenClaw an execution-control layer that reduces uncontrolled tool-loop churn, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, and handoff-resume slices, and is proven active on real OpenClaw runtime paths.**
+**Aionis gives OpenClaw an execution-control layer that reduces uncontrolled tool-loop churn, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices, and is proven active on real OpenClaw runtime paths.**

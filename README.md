@@ -39,7 +39,7 @@ Current benchmark evidence supports four concrete claims:
 
 1. **Tool-loop churn goes down**
 2. **Token burn goes down on benchmarked slices**
-3. **Completion goes up on current replay, focused-repo, and handoff-resume slices**
+3. **Completion goes up on current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices**
 4. **The adapter is active on real OpenClaw runtime paths, not just mock harnesses**
 
 Headline results:
@@ -48,6 +48,9 @@ Headline results:
 - **GLM-5 semi-live token benchmark**: average total tokens dropped from `1893` to `865.33`
 - **Hard-stop / replay token slice**: average total tokens dropped from `1659` to `1267`, with `controlled_stop_rate = 1`
 - **Completion benchmark**: baseline `completed_rate = 0`, treatment `completed_rate = 1` on the current benchmark slices
+- **One-prompt multi-agent A/B**:
+  - issue `#10864`: baseline `completed_rate = 0`, treatment `completed_rate = 1`
+  - dashboard auth drift: baseline `completed_rate = 0`, treatment `completed_rate = 1`
 - **Repeated Google runtime-backed A/B**: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 
 Supporting docs:
@@ -55,6 +58,7 @@ Supporting docs:
 - [Benchmark Evidence Overview](docs/2026-03-14-benchmark-evidence-overview.md)
 - [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
 - [Completion Benchmark](docs/2026-03-14-openclaw-completion-benchmark.md)
+- [One-Prompt Multi-Agent Benchmark](docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
 - [Loader-Backed Semi-Live Token Benchmark](docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md)
 - [Google Runtime Benchmark](docs/2026-03-14-openclaw-google-runtime-benchmark.md)
 - [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
@@ -66,6 +70,8 @@ Public evidence files:
 - [GLM-5 semi-live token summary](evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json)
 - [Hard-stop / replay token summary](evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json)
 - [Completion benchmark summary](evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [One-prompt multi-agent summary: issue #10864](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
+- [One-prompt multi-agent summary: dashboard auth drift](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 
 ## 5-Minute Quickstart
@@ -194,7 +200,7 @@ The current evidence is strong on:
 
 - tool-loop control
 - token reduction on benchmarked slices
-- completion uplift on current benchmark slices
+- completion uplift on current benchmark slices, including one-prompt multi-agent workflows
 - real OpenClaw runtime activity
 
 ## Verification and Benchmark Commands
@@ -222,3 +228,4 @@ Benchmarks:
 - [Changelog](CHANGELOG.md)
 - [Benchmark Evidence Overview](docs/2026-03-14-benchmark-evidence-overview.md)
 - [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
+- [One-Prompt Multi-Agent Benchmark](docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)

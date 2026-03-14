@@ -202,6 +202,206 @@
           }
         }
       }
+    },
+    {
+      "id": "glm_dashboard_auth_drift_one_prompt_workflow",
+      "kind": "dashboard_auth_drift_one_prompt_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "control-ui-auth-drift",
+      "issue_url": "https://github.com/openclaw/openclaw/pull/37382",
+      "top_level_prompt": "In the OpenClaw repo, investigate the Control UI unauthorized/AUTH_TOKEN_MISMATCH drift problem that can appear after restart or token rotation, isolate the exact auth boundary between the shared gateway token and cached device token, propose the smallest viable guard or remediation, define a focused regression validation path, and return a final reviewer verdict on whether the plan is credible.",
+      "agents": [
+        {
+          "name": "scout",
+          "goal": "Identify the exact Control UI auth boundary and the smallest set of target docs/code paths.",
+          "max_steps": 3,
+          "toolset": [
+            {
+              "name": "broad-dashboard-auth-scan",
+              "description": "Broad scan across dashboard auth docs, UI code, tests, and changelog entries.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|unauthorized|1008|sessionStorage|device token|gateway.auth.token|token drift|dashboard\" CHANGELOG.md docs/web/dashboard.md docs/gateway/troubleshooting.md docs/cli/devices.md docs/cli/dashboard.md ui/src/ui/gateway.ts ui/src/ui/views/overview.node.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-dashboard-doc",
+              "description": "Read the dashboard auth doc, including token handling and unauthorized guidance.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,180p' docs/web/dashboard.md"
+              }
+            },
+            {
+              "name": "read-gateway-troubleshooting",
+              "description": "Read troubleshooting entries for AUTH_TOKEN_MISMATCH and dashboard connectivity.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '120,180p' docs/gateway/troubleshooting.md"
+              }
+            },
+            {
+              "name": "read-ui-gateway",
+              "description": "Read the browser gateway client auth/reconnect logic.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' ui/src/ui/gateway.ts"
+              }
+            },
+            {
+              "name": "read-changelog-slice",
+              "description": "Read the changelog slice that documents auth token separation and token drift repair.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '480,510p' CHANGELOG.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "fixer",
+          "goal": "Propose the smallest viable guard or remediation using the scout handoff instead of rediscovering the repo.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-auth-scan",
+              "description": "Broad scan across dashboard auth paths.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|sessionStorage|device token|gateway.auth.token|retry|unauthorized\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/cli/devices.md ui/src/ui/gateway.ts ui/src/ui/views/overview.node.test.ts CHANGELOG.md | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-ui-gateway",
+              "description": "Read the browser gateway client auth/reconnect logic.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' ui/src/ui/gateway.ts"
+              }
+            },
+            {
+              "name": "read-dashboard-doc",
+              "description": "Read the dashboard auth guidance again for the remediation boundary.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,140p' docs/web/dashboard.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "validator",
+          "goal": "Define a focused regression validation path without broad UI/auth sweeps.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-validation-scan",
+              "description": "Broad validation scan across dashboard auth docs and UI auth code.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|sessionStorage|device token|unauthorized|1008|gateway.auth.token|pairing required\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/cli/devices.md ui/src/ui/gateway.ts ui/src/ui/views/overview.node.test.ts CHANGELOG.md | sed -n '1,240p'"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Focused validation scan on the dashboard auth docs and browser auth hint logic.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|sessionStorage|device token|unauthorized|required|failed\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/cli/devices.md ui/src/ui/gateway.ts ui/src/ui/views/overview.node.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-devices-checklist",
+              "description": "Read the token drift recovery checklist reference.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '120,170p' docs/cli/devices.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "reviewer",
+          "goal": "Review whether the auth boundary, remediation, and validation plan are credible and focused.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "read-scout-artifact",
+              "description": "Read the scout artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/scout.json"
+              }
+            },
+            {
+              "name": "read-fixer-artifact",
+              "description": "Read the fixer artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/fixer.json"
+              }
+            },
+            {
+              "name": "read-validator-artifact",
+              "description": "Read the validator artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/validator.json"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Read the focused auth validation scan for reviewer confirmation.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|sessionStorage|device token|unauthorized|required|failed\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/cli/devices.md ui/src/ui/gateway.ts ui/src/ui/views/overview.node.test.ts | sed -n '1,220p'"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "shared gateway token",
+          "device token",
+          "sessionStorage",
+          "ui/src/ui/gateway.ts",
+          "docs/web/dashboard.md",
+          "AUTH_TOKEN_MISMATCH"
+        ],
+        "validation_terms": [
+          "AUTH_TOKEN_MISMATCH",
+          "gateway.auth.token",
+          "token drift recovery checklist",
+          "Control UI settings",
+          "sessionStorage",
+          "unauthorized"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "one-prompt-multi-agent",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 1,
+        "maxDuplicateObservationStreak": 1,
+        "maxNoProgressStreak": 1,
+        "maxEstimatedTokenBurn": 22000
+      },
+      "aionis": {
+        "scout": {
+          "context_text": "Start with docs/web/dashboard.md and docs/gateway/troubleshooting.md, then confirm the browser auth boundary in ui/src/ui/gateway.ts. Avoid repo-wide rediscovery.",
+          "selection_map": {
+            "broad-dashboard-auth-scan": "read-dashboard-doc"
+          }
+        },
+        "fixer": {
+          "context_text": "Use the scout handoff. Stay on shared gateway token vs cached device token separation and the browser reconnect logic in ui/src/ui/gateway.ts. Do not restart broad search.",
+          "selection_map": {
+            "broad-auth-scan": "read-ui-gateway"
+          }
+        },
+        "validator": {
+          "context_text": "Use the fixer handoff. Focus on dashboard unauthorized guidance, AUTH_TOKEN_MISMATCH handling, and the token drift recovery checklist. Avoid broad validation scans.",
+          "selection_map": {
+            "broad-validation-scan": "focused-validation-scan"
+          }
+        },
+        "reviewer": {
+          "context_text": "Review only whether the auth boundary, remediation, and focused validation are credible. Prefer prior artifacts over rediscovery.",
+          "selection_map": {
+            "focused-validation-scan": "read-validator-artifact"
+          }
+        }
+      }
     }
   ]
 }
