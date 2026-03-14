@@ -117,12 +117,14 @@ Mitigation:
 1. use a temporary benchmark profile
 2. patch the local config directly for `GLM-5`
 
-Current feasibility probe:
+Current feasibility result:
 
-1. `openclaw --dev agent --local --session-id bench-1 --message 'Reply with ok only.' --json`
+1. a patched benchmark profile now reaches `provider = zai` and `model = glm-5`
 2. current blocker:
-   - the default agent profile still resolves to provider `anthropic`
-   - without a patched benchmark profile, OpenClaw fails before model execution
+   - the runtime-backed local agent path is now failing at provider-side rate limiting
+   - this happens before a stable tool-loop comparison can complete
+3. reference:
+   - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
 
 ### 2. Usage extraction
 

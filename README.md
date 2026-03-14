@@ -56,6 +56,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 4. `npm run bench:live-task`
 5. `npm run bench:semi-live-token`
 6. `npm run bench:loader-backed-semi-live-token`
+7. `npm run smoke:gateway-backed-feasibility`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 
@@ -70,6 +71,7 @@ Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-completion-benchmark.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
 ### Live-task A/B
@@ -165,6 +167,24 @@ This currently supports:
 
 - the token reduction result survives a real OpenClaw install/discovery path
 - the adapter still reduces churn and token burn when executed from the installed plugin source path
+
+### Gateway-Backed Runtime Feasibility
+
+Current artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/summary.json`
+
+Current result:
+
+- `provider = zai`
+- `model = glm-5`
+- `runtime_path_reached_model = true`
+- `outcome = rate_limited_timeout`
+
+This currently supports:
+
+- the real `openclaw agent --local` runtime path now reaches `zai/glm-5`
+- the earlier Anthropic default-model blocker is resolved
+- the remaining blocker for a full gateway-backed benchmark is provider-side runtime rate limiting
 
 ### Completion-Oriented Benchmark
 

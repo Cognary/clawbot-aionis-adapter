@@ -127,6 +127,22 @@ This proves:
 - Aionis can improve completion on tight-budget focused real-repo tasks
 - Aionis can improve completion on interrupted handoff-resume tasks
 
+### 7. Gateway-backed runtime feasibility is now proven
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/summary.json`
+
+Current result:
+- `provider = zai`
+- `model = glm-5`
+- `runtime_path_reached_model = true`
+- `outcome = rate_limited_timeout`
+
+This proves:
+- the real OpenClaw local agent runtime can be forced onto `zai/glm-5`
+- the earlier Anthropic default-model blocker is gone
+- the remaining blocker for a stronger gateway-backed benchmark is provider-side runtime rate limiting
+
 ## What Is Not Yet Proven
 
 ### 1. Planner-internal reasoning control
@@ -143,6 +159,14 @@ Not proven and not claimed.
 
 Current strongest provider-backed evidence is:
 - `GLM-5`
+
+### 3. A full gateway-backed baseline vs treatment benchmark is not yet complete
+
+Not proven and not claimed.
+
+Reason:
+- the runtime-backed path now reaches `zai/glm-5`
+- but the current live agent turn still rate-limits before a stable baseline vs treatment comparison can finish
 
 ## Current Best Public Claim
 
