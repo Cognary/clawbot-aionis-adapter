@@ -59,6 +59,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 7. `npm run smoke:gateway-backed-feasibility`
 8. `npm run smoke:adapter-activity`
 9. `npm run bench:google-runtime`
+10. `npm run bench:google-runtime-ab`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 
@@ -215,30 +216,35 @@ This helps separate:
 - plugin activity proof
 - from the still-open provider-side rate-limit blocker on the live runtime path
 
-### Google Runtime-Backed Completion Slice
+### Google Runtime-Backed Completion A/B
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314083138/summary.json`
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 Current result:
 
 - provider:
   - `google/gemini-3-flash-preview`
 - baseline:
-  - `payload_text = UNKNOWN`
-  - `completed = false`
-  - `total_tokens = 4310`
+  - `completed_rate = 0`
+  - `avg_total_tokens = 4319`
+  - `timed_out_count = 1`
 - treatment:
-  - `payload_text = resume-alpha-19`
-  - `completed = true`
-  - `total_tokens = 4311`
-  - `mock_paths = ["/v1/memory/context/assemble"]`
+  - `completed_rate = 0.8`
+  - `avg_total_tokens = 4287`
+  - `avg_mock_request_count = 1`
+  - `timed_out_count = 0`
+- delta:
+  - `completion_gain = +0.8`
+  - `avg_token_delta = -26.5`
+  - `token_win_rate = 0.5`
+  - `token_pair_count = 4`
 
 This currently supports:
 
-- a real OpenClaw local agent turn can complete a provider-backed task with the installed adapter enabled
-- adapter-driven externalized context can lift completion on a runtime-backed path
-- the repo now has a stable second-provider runtime slice even while the `zai/glm-5` path remains rate-limited
+- a real OpenClaw local agent path now has a repeated `baseline vs adapter` runtime-backed completion benchmark
+- adapter-driven externalized context lifts completion on a stable provider-backed path
+- this repo no longer depends only on the `zai/glm-5` feasibility line for runtime evidence
 
 ### Completion-Oriented Benchmark
 

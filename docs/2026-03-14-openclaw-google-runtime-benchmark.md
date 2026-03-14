@@ -5,7 +5,7 @@ Repo: `@aionis/openclaw-aionis-adapter`
 
 ## Goal
 
-Provide one stable runtime-backed live benchmark on a provider that is not currently blocked by the `zai/glm-5` rate-limit path.
+Provide a repeated runtime-backed live benchmark on a provider that is not currently blocked by the `zai/glm-5` rate-limit path.
 
 This benchmark uses:
 
@@ -29,7 +29,7 @@ Expected token:
 ## Artifact
 
 - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/summary.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314083138/summary.json`
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 ## Result
 
@@ -37,37 +37,44 @@ Provider:
 
 - `google/gemini-3-flash-preview`
 
+Repetitions:
+
+- `5`
+
 Baseline:
 
-- `payload_text = UNKNOWN`
-- `completed = false`
-- `total_tokens = 4310`
+- `completed_rate = 0`
+- `avg_total_tokens = 4319`
+- `timed_out_count = 1`
 
 Treatment:
 
-- `payload_text = resume-alpha-19`
-- `completed = true`
-- `total_tokens = 4311`
-- `mock_paths = ["/v1/memory/context/assemble"]`
+- `completed_rate = 0.8`
+- `avg_total_tokens = 4287`
+- `avg_mock_request_count = 1`
+- `timed_out_count = 0`
 
 Delta:
 
-- `completion_gain = +1`
-- `token_delta = +1`
+- `completion_gain = +0.8`
+- `avg_token_delta = -26.5`
+- `token_win_rate = 0.5`
+- `token_pair_count = 4`
 
 ## What this proves
 
-This is now the strongest runtime-backed live slice in the repo.
+This is now the strongest stable runtime-backed completion benchmark in the repo.
 
 It proves:
 
-1. a real OpenClaw local agent turn can complete a live provider-backed task with the installed adapter enabled
+1. a real OpenClaw local agent path can be measured in repeated `baseline vs adapter` runs
 2. adapter-driven externalized context can lift completion on that live runtime path
 3. this is not only a loader-backed or harness-only result
+4. this repo now has stable runtime-backed evidence on a second provider even while the `zai/glm-5` path remains rate-limited
 
 ## What this does not prove
 
-1. token reduction on this slice
+1. strong token reduction on this slice
 2. planner-internal reasoning control
 3. universal completion uplift across all runtime tasks
 4. that the `zai/glm-5` live runtime rate-limit blocker is gone

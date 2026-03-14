@@ -5,13 +5,13 @@ Repo: `@aionis/openclaw-aionis-adapter`
 
 ## One-line summary
 
-`@aionis/openclaw-aionis-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, is proven active on a real `openclaw agent --local` turn, and now has a stable Google runtime-backed completion slice.
+`@aionis/openclaw-aionis-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, is proven active on a real `openclaw agent --local` turn, and now has a repeated Google runtime-backed completion A/B.
 
 ## Best current public claim
 
 The strongest accurate claim right now is:
 
-**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn and improve completion by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff. The installed adapter is also proven active on real OpenClaw local agent turns, including a stable Google runtime-backed completion slice.**
+**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn and improve completion by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff. The installed adapter is also proven active on real OpenClaw local agent turns, including a repeated Google runtime-backed completion A/B.**
 
 ## Evidence ladder
 
@@ -107,23 +107,23 @@ Why it matters:
 - Aionis requests are emitted before the run finishes
 - degraded runtime turns can already trigger adapter-driven handoff fallback
 
-### 7. A stable second-provider runtime-backed completion slice exists
+### 7. A repeated second-provider runtime-backed completion A/B exists
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314083138/summary.json`
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 Result:
 - `provider = google`
 - `model = gemini-3-flash-preview`
-- baseline `payload_text = UNKNOWN`
-- treatment `payload_text = resume-alpha-19`
-- baseline `completed = false`
-- treatment `completed = true`
+- baseline `completed_rate = 0`
+- treatment `completed_rate = 0.8`
+- `completion_gain = +0.8`
+- `avg_token_delta = -26.5`
 
 Why it matters:
-- runtime-backed live evidence is no longer only a `zai/glm-5` feasibility probe
-- adapter-driven externalized context is now shown to lift completion on a real provider-backed OpenClaw local-agent path
-- this slice should be framed as completion uplift, not token reduction
+- runtime-backed live evidence is no longer only a `zai/glm-5` feasibility probe or a single run
+- adapter-driven externalized context is now shown to lift completion across repeated provider-backed OpenClaw local-agent runs
+- this slice should be framed as completion uplift first, with only mild token improvement
 
 ## What is proven
 
@@ -133,7 +133,7 @@ Why it matters:
 4. Aionis can save tokens through hard-stop and replay dispatch, not only through softer context shaping.
 5. Aionis improves completion on the current replay, focused real-repo, and handoff-resume slices.
 6. The installed adapter is active on a real OpenClaw local agent turn.
-7. Adapter-driven externalized context can lift completion on a stable Google runtime-backed slice.
+7. Adapter-driven externalized context can lift completion on a repeated Google runtime-backed A/B.
 
 ## What is not yet proven
 

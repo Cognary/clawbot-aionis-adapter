@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import os
 import shutil
@@ -9,7 +10,8 @@ import threading
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Optional
+from statistics import mean
+from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
 ARTIFACT_ROOT = ROOT / "artifacts" / "openclaw-google-runtime-benchmark"
@@ -27,7 +29,7 @@ def ts() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
 
-def extract_json_block(text: str):
+def extract_json_block(text: str) -> Optional[Dict[str, Any]]:
     for idx, ch in enumerate(text):
         if ch != "{":
             continue
@@ -39,7 +41,7 @@ def extract_json_block(text: str):
     return None
 
 
-def as_text(value) -> str:
+def as_text(value: Any) -> str:
     if value is None:
         return ""
     if isinstance(value, bytes):
@@ -49,7 +51,7 @@ def as_text(value) -> str:
 
 class ContextHandler(BaseHTTPRequestHandler):
     lock = threading.Lock()
-    requests = []
+    requests: List[Dict[str, Any]] = []
 
     def log_message(self, fmt, *args):
         return
@@ -94,7 +96,12 @@ class ContextHandler(BaseHTTPRequestHandler):
         self.wfile.write(encoded)
 
 
-def write_config(state_dir: Path, workspace: Path, mode: str, base_url: Optional[str] = None):
+def write_config(
+    state_dir: Path,
+    workspace: Path,
+    mode: str,
+    base_url: Optional[str] = None,
+) -> Dict[str, Any]:
     config = {
         "agents": {
             "defaults": {
@@ -127,12 +134,12 @@ def write_config(state_dir: Path, workspace: Path, mode: str, base_url: Optional
     return config
 
 
-def run_arm(mode: str, out_dir: Path):
-    home_dir = Path(tempfile.mkdtemp(prefix=f"oc-{mode}-"))
-    profile = f"{PROFILE_BASE}-{mode}"
-    state_dir = home_dir / f".openclaw-{profile}"
+def run_arm(mode: str, out_dir: Path, iteration: int) -> Dict[str, Any]:
+    home_dir = Path(tempfile.mkdtemp(prefix="oc-%s-" % mode))
+    profile = "%s-%s-%02d" % (PROFILE_BASE, mode, iteration)
+    state_dir = home_dir / (".openclaw-%s" % profile)
     state_dir.mkdir(parents=True, exist_ok=True)
-    workspace = Path(tempfile.mkdtemp(prefix=f"oc-ws-{mode}-"))
+    workspace = Path(tempfile.mkdtemp(prefix="oc-ws-%s-" % mode))
 
     env = os.environ.copy()
     env["HOME"] = str(home_dir)
@@ -143,7 +150,7 @@ def run_arm(mode: str, out_dir: Path):
     base_url = None
     if mode == "treatment":
         server = ThreadingHTTPServer(("127.0.0.1", 0), ContextHandler)
-        base_url = f"http://127.0.0.1:{server.server_address[1]}"
+        base_url = "http://127.0.0.1:%s" % server.server_address[1]
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
 
@@ -152,17 +159,22 @@ def run_arm(mode: str, out_dir: Path):
     install_rc = None
     install_out = ""
     if mode == "treatment":
-        install = subprocess.run(
-            ["openclaw", "--profile", profile, "plugins", "install", str(ROOT), "--link"],
-            cwd=str(ROOT),
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=30,
-        )
-        install_rc = install.returncode
-        install_out = install.stdout
+        try:
+            install = subprocess.run(
+                ["openclaw", "--profile", profile, "plugins", "install", str(ROOT), "--link"],
+                cwd=str(ROOT),
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=60,
+            )
+            install_rc = install.returncode
+            install_out = install.stdout
+        except subprocess.TimeoutExpired as exc:
+            install_rc = None
+            install_out = as_text(exc.stdout)
+            raise RuntimeError("plugin install timed out for profile %s" % profile)
 
     try:
         proc = subprocess.run(
@@ -173,7 +185,7 @@ def run_arm(mode: str, out_dir: Path):
                 "agent",
                 "--local",
                 "--session-id",
-                f"{mode}-session",
+                "%s-session-%02d" % (mode, iteration),
                 "--message",
                 QUESTION,
                 "--json",
@@ -242,22 +254,13 @@ def run_arm(mode: str, out_dir: Path):
     }
 
 
-def main() -> int:
-    if not os.environ.get("GEMINI_API_KEY"):
-        raise SystemExit("GEMINI_API_KEY is required")
+def total_tokens(arm: Dict[str, Any]) -> Optional[int]:
+    usage = arm.get("usage") or {}
+    return usage.get("total")
 
-    run_id = ts()
-    out_dir = ARTIFACT_ROOT / run_id
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    baseline = run_arm("baseline", out_dir)
-    treatment = run_arm("treatment", out_dir)
-
-    def total_tokens(arm):
-        usage = arm.get("usage") or {}
-        return usage.get("total")
-
-    summary = {
+def build_single_summary(run_id: str, baseline: Dict[str, Any], treatment: Dict[str, Any]) -> Dict[str, Any]:
+    return {
         "benchmark_id": "openclaw_google_runtime_externalized_context_v1",
         "run_id": run_id,
         "scenario": "externalized_context_resume_token",
@@ -268,12 +271,113 @@ def main() -> int:
         "baseline": baseline,
         "treatment": treatment,
         "delta": {
-            "completion_gain": int(bool(treatment["completed"])) - int(bool(baseline["completed"])),
+            "completion_gain": int(treatment.get("completed", False)) - int(baseline.get("completed", False)),
             "token_delta": (total_tokens(treatment) or 0) - (total_tokens(baseline) or 0),
         },
     }
 
+
+def avg_int(values: List[Optional[int]]) -> Optional[float]:
+    kept = [value for value in values if value is not None]
+    return mean(kept) if kept else None
+
+
+def rate(values: List[bool]) -> float:
+    return sum(1 for value in values if value) / len(values) if values else 0.0
+
+
+def build_repeated_summary(run_id: str, cases: List[Dict[str, Any]]) -> Dict[str, Any]:
+    baseline_cases = [case["baseline"] for case in cases]
+    treatment_cases = [case["treatment"] for case in cases]
+
+    baseline_completed = [bool(arm.get("completed")) for arm in baseline_cases]
+    treatment_completed = [bool(arm.get("completed")) for arm in treatment_cases]
+    token_deltas = []
+    for case in cases:
+        baseline_total = total_tokens(case["baseline"])
+        treatment_total = total_tokens(case["treatment"])
+        if baseline_total is None or treatment_total is None:
+            continue
+        token_deltas.append(treatment_total - baseline_total)
+
+    return {
+        "benchmark_id": "openclaw_google_runtime_externalized_context_ab_v1",
+        "run_id": run_id,
+        "scenario": "externalized_context_resume_token",
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
+        "question": QUESTION,
+        "expected": EXPECTED,
+        "repetitions": len(cases),
+        "baseline": {
+            "completed_rate": rate(baseline_completed),
+            "avg_total_tokens": avg_int([total_tokens(arm) for arm in baseline_cases]),
+            "avg_duration_ms": avg_int([arm.get("duration_ms") for arm in baseline_cases]),
+            "completion_count": sum(1 for value in baseline_completed if value),
+            "timed_out_count": sum(1 for arm in baseline_cases if arm.get("agent_process_timed_out")),
+        },
+        "treatment": {
+            "completed_rate": rate(treatment_completed),
+            "avg_total_tokens": avg_int([total_tokens(arm) for arm in treatment_cases]),
+            "avg_duration_ms": avg_int([arm.get("duration_ms") for arm in treatment_cases]),
+            "avg_mock_request_count": avg_int([arm.get("mock_request_count") for arm in treatment_cases]),
+            "completion_count": sum(1 for value in treatment_completed if value),
+            "timed_out_count": sum(1 for arm in treatment_cases if arm.get("agent_process_timed_out")),
+        },
+        "delta": {
+            "completion_gain": rate(treatment_completed) - rate(baseline_completed),
+            "avg_token_delta": mean(token_deltas) if token_deltas else None,
+            "token_win_rate": rate([delta < 0 for delta in token_deltas]),
+            "token_pair_count": len(token_deltas),
+        },
+    }
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repeats", type=int, default=1)
+    return parser.parse_args()
+
+
+def main() -> int:
+    if not os.environ.get("GEMINI_API_KEY"):
+        raise SystemExit("GEMINI_API_KEY is required")
+
+    args = parse_args()
+    if args.repeats < 1:
+        raise SystemExit("--repeats must be >= 1")
+
+    run_id = ts()
+    out_dir = ARTIFACT_ROOT / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    cases: List[Dict[str, Any]] = []
+    for iteration in range(1, args.repeats + 1):
+        case_dir = out_dir / ("run-%02d" % iteration)
+        case_dir.mkdir(parents=True, exist_ok=True)
+        baseline = run_arm("baseline", case_dir, iteration)
+        treatment = run_arm("treatment", case_dir, iteration)
+        case = {
+            "iteration": iteration,
+            "baseline": baseline,
+            "treatment": treatment,
+            "delta": {
+                "completion_gain": int(treatment.get("completed", False)) - int(baseline.get("completed", False)),
+                "token_delta": (total_tokens(treatment) or 0) - (total_tokens(baseline) or 0),
+            },
+        }
+        cases.append(case)
+
+    if args.repeats == 1:
+        summary = build_single_summary(run_id, cases[0]["baseline"], cases[0]["treatment"])
+    else:
+        summary = build_repeated_summary(run_id, cases)
+
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    (out_dir / "cases.jsonl").write_text(
+        "".join(json.dumps(case) + "\n" for case in cases),
+        encoding="utf-8",
+    )
     (ARTIFACT_ROOT / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
     return 0
