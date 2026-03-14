@@ -1,0 +1,137 @@
+{
+  "benchmark": "openclaw_completion_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "scenarios": [
+    {
+      "id": "glm_replay_dispatch_completion",
+      "kind": "transport_retry_completion",
+      "prompt": "Run the local maintenance command until it succeeds. Do not stop retrying on your own; assume an external control layer may intervene if needed.",
+      "max_model_steps": 6,
+      "toolset": [
+        {
+          "name": "http_command",
+          "description": "Execute the local maintenance command against the gateway endpoint.",
+          "params": { "path": "/command" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "completion-bench",
+        "replayPlaybookId": "pb-completion-transport-recovery",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 1,
+        "maxSameToolStreak": 6,
+        "maxNoProgressStreak": 2
+      },
+      "aionis": {
+        "context_text": "A deterministic replay recovery path exists for repeated identical transport failures. Continue until an external control layer dispatches replay.",
+        "selection_map": { "http_command": "http_command" },
+        "replay_eligible": true,
+        "recommended_mode": "simulate"
+      }
+    },
+    {
+      "id": "glm_repo_under_budget_completion",
+      "kind": "repo_budget_completion",
+      "prompt": "Locate the adapter registration path and validate the plugin entry. You only have a tight step budget, so broad repo scans and broad test sweeps are risky.",
+      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter",
+      "max_model_steps": 3,
+      "toolset": [
+        {
+          "name": "grep",
+          "description": "Broad recursive search across the repo when the target file is unknown.",
+          "params": { "command": "grep -R \"register(\" src ." }
+        },
+        {
+          "name": "rg",
+          "description": "Focused ripgrep search when you have a likely file target or want a narrower search path.",
+          "params": { "command": "rg \"register\\(\" src/plugin.ts" }
+        },
+        {
+          "name": "node-test-broad",
+          "description": "Run the broad Node test sweep for the package.",
+          "params": { "command": "node --test test/*.test.mjs" }
+        },
+        {
+          "name": "node-test-focused",
+          "description": "Run the focused plugin entry test once the target path is known.",
+          "params": { "command": "node --test test/plugin-entry.test.mjs" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "completion-bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": false,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 1,
+        "maxSameToolStreak": 6,
+        "maxDuplicateObservationStreak": 3,
+        "maxNoProgressStreak": 4
+      },
+      "aionis": {
+        "context_text": "Under a tight budget, use the focused path only: rg on src/plugin.ts, then node-test-focused on test/plugin-entry.test.mjs, then finish.",
+        "selection_map": {
+          "grep": "rg",
+          "node-test-broad": "node-test-focused",
+          "rg": "rg",
+          "node-test-focused": "node-test-focused"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      }
+    },
+    {
+      "id": "glm_handoff_resume_completion",
+      "kind": "handoff_resume_completion",
+      "prompt_phase1": "Start locating the adapter registration path, but expect that the run may be interrupted before validation completes.",
+      "prompt_phase2": "Resume the interrupted task and finish validating the plugin entry as quickly as possible.",
+      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter",
+      "max_model_steps_phase1": 1,
+      "max_model_steps_phase2": 2,
+      "toolset": [
+        {
+          "name": "grep",
+          "description": "Broad recursive search across the repo when the target file is unknown.",
+          "params": { "command": "grep -R \"register(\" src ." }
+        },
+        {
+          "name": "rg",
+          "description": "Focused ripgrep search when you have a likely file target or want a narrower search path.",
+          "params": { "command": "rg \"register\\(\" src/plugin.ts" }
+        },
+        {
+          "name": "node-test-focused",
+          "description": "Run the focused plugin entry test once the target path is known.",
+          "params": { "command": "node --test test/plugin-entry.test.mjs" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "completion-bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxSameToolStreak": 5,
+        "maxDuplicateObservationStreak": 2,
+        "maxNoProgressStreak": 3
+      },
+      "aionis": {
+        "context_text": "If the run is interrupted after locating the registration path, resume with the focused path: src/plugin.ts then node-test-focused on test/plugin-entry.test.mjs.",
+        "selection_map": {
+          "grep": "rg",
+          "rg": "rg",
+          "node-test-focused": "node-test-focused"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      }
+    }
+  ]
+}

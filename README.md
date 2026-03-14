@@ -64,6 +64,9 @@ It does not control planner-internal reasoning steps that never emit tools.
 
 ## Current Evidence
 
+Benchmark overview:
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-benchmark-evidence-overview.md`
+
 ### Live-task A/B
 
 Artifact:
@@ -132,6 +135,35 @@ This currently supports:
 
 - Aionis can also save tokens through hard-stop and replay-driven control
 - the adapter is not limited to soft context shaping
+
+### Completion-Oriented Benchmark
+
+Current artifacts:
+- replay-dispatch completion:
+  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071310/summary.json`
+- real-repo under-budget completion:
+  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071206/summary.json`
+- handoff-resume slice:
+  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071336/summary.json`
+
+Current result:
+
+- replay-dispatch completion:
+  - baseline `completed_rate = 0`
+  - treatment `completed_rate = 1`
+  - treatment `replay_dispatch_success_rate = 1`
+- real-repo under-budget completion:
+  - baseline `completed_rate = 0`
+  - treatment `completed_rate = 1`
+- handoff-resume:
+  - baseline `completed_rate = 0`
+  - treatment `completed_rate = 0`
+
+This currently supports:
+
+- Aionis can improve completion on replay-eligible repeated workflows
+- Aionis can improve completion on tight-budget real-repo focused tasks
+- handoff-resume is implemented as a benchmark slice, but is currently neutral rather than positive
 
 ## Entry point
 
