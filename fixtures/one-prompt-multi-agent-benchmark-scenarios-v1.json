@@ -1,0 +1,207 @@
+{
+  "benchmark": "openclaw_one_prompt_multi_agent_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "scenarios": [
+    {
+      "id": "glm_issue10864_one_prompt_workflow",
+      "kind": "issue10864_one_prompt_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "#10864",
+      "issue_url": "https://github.com/openclaw/openclaw/issues/10864",
+      "top_level_prompt": "In the OpenClaw repo, investigate issue #10864 about orphan openclaw-completion processes, isolate the most likely cleanup boundary, propose the smallest viable fix or guard, define a focused regression validation path, and return a final reviewer verdict on whether the plan is credible.",
+      "agents": [
+        {
+          "name": "scout",
+          "goal": "Identify the cleanup boundary and the smallest set of target files.",
+          "max_steps": 3,
+          "toolset": [
+            {
+              "name": "broad-repo-scan",
+              "description": "Broad repo scan for issue-related terms across docs, scripts, src, and tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"openclaw-completion|orphan|background process|child-process bridge|SIGTERM|SIGKILL|spawn\\(\" docs scripts src test | sed -n '1,180p'"
+              }
+            },
+            {
+              "name": "read-background-doc",
+              "description": "Read the background process doc that explains child-process bridge expectations.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/background-process.md"
+              }
+            },
+            {
+              "name": "read-recovery-script",
+              "description": "Read the orphan recovery script used by the repo for diagnosis.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' scripts/recover-orphaned-processes.sh"
+              }
+            },
+            {
+              "name": "read-entry",
+              "description": "Read the CLI entry respawn path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,180p' src/entry.ts"
+              }
+            },
+            {
+              "name": "read-node-invoke",
+              "description": "Read the node-host invoke path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,320p' src/node-host/invoke.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "fixer",
+          "goal": "Propose the smallest viable fix or guard using the scout handoff instead of rediscovering the repo.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-repo-scan",
+              "description": "Broad repo scan for process lifecycle references.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|spawn\\(|recover-orphaned|background process\" src scripts docs | sed -n '1,180p'"
+              }
+            },
+            {
+              "name": "read-entry",
+              "description": "Read the entry wrapper where child-process bridge is attached.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,180p' src/entry.ts"
+              }
+            },
+            {
+              "name": "read-node-invoke",
+              "description": "Read the node-host invoke path where spawned processes are managed.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,320p' src/node-host/invoke.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "validator",
+          "goal": "Define a focused regression validation path without broad test sweeps.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-validation-scan",
+              "description": "Broad validation scan across process cleanup references.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"SIGTERM|SIGKILL|attachChildProcessBridge|orphan|background process\" docs/gateway/background-process.md scripts/recover-orphaned-processes.sh src/entry.ts src/node-host/invoke.ts src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Focused validation scan over the likely cleanup boundary and stale pid helpers.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|orphan\" src/entry.ts src/node-host/invoke.ts scripts/recover-orphaned-processes.sh src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,200p'"
+              }
+            },
+            {
+              "name": "read-restart-stale-test",
+              "description": "Read stale pid tests to anchor a regression path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' src/infra/restart-stale-pids.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "reviewer",
+          "goal": "Review whether the plan is credible, targets the right boundary, and uses focused validation.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "read-scout-artifact",
+              "description": "Read the scout artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/scout.json"
+              }
+            },
+            {
+              "name": "read-fixer-artifact",
+              "description": "Read the fixer artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/fixer.json"
+              }
+            },
+            {
+              "name": "read-validator-artifact",
+              "description": "Read the validator artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/validator.json"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Read the focused validation scan for reviewer confirmation.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"attachChildProcessBridge|SIGTERM|SIGKILL|orphan\" src/entry.ts src/node-host/invoke.ts scripts/recover-orphaned-processes.sh src/infra/restart-stale-pids.ts src/infra/restart-stale-pids.test.ts | sed -n '1,200p'"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "entry.ts",
+          "invoke.ts",
+          "node-host/invoke.ts",
+          "child-process bridge",
+          "cleanup boundary",
+          "orphan"
+        ],
+        "validation_terms": [
+          "recover-orphaned",
+          "openclaw-completion",
+          "stale pid",
+          "SIGTERM",
+          "child process cleanup",
+          "orphan"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "one-prompt-multi-agent",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 1,
+        "maxDuplicateObservationStreak": 1,
+        "maxNoProgressStreak": 1,
+        "maxEstimatedTokenBurn": 22000
+      },
+      "aionis": {
+        "scout": {
+          "context_text": "Start with docs/gateway/background-process.md and scripts/recover-orphaned-processes.sh, then confirm the boundary in src/entry.ts and src/node-host/invoke.ts. Avoid broad rediscovery.",
+          "selection_map": {
+            "broad-repo-scan": "read-background-doc"
+          }
+        },
+        "fixer": {
+          "context_text": "Use the scout handoff. Stay on src/entry.ts and src/node-host/invoke.ts. Do not restart repo-wide search.",
+          "selection_map": {
+            "broad-repo-scan": "read-node-invoke"
+          }
+        },
+        "validator": {
+          "context_text": "Use the fixer handoff. Focus on recover-orphaned-processes and stale-pid validation. Avoid broad validation scans.",
+          "selection_map": {
+            "broad-validation-scan": "focused-validation-scan"
+          }
+        },
+        "reviewer": {
+          "context_text": "Review only whether the boundary and validation are credible. Prefer reading the prior artifacts over rediscovery.",
+          "selection_map": {
+            "focused-validation-scan": "read-validator-artifact"
+          }
+        }
+      }
+    }
+  ]
+}
