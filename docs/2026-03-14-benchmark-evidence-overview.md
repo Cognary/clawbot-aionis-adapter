@@ -143,6 +143,26 @@ This proves:
 - the earlier Anthropic default-model blocker is gone
 - the remaining blocker for a stronger gateway-backed benchmark is provider-side runtime rate limiting
 
+### 8. Adapter activity on a real agent turn is now probeable
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/summary.json`
+
+Current result:
+- `provider = zai`
+- `model = glm-5`
+- `runtime_path_reached_model = true`
+- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
+- `outcome = adapter_active`
+
+This proves a narrower fact than a full runtime-backed benchmark:
+
+- the installed adapter is active inside a real `openclaw agent --local` turn
+- the runtime emits Aionis requests such as `/v1/memory/context/assemble`
+- the runtime can also trigger adapter-driven `handoff/store` on a degraded live turn
+
+This raises the evidence level even if the provider later rate-limits the run.
+
 ## What Is Not Yet Proven
 
 ### 1. Planner-internal reasoning control

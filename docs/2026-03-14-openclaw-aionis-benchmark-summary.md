@@ -5,13 +5,13 @@ Repo: `@aionis/openclaw-aionis-adapter`
 
 ## One-line summary
 
-`@aionis/openclaw-aionis-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, and improves completion on the current replay, focused real-repo, and handoff-resume slices.
+`@aionis/openclaw-aionis-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, and is now proven active on a real `openclaw agent --local` turn.
 
 ## Best current public claim
 
 The strongest accurate claim right now is:
 
-**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn and improve completion by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff.**
+**Aionis materially reduces uncontrolled tool-loop churn in OpenClaw and can reduce token burn and improve completion by enforcing policy, cutting repeated no-progress turns, and escaping through replay or handoff. The installed adapter is also proven active on a real OpenClaw local agent turn.**
 
 ## Evidence ladder
 
@@ -91,6 +91,22 @@ Why it matters:
 - Aionis is not only reducing waste
 - on the current slices, it also improves final task completion
 
+### 6. Real agent-turn adapter activity is proven
+
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/20260314082034/summary.json`
+
+Result:
+- `provider = zai`
+- `model = glm-5`
+- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
+- `outcome = adapter_active`
+
+Why it matters:
+- the installed adapter is active inside a real `openclaw agent --local` turn
+- Aionis requests are emitted before the run finishes
+- degraded runtime turns can already trigger adapter-driven handoff fallback
+
 ## What is proven
 
 1. OpenClaw can load the adapter.
@@ -98,6 +114,7 @@ Why it matters:
 3. Aionis reduces `GLM-5` token burn on the current semi-live tasks.
 4. Aionis can save tokens through hard-stop and replay dispatch, not only through softer context shaping.
 5. Aionis improves completion on the current replay, focused real-repo, and handoff-resume slices.
+6. The installed adapter is active on a real OpenClaw local agent turn.
 
 ## What is not yet proven
 
@@ -114,6 +131,7 @@ Say:
 - `replay and handoff escape`
 - `lower token burn`
 - `higher completion on current slices`
+- `installed adapter activity on real local agent turns`
 
 Do not say:
 

@@ -57,6 +57,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 5. `npm run bench:semi-live-token`
 6. `npm run bench:loader-backed-semi-live-token`
 7. `npm run smoke:gateway-backed-feasibility`
+8. `npm run smoke:adapter-activity`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 
@@ -71,6 +72,7 @@ Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-completion-benchmark.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
@@ -185,6 +187,31 @@ This currently supports:
 - the real `openclaw agent --local` runtime path now reaches `zai/glm-5`
 - the earlier Anthropic default-model blocker is resolved
 - the remaining blocker for a full gateway-backed benchmark is provider-side runtime rate limiting
+
+### Adapter Activity Probe
+
+Current artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/summary.json`
+
+Current result:
+
+- `provider = zai`
+- `model = glm-5`
+- `runtime_path_reached_model = true`
+- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
+- `outcome = adapter_active`
+
+This probe is narrower than a full runtime-backed benchmark.
+
+It is designed to show:
+
+- the installed adapter is active inside a real `openclaw agent --local` turn
+- the runtime emits real Aionis requests such as `context/assemble`
+
+This helps separate:
+
+- plugin activity proof
+- from the still-open provider-side rate-limit blocker on the live runtime path
 
 ### Completion-Oriented Benchmark
 

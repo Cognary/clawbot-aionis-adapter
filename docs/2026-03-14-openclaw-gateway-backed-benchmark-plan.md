@@ -25,6 +25,11 @@ Current evidence already proves:
 
 What is still missing is a stronger runtime-backed proof where OpenClaw itself is the execution shell, not only the plugin loader.
 
+There are now two narrower runtime-backed proofs already in place:
+
+1. `gateway-backed feasibility`
+2. `adapter activity probe`
+
 ## Recommended first path
 
 Use:
@@ -125,6 +130,16 @@ Current feasibility result:
    - this happens before a stable tool-loop comparison can complete
 3. reference:
    - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
+
+### 1b. Installed adapter activity
+
+Current result:
+
+1. a real `openclaw agent --local` turn now emits:
+   - `/v1/memory/context/assemble`
+   - `/v1/handoff/store`
+2. reference:
+   - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
 
 ### 2. Usage extraction
 
