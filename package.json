@@ -9,7 +9,9 @@
     "dist",
     "openclaw.plugin.json",
     "README.md",
-    "PRODUCT.md"
+    "PRODUCT.md",
+    "CHANGELOG.md",
+    "examples"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit false",

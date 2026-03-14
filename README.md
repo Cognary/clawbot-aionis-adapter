@@ -2,6 +2,63 @@
 
 A standalone adapter for connecting OpenClaw to Aionis execution control.
 
+## Quickstart
+
+Install from local checkout:
+
+```bash
+cd /Volumes/ziel/openclaw-aionis-adapter
+npm install
+npm run build
+openclaw plugins install . --link
+```
+
+Minimal config reference:
+
+- `/Volumes/ziel/openclaw-aionis-adapter/examples/openclaw.json`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-install-and-config.md`
+
+Expected Aionis endpoint:
+
+- `http://127.0.0.1:3321`
+
+Minimum plugin config:
+
+```json
+{
+  "plugins": {
+    "allow": ["openclaw-aionis-adapter"],
+    "entries": {
+      "openclaw-aionis-adapter": {
+        "enabled": true,
+        "config": {
+          "baseUrl": "http://127.0.0.1:3321",
+          "tenantId": "default",
+          "actor": "openclaw",
+          "scopeMode": "project",
+          "strictToolBlocking": true,
+          "replayDispatchEnabled": true,
+          "handoffFallbackEnabled": true
+        }
+      }
+    }
+  }
+}
+```
+
+## Release Status
+
+Current package metadata is prepared for a first release surface:
+
+1. `CHANGELOG.md` exists
+2. install/config example exists
+3. package `files` includes `CHANGELOG.md` and `examples/`
+
+Current boundary:
+
+1. package is still marked `private`
+2. publish workflow is not set up in this repo yet
+
 ## What it is
 
 This project provides:

@@ -1,0 +1,34 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "/absolute/path/to/workspace",
+      "model": {
+        "primary": "google/gemini-3-flash-preview"
+      }
+    }
+  },
+  "plugins": {
+    "allow": ["openclaw-aionis-adapter"],
+    "entries": {
+      "openclaw-aionis-adapter": {
+        "enabled": true,
+        "config": {
+          "baseUrl": "http://127.0.0.1:3321",
+          "tenantId": "default",
+          "actor": "openclaw",
+          "scopeMode": "project",
+          "strictToolBlocking": true,
+          "replayDispatchEnabled": true,
+          "handoffFallbackEnabled": true,
+          "maxSteps": 8,
+          "maxSameToolStreak": 2,
+          "maxDuplicateObservationStreak": 2,
+          "maxNoProgressStreak": 2,
+          "maxEstimatedTokenBurn": 12000,
+          "maxBroadTestInvocations": 1,
+          "maxBroadScanInvocations": 1
+        }
+      }
+    }
+  }
+}
