@@ -67,8 +67,10 @@ It does not control planner-internal reasoning steps that never emit tools.
 
 Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-benchmark-evidence-overview.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-completion-benchmark.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
 ### Live-task A/B
 
