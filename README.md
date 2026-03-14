@@ -54,6 +54,7 @@ It does not control planner-internal reasoning steps that never emit tools.
 2. `npm run smoke:openclaw-load`
 3. `npm run bench:openclaw-ab`
 4. `npm run bench:live-task`
+5. `npm run bench:semi-live-token`
 
 `bench:live-task` is the first scenario-backed benchmark layer:
 

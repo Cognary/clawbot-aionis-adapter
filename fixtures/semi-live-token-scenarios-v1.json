@@ -1,0 +1,133 @@
+{
+  "benchmark": "openclaw_semi_live_token_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "scenarios": [
+    {
+      "id": "glm_keepalive_poll_churn",
+      "kind": "polling",
+      "prompt": "Monitor the local job endpoint until the status meaningfully changes. Do not stop early just because the endpoint is unchanged.",
+      "max_model_steps": 6,
+      "toolset": [
+        {
+          "name": "http_get",
+          "description": "Poll the local job status endpoint. Use this when you need the current status.",
+          "params": { "path": "/status" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "semi-live",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 2,
+        "maxSameToolStreak": 8,
+        "maxNoProgressStreak": 8
+      },
+      "aionis": {
+        "context_text": "Repeated unchanged monitor polls are not progress. If the status remains unchanged, stop with a structured handoff instead of continuing forever.",
+        "selection_map": {
+          "http_get": "http_get"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      }
+    },
+    {
+      "id": "glm_transport_retry_churn",
+      "kind": "transport_retry",
+      "prompt": "Run the local maintenance command against the gateway until it succeeds. Do not stop after the first failure unless you have a stronger control signal.",
+      "max_model_steps": 6,
+      "toolset": [
+        {
+          "name": "http_command",
+          "description": "Execute the local maintenance command against the gateway endpoint.",
+          "params": { "path": "/command" }
+        }
+      ],
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "semi-live",
+        "replayPlaybookId": "pb-semi-live-transport-recovery",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 1,
+        "maxSameToolStreak": 6,
+        "maxNoProgressStreak": 2
+      },
+      "aionis": {
+        "context_text": "Repeated transport errors are not progress. After the same transport failure repeats, stop retry churn and prefer deterministic recovery if an approved replay path exists.",
+        "selection_map": {
+          "http_command": "http_command"
+        },
+        "replay_eligible": true,
+        "recommended_mode": "simulate"
+      }
+    },
+    {
+      "id": "glm_repo_broad_drift",
+      "kind": "repo_drift",
+      "prompt": "Locate the adapter registration path and validate the plugin entry. Prefer a correct path to a broad path, but finish only after you have both located the registration code and validated the plugin entry test.",
+      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter",
+      "max_model_steps": 6,
+      "toolset": [
+        {
+          "name": "grep",
+          "description": "Broad recursive search across the repo when the target file is unknown.",
+          "params": { "command": "grep -R \"register(\" src ." }
+        },
+        {
+          "name": "rg",
+          "description": "Focused ripgrep search when you have a likely file target or want a narrower search path.",
+          "params": { "command": "rg \"register\\(\" src/plugin.ts" }
+        },
+        {
+          "name": "node-test-broad",
+          "description": "Run the broad Node test sweep for the package.",
+          "params": { "command": "node --test test/*.test.mjs" }
+        },
+        {
+          "name": "node-test-focused",
+          "description": "Run the focused plugin entry test once the target path is known.",
+          "params": { "command": "node --test test/plugin-entry.test.mjs" }
+        }
+      ],
+      "reroutes": {
+        "rg": {
+          "toolName": "rg",
+          "params": { "command": "rg \"register\\(\" src/plugin.ts" }
+        },
+        "node-test-focused": {
+          "toolName": "node-test-focused",
+          "params": { "command": "node --test test/plugin-entry.test.mjs" }
+        }
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "semi-live",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": false,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 1,
+        "maxSameToolStreak": 6,
+        "maxDuplicateObservationStreak": 3,
+        "maxNoProgressStreak": 4
+      },
+      "aionis": {
+        "context_text": "Prefer this focused path: first use rg on src/plugin.ts to locate the registration path, then run node-test-focused to validate the plugin entry test, then stop. Repeating the same rg result is not progress. Avoid recursive grep and avoid broad node --test sweeps.",
+        "selection_map": {
+          "grep": "rg",
+          "node-test-broad": "node-test-focused",
+          "rg": "rg",
+          "node-test-focused": "node-test-focused"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      }
+    }
+  ]
+}
