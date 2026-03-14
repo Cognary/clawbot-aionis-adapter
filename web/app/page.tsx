@@ -178,7 +178,9 @@ export default function HomePage() {
             ))}
           </div>
           <Reveal delay={0.18} variant="scale">
-            <BenchmarkTerminal />
+            <div className="proofTerminalWrap">
+              <BenchmarkTerminal />
+            </div>
           </Reveal>
           <Reveal delay={0.22}>
             <div className="linkRail">

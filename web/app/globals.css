@@ -272,6 +272,10 @@ h2 {
   max-width: 780px;
 }
 
+.proofTerminalWrap {
+  margin-top: 28px;
+}
+
 .codeBlock,
 .demoTerminal {
   overflow: hidden;
@@ -343,6 +347,26 @@ h2 {
   padding: 0 16px 16px;
   color: var(--muted);
   font-size: 0.83rem;
+}
+
+.benchTerminal .codeHead {
+  min-height: 56px;
+  padding: 0 22px;
+}
+
+.benchTerminal pre {
+  padding: 24px 28px;
+  gap: 12px;
+  line-height: 1.72;
+}
+
+.benchTerminal .terminalLine + .terminalLine {
+  margin-top: 2px;
+}
+
+.benchTerminal .benchMeta {
+  padding: 4px 28px 22px;
+  gap: 16px;
 }
 
 .linkRail {
