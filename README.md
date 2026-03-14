@@ -77,6 +77,7 @@ Benchmark overview:
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-benchmark.md`
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-case-study.md`
 - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
 ### Live-task A/B

@@ -194,6 +194,9 @@ This proves:
 This does not prove:
 - strong token reduction on this slice
 
+Case-study write-up:
+- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-case-study.md`
+
 ## What Is Not Yet Proven
 
 ### 1. Planner-internal reasoning control
