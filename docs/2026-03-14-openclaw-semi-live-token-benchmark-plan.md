@@ -1,14 +1,14 @@
 # OpenClaw Semi-Live Token Benchmark Plan
 
 Date: 2026-03-14
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 Status: draft v1
 
 ## Goal
 
 Design a **model-backed semi-live benchmark** that can answer one narrow question:
 
-**Does `@aionis/openclaw-aionis-adapter` materially reduce token burn in OpenClaw on tool-loop-heavy tasks without improving results only by failing earlier?**
+**Does `@aionis/openclaw-adapter` materially reduce token burn in OpenClaw on tool-loop-heavy tasks without improving results only by failing earlier?**
 
 This benchmark exists because the current evidence base already shows:
 - fewer executed steps

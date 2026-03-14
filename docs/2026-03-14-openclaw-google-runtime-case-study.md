@@ -1,7 +1,7 @@
 # Google Runtime-Backed Completion Case Study
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 
 ## Question
 
@@ -33,7 +33,7 @@ Arms:
    - empty workspace context
 2. `treatment`
    - real `openclaw agent --local`
-   - installed `@aionis/openclaw-aionis-adapter`
+   - installed `@aionis/openclaw-adapter`
    - adapter receives externalized context from `/v1/memory/context/assemble`
 
 Repetitions:

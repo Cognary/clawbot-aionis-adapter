@@ -1,7 +1,7 @@
 # OpenClaw Completion Benchmark
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 
 ## Goal
 

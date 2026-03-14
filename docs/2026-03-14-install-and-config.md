@@ -1,7 +1,7 @@
 # Install and Config Guide
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 
 ## Goal
 
@@ -14,13 +14,17 @@ Provide the minimum steps needed to install the adapter into OpenClaw and run it
    - example: `http://127.0.0.1:3321`
 3. a model provider that OpenClaw can already use
 
-## Install From Local Checkout
+## Start Aionis Lite
 
 ```bash
-cd /absolute/path/to/openclaw-aionis-adapter
-npm install
-npm run build
-openclaw plugins install . --link
+npx @aionis/sdk@0.2.19 dev
+npx @aionis/sdk@0.2.19 health
+```
+
+## Install From npm
+
+```bash
+openclaw plugins install @aionis/openclaw-adapter
 ```
 
 ## Verify Load
@@ -33,7 +37,7 @@ openclaw plugins info openclaw-aionis-adapter --json
 Expected:
 
 1. plugin id `openclaw-aionis-adapter` appears in the list
-2. plugin source points at this checkout or installed package path
+2. plugin source points at the installed package path
 
 ## Minimal OpenClaw Config
 

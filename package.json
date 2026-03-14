@@ -1,9 +1,19 @@
 {
-  "name": "@aionis/openclaw-aionis-adapter",
+  "name": "@aionis/openclaw-adapter",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "description": "Standalone OpenClaw adapter for Aionis execution control.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cognary/clawbot-aionis-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Cognary/clawbot-aionis-adapter/issues"
+  },
+  "homepage": "https://github.com/Cognary/clawbot-aionis-adapter#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "files": [
     "dist",

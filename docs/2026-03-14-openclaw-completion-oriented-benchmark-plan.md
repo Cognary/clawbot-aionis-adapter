@@ -1,12 +1,12 @@
 # OpenClaw Completion-Oriented Benchmark Plan
 
 Date: 2026-03-14
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 Status: draft v1
 
 ## Goal
 
-Design a benchmark that measures whether `@aionis/openclaw-aionis-adapter` can improve **task completion rate**, not just reduce loop churn or token burn.
+Design a benchmark that measures whether `@aionis/openclaw-adapter` can improve **task completion rate**, not just reduce loop churn or token burn.
 
 Target question:
 

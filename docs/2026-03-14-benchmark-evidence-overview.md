@@ -1,7 +1,7 @@
 # Benchmark Evidence Overview
 
 Date: 2026-03-14
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 Status: current evidence snapshot
 
 ## What Is Already Proven

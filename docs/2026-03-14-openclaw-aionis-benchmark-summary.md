@@ -1,11 +1,11 @@
 # OpenClaw Aionis Benchmark Summary
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 
 ## One-line summary
 
-`@aionis/openclaw-aionis-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, is proven active on a real `openclaw agent --local` turn, and now has a repeated Google runtime-backed completion A/B.
+`@aionis/openclaw-adapter` reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn in `GLM-5` scenario-backed semi-live tasks, improves completion on the current replay, focused real-repo, and handoff-resume slices, is proven active on a real `openclaw agent --local` turn, and now has a repeated Google runtime-backed completion A/B.
 
 ## Best current public claim
 

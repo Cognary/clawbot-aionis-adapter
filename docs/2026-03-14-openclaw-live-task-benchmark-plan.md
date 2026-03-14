@@ -1,7 +1,7 @@
 # OpenClaw Live-Task Benchmark Plan
 
 Date: 2026-03-14
-Repo: `@aionis/openclaw-aionis-adapter`
+Repo: `@aionis/openclaw-adapter`
 Status: draft v1
 
 ## Goal
@@ -9,7 +9,7 @@ Status: draft v1
 Design a benchmark that is closer to real OpenClaw behavior than the current trace-driven tool-loop A/B, while still being repeatable enough to compare:
 
 - `without adapter`
-- `with @aionis/openclaw-aionis-adapter`
+- `with @aionis/openclaw-adapter`
 
 The benchmark should answer one narrow question:
 
@@ -99,7 +99,7 @@ Reason:
 - same model, same prompt, same environment, same tools
 
 2. `aionis_adapter`
-- OpenClaw runs the same task with `@aionis/openclaw-aionis-adapter`
+- OpenClaw runs the same task with `@aionis/openclaw-adapter`
 - same model, same prompt, same environment, same tools
 
 ### Invariants

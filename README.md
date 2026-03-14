@@ -4,17 +4,23 @@ A standalone adapter for connecting OpenClaw to Aionis execution control.
 
 ## Quickstart
 
-Install from local checkout:
+1. Start Aionis Lite:
 
 ```bash
-git clone https://github.com/Cognary/clawbot-aionis-adapter.git
-cd clawbot-aionis-adapter
-npm install
-npm run build
-openclaw plugins install . --link
+npx @aionis/sdk@0.2.19 dev
+npx @aionis/sdk@0.2.19 health
 ```
 
-Minimal config reference:
+2. Install the adapter into OpenClaw from npm:
+
+```bash
+openclaw plugins install @aionis/openclaw-adapter
+openclaw plugins info openclaw-aionis-adapter --json
+```
+
+3. Add the plugin config shown below.
+
+Reference files:
 
 - `examples/openclaw.json`
 - `docs/2026-03-14-install-and-config.md`
@@ -49,15 +55,16 @@ Minimum plugin config:
 
 ## Release Status
 
-Current package metadata is prepared for a first release surface:
+Current package metadata is prepared for publish:
 
 1. `CHANGELOG.md` exists
 2. install/config example exists
 3. package `files` includes `CHANGELOG.md` and `examples/`
+4. package metadata includes `repository`, `bugs`, and `homepage`
 
 Current boundary:
 
-1. package is still marked `private`
+1. plugin id remains `openclaw-aionis-adapter` for compatibility
 2. publish workflow is not set up in this repo yet
 
 ## What it is
