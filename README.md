@@ -7,7 +7,8 @@ A standalone adapter for connecting OpenClaw to Aionis execution control.
 Install from local checkout:
 
 ```bash
-cd /Volumes/ziel/openclaw-aionis-adapter
+git clone https://github.com/Cognary/clawbot-aionis-adapter.git
+cd clawbot-aionis-adapter
 npm install
 npm run build
 openclaw plugins install . --link
