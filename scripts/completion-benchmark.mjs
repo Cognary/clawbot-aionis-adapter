@@ -351,7 +351,10 @@ async function runOnePhase({ scenario, prompt, maxSteps, mode, toolset, repoPath
     for (let step = 1; step <= maxSteps; step += 1) {
       const { parsed, usage } = await callGlm(buildMessages({ prompt, toolset, history, injectedContext }));
       tokenBreakdown.push({ step, ...usage, model_decision: parsed });
-      if (parsed.action === 'finish') break;
+      if (parsed.action === 'finish') {
+        completed = true;
+        break;
+      }
       let tool = lookupTool(toolset, parsed.tool);
       if (!tool) break;
 
@@ -362,15 +365,14 @@ async function runOnePhase({ scenario, prompt, maxSteps, mode, toolset, repoPath
           runId: ctx.runId,
           toolCallId: `${ctx.toolCallId}-${step}`,
         }, { ...ctx, toolName: tool.name });
-        if (before?.block) {
-          controlledStop = true;
-          stopReason = before.blockReason ?? null;
-          break;
-        }
         const reroute = /^policy selected ([^ ]+) instead of /.exec(before?.blockReason ?? '');
         if (reroute) {
           const redirected = lookupTool(toolset, reroute[1]);
           if (redirected) tool = redirected;
+        } else if (before?.block) {
+          controlledStop = true;
+          stopReason = before.blockReason ?? null;
+          break;
         }
       }
 

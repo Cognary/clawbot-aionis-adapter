@@ -138,32 +138,27 @@ This currently supports:
 
 ### Completion-Oriented Benchmark
 
-Current artifacts:
-- replay-dispatch completion:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071310/summary.json`
-- real-repo under-budget completion:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071206/summary.json`
-- handoff-resume slice:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071336/summary.json`
+Current artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
 
 Current result:
 
-- replay-dispatch completion:
-  - baseline `completed_rate = 0`
-  - treatment `completed_rate = 1`
-  - treatment `replay_dispatch_success_rate = 1`
-- real-repo under-budget completion:
-  - baseline `completed_rate = 0`
-  - treatment `completed_rate = 1`
-- handoff-resume:
-  - baseline `completed_rate = 0`
-  - treatment `completed_rate = 0`
+- baseline:
+  - `completed_rate = 0`
+  - `avg_executed_steps = 3.67`
+  - `avg_total_tokens = 1125`
+- treatment:
+  - `completed_rate = 1`
+  - `avg_executed_steps = 2`
+  - `avg_total_tokens = 882.67`
+  - `replay_dispatch_success_rate = 0.3333`
+  - `handoff_resume_success_rate = 0.3333`
 
 This currently supports:
 
 - Aionis can improve completion on replay-eligible repeated workflows
 - Aionis can improve completion on tight-budget real-repo focused tasks
-- handoff-resume is implemented as a benchmark slice, but is currently neutral rather than positive
+- Aionis can also improve completion on interrupted handoff-resume tasks
 
 ## Entry point
 

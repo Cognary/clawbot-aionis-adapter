@@ -82,43 +82,31 @@ This proves:
 - Aionis is not limited to soft context shaping
 - hard-stop plus replay-driven control can also reduce token burn
 
-### 5. Completion uplift is now partially proven
+### 5. Completion uplift is now proven on the current three-slice benchmark
 
-Artifacts:
-- replay-dispatch completion:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071310/summary.json`
-- real-repo under-budget completion:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071206/summary.json`
+Artifact:
+- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
 
-Current results:
-- replay-dispatch completion:
-  - baseline `completed_rate = 0`
-  - treatment `completed_rate = 1`
-- real-repo under-budget completion:
-  - baseline `completed_rate = 0`
-  - treatment `completed_rate = 1`
+Current result:
+- baseline:
+  - `completed_rate = 0`
+  - `avg_executed_steps = 3.67`
+  - `avg_total_tokens = 1125`
+- treatment:
+  - `completed_rate = 1`
+  - `avg_executed_steps = 2`
+  - `avg_total_tokens = 882.67`
+  - `replay_dispatch_success_rate = 0.3333`
+  - `handoff_resume_success_rate = 0.3333`
 
 This proves:
 - Aionis can improve completion on replay-eligible repeated workflows
 - Aionis can improve completion on tight-budget focused real-repo tasks
+- Aionis can improve completion on interrupted handoff-resume tasks
 
 ## What Is Not Yet Proven
 
-### 1. Handoff-resume completion uplift
-
-Not yet proven.
-
-Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314071336/summary.json`
-
-Current result:
-- baseline `completed_rate = 0`
-- treatment `completed_rate = 0`
-
-Planned next step:
-- improve the handoff-resume scenario or choose a sharper interrupted-task target
-
-### 2. Planner-internal reasoning control
+### 1. Planner-internal reasoning control
 
 Not proven and not claimed.
 
@@ -126,7 +114,7 @@ Reason:
 - OpenClaw hook coverage is strong at the tool boundary
 - it is not a native planner-thought-step control surface
 
-### 3. Universal effect across all models and providers
+### 2. Universal effect across all models and providers
 
 Not proven and not claimed.
 
