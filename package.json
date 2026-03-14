@@ -1,5 +1,5 @@
 {
-  "name": "@aionis/openclaw-adapter",
+  "name": "@aionis/openclaw-aionis-adapter",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,8 @@
     "build": "tsc -p tsconfig.json --noEmit false",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test test/*.test.mjs",
-    "bench:anti-loop": "npm run build && node scripts/anti-loop-benchmark.mjs"
+    "bench:anti-loop": "npm run build && node scripts/anti-loop-benchmark.mjs",
+    "smoke:openclaw-load": "npm run build && node scripts/openclaw-load-smoke.mjs"
   },
   "exports": {
     ".": "./dist/index.js",

@@ -89,7 +89,7 @@ const plugin = {
   name: "OpenClaw Aionis Adapter",
   description: "Tool-loop control adapter for Aionis-backed policy, replay, handoff, and evidence capture.",
   version: "0.1.0",
-  async register(api: OpenClawHostApi & { pluginConfig?: Record<string, unknown>; logger: { info: (msg: string) => void; warn: (msg: string) => void } }) {
+  register(api: OpenClawHostApi & { pluginConfig?: Record<string, unknown>; logger: { info: (msg: string) => void; warn: (msg: string) => void } }) {
     const rawCfg = asRecord((api as { pluginConfig?: unknown }).pluginConfig);
     const resolved = resolveConfig(rawCfg);
     const client = createAionisHttpLoopControlClient({
