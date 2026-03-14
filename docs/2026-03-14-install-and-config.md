@@ -1,51 +1,75 @@
 # Install and Config Guide
 
 Date: 2026-03-14  
-Repo: `@aionis/openclaw-adapter`
+Package: `@aionis/openclaw-adapter`
 
-## Goal
+## What You Are Setting Up
 
-Provide the minimum steps needed to install the adapter into OpenClaw and run it against a local Aionis service.
+This guide connects three things into one working path:
 
-## Prerequisites
+1. **Aionis Lite** as the execution-control backend
+2. **OpenClaw** as the agent runtime
+3. **`@aionis/openclaw-adapter`** as the control layer between them
 
-1. `openclaw` installed and working
-2. a reachable Aionis runtime
-   - example: `http://127.0.0.1:3321`
-3. a model provider that OpenClaw can already use
+The goal is not just to load another plugin. The goal is to make OpenClaw runs behave with:
 
-## Start Aionis Lite
+- externalized execution context
+- pre-tool policy gating
+- replay dispatch when work is reusable
+- handoff fallback when work should stop cleanly instead of degrading
+
+## Before You Start
+
+You need:
+
+1. `openclaw` already installed and working
+2. a model/provider that OpenClaw can already call successfully
+3. local shell access to run `npx` and `openclaw`
+
+## Step 1: Start Aionis Lite
 
 ```bash
 npx @aionis/sdk@0.2.19 dev
 npx @aionis/sdk@0.2.19 health
 ```
 
-## Install From npm
+Expected base URL:
+
+- `http://127.0.0.1:3321`
+
+If you want a deeper check before wiring OpenClaw to it:
+
+```bash
+npx @aionis/sdk@0.2.19 doctor
+npx @aionis/sdk@0.2.19 selfcheck
+```
+
+## Step 2: Install the Adapter into OpenClaw
 
 ```bash
 openclaw plugins install @aionis/openclaw-adapter
 ```
 
-## Verify Load
+Then verify OpenClaw sees the installed adapter:
 
 ```bash
 openclaw plugins list --json
 openclaw plugins info openclaw-adapter --json
 ```
 
-Expected:
+What you should confirm:
 
-1. plugin id `openclaw-adapter` appears in the list
-2. plugin source points at the installed package path
+1. plugin id is `openclaw-adapter`
+2. plugin status is `loaded`
+3. plugin version matches the npm release you installed
 
-## Minimal OpenClaw Config
+## Step 3: Add the Adapter Config
 
-Reference file:
+Reference example:
 
-- `examples/openclaw.json`
+- [examples/openclaw.json](../examples/openclaw.json)
 
-Core shape:
+Minimal configuration:
 
 ```json
 {
@@ -69,15 +93,28 @@ Core shape:
 }
 ```
 
-## Recommended First Run
+What these switches mean in practice:
+
+- `strictToolBlocking`: block obviously bad tool paths instead of only warning
+- `replayDispatchEnabled`: allow reusable work to escape into replay
+- `handoffFallbackEnabled`: preserve a structured continuation point when the right move is to stop
+
+## Step 4: Run a First Controlled Turn
 
 ```bash
-openclaw agent --local --message "Inspect the task and proceed carefully." --json
+openclaw agent --local --message "Inspect the task, avoid broad scans, and proceed carefully." --json
 ```
 
-## Recommended Verification
+With the adapter enabled, OpenClaw can now ask Aionis for:
 
-Run the adapter repo checks:
+1. run-start context
+2. tool policy before execution
+3. feedback/evidence persistence after execution
+4. replay or handoff decisions when the run degrades
+
+## Step 5: Verify the Integration
+
+Core checks:
 
 ```bash
 npm run test
@@ -85,16 +122,38 @@ npm run smoke:openclaw-load
 npm run smoke:adapter-activity
 ```
 
-## Boundary
+What these checks prove:
+
+1. the adapter package builds and passes unit coverage
+2. OpenClaw can install and discover the adapter
+3. the adapter is active in a real `openclaw agent --local` turn, not just in a synthetic harness
+
+## Recommended Operating Model
+
+For first deployments, keep the setup narrow:
+
+1. use project-scoped execution context
+2. keep `strictToolBlocking` enabled
+3. keep replay and handoff enabled together
+4. start with a provider/model pair you already know works in OpenClaw before you benchmark more aggressive scenarios
+
+## What This Guide Covers
 
 This guide covers:
 
-1. local install
-2. local OpenClaw plugin registration
-3. local Aionis runtime configuration
+1. local Aionis Lite startup
+2. npm-based adapter install
+3. minimal OpenClaw config
+4. first-turn validation
 
 This guide does not cover:
 
-1. npm package release flow
-2. hosted Aionis deployment
-3. provider-specific OpenClaw model troubleshooting
+1. hosted Aionis deployment
+2. provider-specific model tuning inside OpenClaw
+3. benchmark interpretation and evidence review
+
+For that, use:
+
+- [README](../README.md)
+- [Benchmark Evidence Overview](2026-03-14-benchmark-evidence-overview.md)
+- [Benchmark Summary](2026-03-14-openclaw-aionis-benchmark-summary.md)
