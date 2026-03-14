@@ -1,0 +1,29 @@
+{
+  "benchmark": "openclaw_semi_live_token_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "cases": 3,
+  "baseline": {
+    "avg_total_tokens": 1893,
+    "avg_prompt_tokens_total": 1637.6666666666667,
+    "avg_completion_tokens_total": 255.33333333333334,
+    "avg_executed_steps": 5.666666666666667,
+    "controlled_stop_rate": 0,
+    "completed_rate": 0.3333333333333333,
+    "avg_broad_tool_calls": 0.6666666666666666
+  },
+  "treatment": {
+    "avg_total_tokens": 865.3333333333334,
+    "avg_prompt_tokens_total": 730,
+    "avg_completion_tokens_total": 135.33333333333334,
+    "avg_executed_steps": 2,
+    "controlled_stop_rate": 0,
+    "completed_rate": 0.3333333333333333,
+    "replay_dispatch_rate": 0,
+    "handoff_store_rate": 0.6666666666666666,
+    "avg_feedback_writes": 2,
+    "avg_evidence_writes": 2,
+    "avg_broad_tool_calls": 0,
+    "avg_policy_reroutes": 0
+  }
+}

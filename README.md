@@ -15,8 +15,8 @@ openclaw plugins install . --link
 
 Minimal config reference:
 
-- `/Volumes/ziel/openclaw-aionis-adapter/examples/openclaw.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-install-and-config.md`
+- `examples/openclaw.json`
+- `docs/2026-03-14-install-and-config.md`
 
 Expected Aionis endpoint:
 
@@ -127,20 +127,20 @@ It does not control planner-internal reasoning steps that never emit tools.
 ## Current Evidence
 
 Benchmark overview:
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-benchmark-evidence-overview.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-completion-benchmark.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-benchmark.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-case-study.md`
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
+- `docs/2026-03-14-benchmark-evidence-overview.md`
+- `docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
+- `docs/2026-03-14-openclaw-completion-benchmark.md`
+- `docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
+- `docs/2026-03-14-openclaw-adapter-activity-probe.md`
+- `docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
+- `docs/2026-03-14-openclaw-google-runtime-benchmark.md`
+- `docs/2026-03-14-openclaw-google-runtime-case-study.md`
+- `docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
 
 ### Live-task A/B
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-live-task-benchmark/20260314061733/summary.json`
+- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
 
 Current result:
 
@@ -164,7 +164,7 @@ This currently supports:
 ### GLM-5 Semi-Live Token Benchmark
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
+- `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
 
 Current 3-scenario result:
 
@@ -187,7 +187,7 @@ This currently supports:
 ### Hard-Stop / Replay-Driven Token Slice
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
 
 Single-scenario result:
 
@@ -209,7 +209,7 @@ This currently supports:
 ### Loader-Backed Semi-Live Token Benchmark
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+- `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
 
 Current result:
 
@@ -234,7 +234,7 @@ This currently supports:
 ### Gateway-Backed Runtime Feasibility
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/summary.json`
+- `evidence/openclaw-gateway-backed-feasibility/summary.json`
 
 Current result:
 
@@ -252,7 +252,7 @@ This currently supports:
 ### Adapter Activity Probe
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/summary.json`
+- `evidence/openclaw-adapter-activity-probe/summary.json`
 
 Current result:
 
@@ -277,7 +277,7 @@ This helps separate:
 ### Google Runtime-Backed Completion A/B
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 Current result:
 
@@ -307,7 +307,7 @@ This currently supports:
 ### Completion-Oriented Benchmark
 
 Current artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
+- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
 
 Current result:
 

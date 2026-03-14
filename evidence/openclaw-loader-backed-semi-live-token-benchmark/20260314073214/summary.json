@@ -1,0 +1,30 @@
+{
+  "benchmark": "openclaw_loader_backed_semi_live_token_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "plugin_module_path": "dist/plugin.js",
+  "cases": 4,
+  "baseline": {
+    "avg_total_tokens": 1836,
+    "avg_prompt_tokens_total": 1564.25,
+    "avg_completion_tokens_total": 271.75,
+    "avg_executed_steps": 5.75,
+    "controlled_stop_rate": 0,
+    "completed_rate": 0.25,
+    "avg_broad_tool_calls": 0.5
+  },
+  "treatment": {
+    "avg_total_tokens": 968.25,
+    "avg_prompt_tokens_total": 808.75,
+    "avg_completion_tokens_total": 159.5,
+    "avg_executed_steps": 2.25,
+    "controlled_stop_rate": 0.25,
+    "completed_rate": 0.25,
+    "replay_dispatch_rate": 0.25,
+    "handoff_store_rate": 0.5,
+    "avg_feedback_writes": 2.25,
+    "avg_evidence_writes": 2.25,
+    "avg_broad_tool_calls": 0,
+    "avg_policy_reroutes": 0
+  }
+}

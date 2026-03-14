@@ -26,8 +26,8 @@ The current runtime-backed blocker is different:
 
 ## Current artifact
 
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/summary.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/20260314080716/summary.json`
+- `evidence/openclaw-gateway-backed-feasibility/summary.json`
+- `evidence/openclaw-gateway-backed-feasibility/20260314080716/summary.json`
 
 ## Current result
 

@@ -42,7 +42,7 @@ Repetitions:
 
 Artifact:
 
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 ## Result
 

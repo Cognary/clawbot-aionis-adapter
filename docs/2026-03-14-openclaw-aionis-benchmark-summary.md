@@ -18,7 +18,7 @@ The strongest accurate claim right now is:
 ### 1. Real plugin load works
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-load-smoke/summary.json`
+- `evidence/openclaw-load-smoke/summary.json`
 
 Result:
 - `plugin_status = loaded`
@@ -31,7 +31,7 @@ Why it matters:
 ### 2. Tool-loop churn goes down
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-live-task-benchmark/20260314061733/summary.json`
+- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
 
 Result:
 - baseline `avg_executed_steps = 7.33`
@@ -45,9 +45,9 @@ Why it matters:
 
 Artifacts:
 - direct semi-live:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
+  - `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
 - loader-backed semi-live:
-  - `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+  - `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
 
 Results:
 - direct semi-live:
@@ -63,7 +63,7 @@ Why it matters:
 ### 4. Hard-stop and replay are real, not only soft shaping
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
 
 Result:
 - treatment `controlled_stop_rate = 1`
@@ -76,7 +76,7 @@ Why it matters:
 ### 5. Completion goes up on current slices
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
+- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
 
 Result:
 - baseline `completed_rate = 0`
@@ -94,7 +94,7 @@ Why it matters:
 ### 6. Real agent-turn adapter activity is proven
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/20260314082034/summary.json`
+- `evidence/openclaw-adapter-activity-probe/20260314082034/summary.json`
 
 Result:
 - `provider = zai`
@@ -110,7 +110,7 @@ Why it matters:
 ### 7. A repeated second-provider runtime-backed completion A/B exists
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 Result:
 - `provider = google`

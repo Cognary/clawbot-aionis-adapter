@@ -39,7 +39,7 @@ Expected:
 
 Reference file:
 
-- `/Volumes/ziel/openclaw-aionis-adapter/examples/openclaw.json`
+- `examples/openclaw.json`
 
 Core shape:
 

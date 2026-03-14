@@ -9,12 +9,12 @@ Status: current evidence snapshot
 ### 1. Real OpenClaw loader integration works
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-load-smoke/summary.json`
+- `evidence/openclaw-load-smoke/summary.json`
 
 Current result:
 - `plugin_status = loaded`
 - `hook_count = 8`
-- `plugin_source = /Volumes/ziel/openclaw-aionis-adapter/dist/plugin.js`
+- `plugin_source = dist/plugin.js`
 
 This proves:
 - the package is not only a library scaffold
@@ -23,7 +23,7 @@ This proves:
 ### 2. Tool-loop churn can be reduced
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-live-task-benchmark/20260314061733/summary.json`
+- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
 
 Current result:
 - baseline:
@@ -45,7 +45,7 @@ This proves:
 ### 3. GLM-5 token burn can be reduced on semi-live tasks
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
+- `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
 
 Current result:
 - baseline:
@@ -65,7 +65,7 @@ This proves:
 ### 4. Hard-stop and replay-driven token saving also works
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
+- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
 
 Current result:
 - baseline:
@@ -85,7 +85,7 @@ This proves:
 ### 5. Loader-backed semi-live token reduction also works
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+- `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
 
 Current result:
 - baseline:
@@ -108,7 +108,7 @@ This proves:
 ### 6. Completion uplift is now proven on the current three-slice benchmark
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
+- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
 
 Current result:
 - baseline:
@@ -130,7 +130,7 @@ This proves:
 ### 7. Gateway-backed runtime feasibility is now proven
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-gateway-backed-feasibility/summary.json`
+- `evidence/openclaw-gateway-backed-feasibility/summary.json`
 
 Current result:
 - `provider = zai`
@@ -146,7 +146,7 @@ This proves:
 ### 8. Adapter activity on a real agent turn is now probeable
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/summary.json`
+- `evidence/openclaw-adapter-activity-probe/summary.json`
 
 Current result:
 - `provider = zai`
@@ -166,7 +166,7 @@ This raises the evidence level even if the provider later rate-limits the run.
 ### 9. A stable second-provider runtime-backed completion A/B now exists
 
 Artifact:
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-google-runtime-benchmark/20260314084010/summary.json`
+- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
 
 Current result:
 - `provider = google`
@@ -195,7 +195,7 @@ This does not prove:
 - strong token reduction on this slice
 
 Case-study write-up:
-- `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-google-runtime-case-study.md`
+- `docs/2026-03-14-openclaw-google-runtime-case-study.md`
 
 ## What Is Not Yet Proven
 

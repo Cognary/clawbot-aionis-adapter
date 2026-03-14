@@ -22,8 +22,8 @@ It uses the same:
 
 ## Artifact
 
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/summary.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-completion-benchmark/20260314072335/cases.jsonl`
+- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
+- `evidence/openclaw-completion-benchmark/20260314072335/cases.jsonl`
 
 ## Scenarios
 

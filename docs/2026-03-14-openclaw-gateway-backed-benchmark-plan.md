@@ -129,7 +129,7 @@ Current feasibility result:
    - the runtime-backed local agent path is now failing at provider-side rate limiting
    - this happens before a stable tool-loop comparison can complete
 3. reference:
-   - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
+   - `docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
 
 ### 1b. Installed adapter activity
 
@@ -139,7 +139,7 @@ Current result:
    - `/v1/memory/context/assemble`
    - `/v1/handoff/store`
 2. reference:
-   - `/Volumes/ziel/openclaw-aionis-adapter/docs/2026-03-14-openclaw-adapter-activity-probe.md`
+   - `docs/2026-03-14-openclaw-adapter-activity-probe.md`
 
 ### 2. Usage extraction
 

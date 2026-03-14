@@ -1,0 +1,25 @@
+{
+  "benchmark": "openclaw_live_task_v1",
+  "cases": 3,
+  "baseline": {
+    "avg_executed_steps": 7.333333333333333,
+    "controlled_stop_rate": 0,
+    "completed_rate": 0.3333333333333333,
+    "avg_broad_tool_calls": 1.3333333333333333,
+    "avg_same_tool_streak_peak": 6.333333333333333,
+    "avg_duplicate_observation_streak_peak": 5.333333333333333
+  },
+  "treatment": {
+    "avg_executed_steps": 3,
+    "controlled_stop_rate": 0.6666666666666666,
+    "completed_rate": 0.3333333333333333,
+    "replay_dispatch_rate": 0.3333333333333333,
+    "handoff_store_rate": 0.3333333333333333,
+    "avg_feedback_writes": 3,
+    "avg_evidence_writes": 3,
+    "avg_broad_tool_calls": 0,
+    "avg_policy_reroutes": 0.6666666666666666,
+    "avg_same_tool_streak_peak": 2.6666666666666665,
+    "avg_duplicate_observation_streak_peak": 1.6666666666666667
+  }
+}

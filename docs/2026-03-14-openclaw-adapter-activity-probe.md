@@ -23,8 +23,8 @@ What it does not prove by itself is:
 
 ## Current artifact
 
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/summary.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-adapter-activity-probe/20260314082034/summary.json`
+- `evidence/openclaw-adapter-activity-probe/summary.json`
+- `evidence/openclaw-adapter-activity-probe/20260314082034/summary.json`
 
 ## Probe shape
 

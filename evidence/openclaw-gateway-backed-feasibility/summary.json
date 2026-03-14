@@ -1,0 +1,23 @@
+{
+  "benchmark_id": "openclaw_gateway_backed_feasibility_v1",
+  "run_id": "20260314080716",
+  "profile": "benchzai-runtime",
+  "session_id": "gateway-feasibility-1",
+  "message": "Reply with ok only.",
+  "return_code": 0,
+  "provider": "zai",
+  "model": "glm-5",
+  "runtime_path_reached_model": true,
+  "outcome": "rate_limited",
+  "aborted": false,
+  "duration_ms": 31588,
+  "system_prompt_chars": 13444,
+  "tool_count": 1,
+  "skills_count": 13,
+  "payload_text": "\u26a0\ufe0f API rate limit reached. Please try again later.",
+  "raw_output_excerpt": "[agent/embedded] embedded run agent end: runId=gateway-feasibility-1 isError=true error=\u26a0\ufe0f API rate limit reached. Please try again later.\n[agent/embedded] embedded run agent end: runId=gateway-feasibility-1 isError=true error=\u26a0\ufe0f API rate limit reached. Please try again later.\n[agent/embedded] embedded run agent end: runId=gateway-feasibility-1 isError=true error=\u26a0\ufe0f API rate limit reached. Please try again later.\n[agent/embedded] embedded run agent end: runId=gateway-feasibility-1 isError=true error=\u26a0\ufe0f API rate limit reached. Please try again later.\n{\n  \"payloads\": [\n    {\n      \"text\": \"\u26a0\ufe0f API rate limit reached. Please try again later.\",\n      \"mediaUrl\": null\n    }\n  ],\n  \"meta\": {\n    \"durationMs\": 31588,\n    \"agentMeta\": {\n      \"sessionId\": \"gateway-feasibility-1\",\n      \"provider\": \"zai\",\n      \"model\": \"glm-5\",\n      \"lastCallUsage\": {\n        \"input\": 0,\n        \"output\": 0,\n        \"cacheRead\": 0,\n        \"cacheWrite\": 0,\n        \"total\": 0\n      }\n    },\n    \"aborted\": false,\n    \"systemPromptReport\": {\n      \"source\": \"run\",\n      \"generatedAt\": 1773475642101,\n      \"sessionId\": \"gateway-feasibility-1\",\n      \"provider\": \"zai\",\n      \"model\": \"glm-5\",\n      \"workspaceDir\": \"/var/folders/x1/sdrf3d3x23332p4d38kr0cj80000gn/T/oc-home-oigjym4b/.openclaw/workspace-benchzai-runtime\",\n      \"bootstrapMaxChars\": 20000,\n      \"bootstrapTotalMaxChars\": 150000,\n      \"sandbox\": {\n        \"mode\": \"off\",\n        \"sandboxed\": false\n      },\n      \"systemPrompt\": {\n        \"chars\": 13444,\n        \"projectContextChars\": 1993,\n        \"nonProjectContextChars\": 11451\n      },\n      \"injectedWorkspaceFiles\": [\n        {\n          \"name\": \"AGENTS.md\",\n          \"path\": \"/var/folders/x1/sdrf3d3x23332p4d38kr0cj80000gn/T/oc-home-oigjym4b/.openclaw/workspace-benchzai-runtime/AGENTS.md\",\n          \"missing\": true,\n          \"rawChars\": 0,\n          \"injectedChars\": 135,\n          \"truncated\": false\n        },\n        {\n          \"name\": \"SOUL.md\",\n          \"path\": \"/var/folders/",
+  "artifacts": {
+    "stdout_log": "artifacts/openclaw-gateway-backed-feasibility/20260314080716/stdout.log",
+    "config": "artifacts/openclaw-gateway-backed-feasibility/20260314080716/config.json"
+  }
+}

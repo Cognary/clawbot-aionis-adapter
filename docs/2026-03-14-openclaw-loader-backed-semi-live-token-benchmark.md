@@ -16,8 +16,8 @@ It does claim a stronger setup than direct local module import:
 
 ## Artifact
 
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
-- `/Volumes/ziel/openclaw-aionis-adapter/artifacts/openclaw-loader-backed-semi-live-token-benchmark/summary.json`
+- `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
+- `evidence/openclaw-loader-backed-semi-live-token-benchmark/summary.json`
 
 ## Result
 

@@ -1,0 +1,28 @@
+{
+  "benchmark_id": "openclaw_adapter_activity_probe_v1",
+  "run_id": "20260314082034",
+  "profile": "bench-activity",
+  "session_id": "adapter-activity-1",
+  "plugin_id": "openclaw-aionis-adapter",
+  "install_return_code": 0,
+  "agent_return_code": 0,
+  "agent_process_timed_out": false,
+  "provider": "zai",
+  "model": "glm-5",
+  "runtime_path_reached_model": true,
+  "mock_request_count": 2,
+  "mock_paths": [
+    "/v1/memory/context/assemble",
+    "/v1/handoff/store"
+  ],
+  "context_assemble_seen": true,
+  "handoff_store_seen": true,
+  "payload_text": "Request timed out before a response was generated. Please try again, or increase `agents.defaults.timeoutSeconds` in your config.",
+  "outcome": "adapter_active",
+  "artifacts": {
+    "install_log": "artifacts/openclaw-adapter-activity-probe/20260314082034/install.log",
+    "agent_log": "artifacts/openclaw-adapter-activity-probe/20260314082034/agent.log",
+    "requests": "artifacts/openclaw-adapter-activity-probe/20260314082034/requests.json",
+    "config": "artifacts/openclaw-adapter-activity-probe/20260314082034/config.json"
+  }
+}

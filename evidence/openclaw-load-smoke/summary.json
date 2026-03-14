@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "state_dir": "/var/folders/x1/sdrf3d3x23332p4d38kr0cj80000gn/T/openclaw-adapter-home.3xeubt4k/.openclaw",
+  "plugin_status": "loaded",
+  "plugin_source": "dist/plugin.js",
+  "plugin_origin": "config",
+  "hook_count": 8
+}

@@ -1,0 +1,31 @@
+{
+  "benchmark_id": "openclaw_google_runtime_externalized_context_ab_v1",
+  "run_id": "20260314084010",
+  "scenario": "externalized_context_resume_token",
+  "provider": "google",
+  "model": "gemini-3-flash-preview",
+  "question": "Resume the previous run and reply with the exact resume token only. If the token is unknown from current context, reply UNKNOWN.",
+  "expected": "resume-alpha-19",
+  "repetitions": 5,
+  "baseline": {
+    "completed_rate": 0.0,
+    "avg_total_tokens": 4319,
+    "avg_duration_ms": 8585.25,
+    "completion_count": 0,
+    "timed_out_count": 1
+  },
+  "treatment": {
+    "completed_rate": 0.8,
+    "avg_total_tokens": 4287,
+    "avg_duration_ms": 8220.8,
+    "avg_mock_request_count": 1,
+    "completion_count": 4,
+    "timed_out_count": 0
+  },
+  "delta": {
+    "completion_gain": 0.8,
+    "avg_token_delta": -26.5,
+    "token_win_rate": 0.5,
+    "token_pair_count": 4
+  }
+}
