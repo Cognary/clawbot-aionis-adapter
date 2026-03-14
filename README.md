@@ -59,6 +59,7 @@ Supporting docs:
 - [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
 - [Completion Benchmark](docs/2026-03-14-openclaw-completion-benchmark.md)
 - [One-Prompt Multi-Agent Benchmark](docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
+- [One-Prompt Multi-Agent Case Study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
 - [Loader-Backed Semi-Live Token Benchmark](docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md)
 - [Google Runtime Benchmark](docs/2026-03-14-openclaw-google-runtime-benchmark.md)
 - [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
@@ -72,6 +73,7 @@ Public evidence files:
 - [Completion benchmark summary](evidence/openclaw-completion-benchmark/20260314072335/summary.json)
 - [One-prompt multi-agent summary: issue #10864](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314115524/summary.json)
 - [One-prompt multi-agent summary: dashboard auth drift](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314125034/summary.json)
+- [One-prompt multi-agent case study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 
 ## 5-Minute Quickstart
@@ -229,3 +231,4 @@ Benchmarks:
 - [Benchmark Evidence Overview](docs/2026-03-14-benchmark-evidence-overview.md)
 - [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
 - [One-Prompt Multi-Agent Benchmark](docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
+- [One-Prompt Multi-Agent Case Study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)

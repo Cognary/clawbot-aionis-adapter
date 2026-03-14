@@ -402,6 +402,199 @@
           }
         }
       }
+    },
+    {
+      "id": "glm_markdown_fallback_one_prompt_workflow",
+      "kind": "markdown_fallback_one_prompt_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "#36445/#36213",
+      "issue_url": "https://github.com/openclaw/openclaw/issues/36213",
+      "top_level_prompt": "In the OpenClaw repo, investigate the Control UI markdown parser crash fallback problem around malformed recursive markdown, isolate the exact rendering boundary, propose the smallest viable fallback or guard, define a focused regression validation path, and return a final reviewer verdict on whether the plan is credible.",
+      "agents": [
+        {
+          "name": "scout",
+          "goal": "Identify the exact markdown crash boundary and the smallest set of target docs/code/test paths.",
+          "max_steps": 3,
+          "toolset": [
+            {
+              "name": "broad-markdown-scan",
+              "description": "Broad scan across changelog, UI markdown implementation, and tests for parser fallback references.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"#36213|#36445|marked.parse|fallback to plain text|markdown parser crash|recursive markdown|escaped plain text|<pre class=\\\"code-block\\\"\" CHANGELOG.md ui/src/ui/markdown.ts ui/src/ui/markdown.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-markdown-impl",
+              "description": "Read the markdown rendering implementation around marked.parse and fallback behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '130,185p' ui/src/ui/markdown.ts"
+              }
+            },
+            {
+              "name": "read-markdown-tests",
+              "description": "Read the markdown regression tests that cover parser fallback.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '90,175p' ui/src/ui/markdown.test.ts"
+              }
+            },
+            {
+              "name": "read-changelog-slice",
+              "description": "Read the changelog slice that documents markdown parser crash fallback and regression coverage.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '500,506p' CHANGELOG.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "fixer",
+          "goal": "Propose the smallest viable fallback or guard using the scout handoff instead of rediscovering the repo.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-markdown-scan",
+              "description": "Broad scan across markdown implementation and tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"marked.parse|fallback to plain text|recursive markdown|code-block|console.warn\" ui/src/ui/markdown.ts ui/src/ui/markdown.test.ts CHANGELOG.md | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-markdown-impl",
+              "description": "Read the markdown rendering implementation around marked.parse and fallback behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '130,185p' ui/src/ui/markdown.ts"
+              }
+            },
+            {
+              "name": "read-markdown-tests",
+              "description": "Read the markdown regression tests that cover parser fallback.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '90,175p' ui/src/ui/markdown.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "validator",
+          "goal": "Define a focused regression validation path without broad UI sweeps.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "broad-validation-scan",
+              "description": "Broad validation scan across markdown implementation, tests, and changelog.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"#36213|#36445|marked.parse|fallback to plain text|recursive markdown|console.warn|code-block\" ui/src/ui/markdown.ts ui/src/ui/markdown.test.ts CHANGELOG.md | sed -n '1,240p'"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Focused validation scan on markdown fallback implementation and regression tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"marked.parse|fallback to plain text|recursive markdown|code-block|warnSpy\" ui/src/ui/markdown.ts ui/src/ui/markdown.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-markdown-tests",
+              "description": "Read the markdown regression tests that cover parser fallback.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '90,175p' ui/src/ui/markdown.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "reviewer",
+          "goal": "Review whether the rendering boundary, fallback, and validation plan are credible and focused.",
+          "max_steps": 1,
+          "toolset": [
+            {
+              "name": "read-scout-artifact",
+              "description": "Read the scout artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/scout.json"
+              }
+            },
+            {
+              "name": "read-fixer-artifact",
+              "description": "Read the fixer artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/fixer.json"
+              }
+            },
+            {
+              "name": "read-validator-artifact",
+              "description": "Read the validator artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/validator.json"
+              }
+            },
+            {
+              "name": "focused-validation-scan",
+              "description": "Read the focused validation scan for reviewer confirmation.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"marked.parse|fallback to plain text|recursive markdown|code-block|warnSpy\" ui/src/ui/markdown.ts ui/src/ui/markdown.test.ts | sed -n '1,220p'"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "ui/src/ui/markdown.ts",
+          "marked.parse",
+          "escaped plain text",
+          "pre class=\"code-block\"",
+          "recursive markdown",
+          "fallback"
+        ],
+        "validation_terms": [
+          "#36213",
+          "#36445",
+          "marked.parse",
+          "falls back to escaped plain text",
+          "code-block",
+          "warnSpy"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "one-prompt-multi-agent",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 1,
+        "maxDuplicateObservationStreak": 1,
+        "maxNoProgressStreak": 1,
+        "maxEstimatedTokenBurn": 22000
+      },
+      "aionis": {
+        "scout": {
+          "context_text": "Start with ui/src/ui/markdown.ts and ui/src/ui/markdown.test.ts, then confirm the public evidence in the changelog. Avoid broad rediscovery.",
+          "selection_map": {
+            "broad-markdown-scan": "read-markdown-impl"
+          }
+        },
+        "fixer": {
+          "context_text": "Use the scout handoff. Stay on ui/src/ui/markdown.ts and ui/src/ui/markdown.test.ts. Do not restart broad search.",
+          "selection_map": {
+            "broad-markdown-scan": "read-markdown-impl"
+          }
+        },
+        "validator": {
+          "context_text": "Use the fixer handoff. Focus on parser-fallback regression coverage in markdown.ts and markdown.test.ts. Avoid broad validation scans.",
+          "selection_map": {
+            "broad-validation-scan": "focused-validation-scan"
+          }
+        },
+        "reviewer": {
+          "context_text": "Review only whether the rendering boundary, fallback, and focused validation are credible. Prefer prior artifacts over rediscovery.",
+          "selection_map": {
+            "focused-validation-scan": "read-validator-artifact"
+          }
+        }
+      }
     }
   ]
 }
