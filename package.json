@@ -16,7 +16,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test test/*.test.mjs",
     "bench:anti-loop": "npm run build && node scripts/anti-loop-benchmark.mjs",
-    "smoke:openclaw-load": "npm run build && node scripts/openclaw-load-smoke.mjs"
+    "smoke:openclaw-load": "npm run build && python3 scripts/openclaw-load-smoke.py",
+    "bench:openclaw-ab": "npm run build && node scripts/openclaw-anti-loop-ab-benchmark.mjs"
   },
   "exports": {
     ".": "./dist/index.js",

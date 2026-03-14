@@ -1,0 +1,96 @@
+{
+  "benchmark": "openclaw_tool_loop_ab_v1",
+  "scenarios": [
+    {
+      "id": "rg_repeat_replay",
+      "description": "Repeated focused rg calls with no new progress should stop and dispatch replay.",
+      "prompt": "Find the parser code and stop repeating the same search.",
+      "tool_name": "rg",
+      "params": { "q": "OptionParser" },
+      "iterations": 12,
+      "duration_ms": 30,
+      "result": { "matches": ["click/parser.py:42"] },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "bench",
+        "replayPlaybookId": "pb-click-rg-focus",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxSameToolStreak": 3
+      },
+      "aionis": {
+        "context_text": "Use focused search and avoid repeating identical rg calls.",
+        "selected_tool": "rg",
+        "replay_eligible": true,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_block_reason": "replay dispatch selected",
+        "treatment_escape": "replay_dispatch",
+        "blocked_at_step": 4
+      }
+    },
+    {
+      "id": "pytest_repeat_handoff",
+      "description": "Repeated focused pytest calls with no progress should store a handoff when replay is not eligible.",
+      "prompt": "Keep test scope narrow and stop retrying the same failing test forever.",
+      "tool_name": "pytest",
+      "params": { "args": ["tests/test_parser.py"] },
+      "iterations": 10,
+      "duration_ms": 45,
+      "result": { "status": "failed", "summary": "same assertion failure" },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "bench",
+        "replayPlaybookId": "pb-click-pytest-focus",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxSameToolStreak": 3
+      },
+      "aionis": {
+        "context_text": "Retrying the same test without changing inputs is not progress.",
+        "selected_tool": "pytest",
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_block_reason": "handoff stored after loop-control stop",
+        "treatment_escape": "handoff_store",
+        "blocked_at_step": 4
+      }
+    },
+    {
+      "id": "grep_policy_reroute",
+      "description": "Broad grep scans should be blocked immediately when policy selects rg instead.",
+      "prompt": "Search the repo without broad recursive grep.",
+      "tool_name": "grep",
+      "params": { "pattern": "OptionParser", "args": ["-R", "."] },
+      "iterations": 6,
+      "duration_ms": 20,
+      "result": { "matches": ["./click/parser.py:42"] },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": false,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 3
+      },
+      "aionis": {
+        "context_text": "Prefer rg over recursive grep for repo search.",
+        "selected_tool": "rg",
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_block_reason": "policy selected rg instead of grep",
+        "treatment_escape": "policy_block",
+        "blocked_at_step": 1
+      }
+    }
+  ]
+}
