@@ -77,7 +77,21 @@ export class LoopStateStore {
     return state;
   }
 
+  link(state: LoopRunState, ...ids: Array<string | undefined>): LoopRunState {
+    for (const id of ids) {
+      if (!id) continue;
+      this.states.set(id, state);
+    }
+    return state;
+  }
+
   delete(stateId: string): void {
     this.states.delete(stateId);
+  }
+
+  deleteAllFor(target: LoopRunState): void {
+    for (const [key, value] of this.states.entries()) {
+      if (value === target) this.states.delete(key);
+    }
   }
 }

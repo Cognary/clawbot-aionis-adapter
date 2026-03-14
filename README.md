@@ -48,6 +48,19 @@ It does not control planner-internal reasoning steps that never emit tools.
 2. `src/binding/`
 3. `src/types/`
 
+## Verification
+
+1. `npm run test`
+2. `npm run smoke:openclaw-load`
+3. `npm run bench:openclaw-ab`
+4. `npm run bench:live-task`
+
+`bench:live-task` is the first scenario-backed benchmark layer:
+
+1. keepalive poll churn
+2. transport retry churn
+3. real-repo broad-search / broad-test drift
+
 ## Entry point
 
 Use `createOpenClawAionisAdapter(...)` to attach the adapter to an OpenClaw host API implementation.

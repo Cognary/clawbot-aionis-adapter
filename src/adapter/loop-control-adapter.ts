@@ -49,10 +49,16 @@ export class AionisLoopControlAdapter {
       sessionId: ctx.sessionId,
       workspaceDir: ctx.workspaceDir,
     });
-    return this.states.upsert(state);
+    this.states.upsert(state);
+    return this.states.link(state, ctx.sessionId, ctx.sessionKey);
   }
 
   sessionEnd(sessionId: string): void {
+    const state = this.states.get(sessionId);
+    if (state) {
+      this.states.deleteAllFor(state);
+      return;
+    }
     this.states.delete(sessionId);
   }
 
@@ -257,8 +263,17 @@ export class AionisLoopControlAdapter {
     const stateId = args.runId ?? args.sessionId ?? args.sessionKey ?? randomUUID();
     const existing = this.states.get(stateId);
     if (existing) return existing;
+    if (args.runId) {
+      const existingBySession = this.findState({ sessionId: args.sessionId, sessionKey: args.sessionKey });
+      if (existingBySession) {
+        existingBySession.runId = args.runId;
+        existingBySession.workspaceDir = args.workspaceDir ?? existingBySession.workspaceDir;
+        this.states.link(existingBySession, args.runId, args.sessionId, args.sessionKey);
+        return existingBySession;
+      }
+    }
     const scope = this.config.scopeResolver(args);
-    return this.states.upsert(createRunState({
+    const created = this.states.upsert(createRunState({
       stateId,
       scope,
       agentId: args.agentId,
@@ -268,6 +283,7 @@ export class AionisLoopControlAdapter {
       workspaceDir: args.workspaceDir,
       prompt: args.prompt,
     }));
+    return this.states.link(created, args.runId, args.sessionId, args.sessionKey);
   }
 
   private findState(args: { sessionId?: string; sessionKey?: string }): LoopRunState | undefined {

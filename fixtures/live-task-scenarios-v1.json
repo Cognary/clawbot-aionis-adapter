@@ -1,0 +1,150 @@
+{
+  "benchmark": "openclaw_live_task_v1",
+  "scenarios": [
+    {
+      "id": "keepalive_poll_churn",
+      "kind": "polling",
+      "description": "Repeated unchanged monitor polling should stop with a structured handoff instead of drifting until timeout.",
+      "prompt": "Monitor the local job endpoint and stop if the status does not meaningfully change.",
+      "iterations": 10,
+      "tool": {
+        "name": "http_get",
+        "params": {
+          "path": "/status"
+        }
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "live-bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 2,
+        "maxSameToolStreak": 8,
+        "maxNoProgressStreak": 8
+      },
+      "aionis": {
+        "context_text": "Repeated unchanged monitor polls are not progress. Stop with a structured handoff if the endpoint keeps returning the same state.",
+        "selection_map": {
+          "http_get": "http_get"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_outcome": "controlled_stop",
+        "treatment_stop_reason": "handoff stored after loop-control stop"
+      }
+    },
+    {
+      "id": "transport_retry_churn",
+      "kind": "transport_retry",
+      "description": "Repeated temporary transport failures should escape through replay instead of blind retries.",
+      "prompt": "Run the maintenance command against the local gateway and stop retry churn if transport remains unavailable.",
+      "iterations": 8,
+      "tool": {
+        "name": "http_command",
+        "params": {
+          "path": "/command"
+        }
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "live-bench",
+        "replayPlaybookId": "pb-live-transport-recovery",
+        "replayMode": "simulate",
+        "replayDispatchEnabled": true,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxDuplicateObservationStreak": 1,
+        "maxSameToolStreak": 6,
+        "maxNoProgressStreak": 2
+      },
+      "aionis": {
+        "context_text": "Repeated transport errors are not progress. Prefer deterministic recovery if an approved replay path exists.",
+        "selection_map": {
+          "http_command": "http_command"
+        },
+        "replay_eligible": true,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_outcome": "controlled_stop",
+        "treatment_stop_reason": "replay dispatch selected"
+      }
+    },
+    {
+      "id": "repo_broad_search_and_test_drift",
+      "kind": "repo_drift",
+      "description": "Broad grep and broad Node test drift on a real repo should be rerouted onto focused search and focused test paths.",
+      "prompt": "Locate the adapter registration path and validate the plugin entry without broad repo scans or broad test sweeps.",
+      "repo_path": "/Volumes/ziel/openclaw-aionis-adapter",
+      "plan": [
+        {
+          "toolName": "grep",
+          "params": {
+            "command": "grep -R \"register(\" src ."
+          }
+        },
+        {
+          "toolName": "node-test-broad",
+          "params": {
+            "command": "node --test test/*.test.mjs"
+          }
+        },
+        {
+          "toolName": "grep",
+          "params": {
+            "command": "grep -R \"openclaw-aionis-adapter\" src ."
+          }
+        },
+        {
+          "toolName": "node-test-broad",
+          "params": {
+            "command": "node --test test/*.test.mjs"
+          }
+        }
+      ],
+      "reroutes": {
+        "rg": {
+          "toolName": "rg",
+          "params": {
+            "command": "rg \"register\\(\" src/plugin.ts"
+          }
+        },
+        "node-test-focused": {
+          "toolName": "node-test-focused",
+          "params": {
+            "command": "node --test test/plugin-entry.test.mjs"
+          }
+        }
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "live-bench",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": false,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 1,
+        "maxSameToolStreak": 6,
+        "maxDuplicateObservationStreak": 3,
+        "maxNoProgressStreak": 4
+      },
+      "aionis": {
+        "context_text": "Prefer focused repo search and focused test execution. Use rg instead of recursive grep and avoid broad node --test sweeps.",
+        "selection_map": {
+          "grep": "rg",
+          "node-test-broad": "node-test-focused",
+          "rg": "rg",
+          "node-test-focused": "node-test-focused"
+        },
+        "replay_eligible": false,
+        "recommended_mode": "simulate"
+      },
+      "expected": {
+        "treatment_outcome": "completed"
+      }
+    }
+  ]
+}

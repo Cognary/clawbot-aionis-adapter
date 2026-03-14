@@ -8,8 +8,28 @@ export function classifyBroadScan(toolName: string, params: Record<string, unkno
 export function classifyBroadTest(toolName: string, params: Record<string, unknown>): boolean {
   const normalized = toolName.toLowerCase();
   const cmd = String(params.command ?? params.cmd ?? params.argv ?? "").toLowerCase();
-  if (normalized.includes("pytest-all")) return true;
-  return cmd.includes("pytest") && !cmd.includes("tests/") && !cmd.includes("::");
+  if (
+    normalized.includes("pytest-all") ||
+    normalized.includes("test-broad") ||
+    normalized.includes("jest-broad") ||
+    normalized.includes("vitest-broad")
+  ) {
+    return true;
+  }
+  if (cmd.includes("pytest")) {
+    return !cmd.includes("tests/") && !cmd.includes("::");
+  }
+  if (cmd.includes("npm test")) return true;
+  if (cmd.includes("node --test")) {
+    return cmd.includes("*") || !cmd.includes("test/");
+  }
+  if (cmd.includes("jest")) {
+    return !cmd.includes("test/") && !cmd.includes("--run");
+  }
+  if (cmd.includes("vitest")) {
+    return !cmd.includes("test/") && !cmd.includes("--run");
+  }
+  return false;
 }
 
 export function summarizeToolResult(result: unknown, error?: string): string {
@@ -21,6 +41,7 @@ export function summarizeToolResult(result: unknown, error?: string): string {
 export function inferProgress(toolName: string, summary: string): boolean {
   const normalized = toolName.toLowerCase();
   const text = summary.toLowerCase();
+  if (text.startsWith("error:")) return false;
   if (normalized.includes("edit") || normalized.includes("write") || normalized.includes("patch")) {
     return text.length > 0 && !text.includes("no changes");
   }
