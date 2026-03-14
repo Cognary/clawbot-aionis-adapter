@@ -1,0 +1,42 @@
+{
+  "name": "@aionis/openclaw-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone OpenClaw adapter for Aionis execution control.",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "openclaw.plugin.json",
+    "README.md",
+    "PRODUCT.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit false",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "bench:anti-loop": "npm run build && node scripts/anti-loop-benchmark.mjs"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./plugin": "./dist/plugin.js"
+  },
+  "keywords": [
+    "aionis",
+    "openclaw",
+    "adapter",
+    "loop-control",
+    "policy",
+    "replay",
+    "handoff"
+  ],
+  "openclaw": {
+    "extensions": [
+      "./dist/plugin.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}
