@@ -1,35 +1,104 @@
 # Aionis OpenClaw Adapter
 
-A standalone adapter for connecting OpenClaw to Aionis execution control.
+**Bring execution control to OpenClaw.**
 
-## Quickstart
+`@aionis/openclaw-adapter` connects OpenClaw to Aionis so agent runs stop acting like an unbounded ReAct loop and start behaving like a controlled execution system.
 
-1. Start Aionis Lite:
+What Aionis adds on top of OpenClaw:
+
+- **externalized context** so each run starts with the right task state instead of rediscovering it
+- **policy gating** so broad search, broad test, and repeated no-progress tool paths get suppressed
+- **replay dispatch** so repeatable work can escape into a known path instead of starting over
+- **handoff fallback** so failed or interrupted runs preserve a usable continuation point
+- **loop control** so tool churn, duplicate observations, and no-progress streaks get stopped before they burn more time and tokens
+
+This is not a generic memory plugin. It is an **execution-control adapter** for OpenClaw.
+
+## Why It Matters
+
+OpenClaw is powerful, but on complex tasks it can still fail in predictable ways:
+
+- too many repeated tool calls
+- broad repo scans when a focused path would do
+- broad test runs when a targeted validation is enough
+- no-progress retry loops that keep burning tokens
+- interrupted runs that lose the exact execution state needed to continue
+
+Aionis changes that operating model.
+
+Instead of letting each run improvise from scratch, the adapter gives OpenClaw:
+
+1. a compact execution context at run start
+2. a policy layer before expensive tool calls
+3. feedback and evidence capture after each tool call
+4. structured escape hatches through replay or handoff
+
+## What Is Proven Today
+
+Current benchmark evidence supports four concrete claims:
+
+1. **Tool-loop churn goes down**
+2. **Token burn goes down on benchmarked slices**
+3. **Completion goes up on current replay, focused-repo, and handoff-resume slices**
+4. **The adapter is active on real OpenClaw runtime paths, not just mock harnesses**
+
+Headline results:
+
+- **Live-task A/B**: average executed steps dropped from `7.33` to `3`, and broad tool calls dropped from `1.33` to `0`
+- **GLM-5 semi-live token benchmark**: average total tokens dropped from `1893` to `865.33`
+- **Hard-stop / replay token slice**: average total tokens dropped from `1659` to `1267`, with `controlled_stop_rate = 1`
+- **Completion benchmark**: baseline `completed_rate = 0`, treatment `completed_rate = 1` on the current benchmark slices
+- **Repeated Google runtime-backed A/B**: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
+
+Supporting docs:
+
+- [Benchmark Evidence Overview](docs/2026-03-14-benchmark-evidence-overview.md)
+- [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
+- [Completion Benchmark](docs/2026-03-14-openclaw-completion-benchmark.md)
+- [Loader-Backed Semi-Live Token Benchmark](docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md)
+- [Google Runtime Benchmark](docs/2026-03-14-openclaw-google-runtime-benchmark.md)
+- [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
+
+Public evidence files:
+
+- [Evidence Index](evidence/README.md)
+- [Live-task benchmark summary](evidence/openclaw-live-task-benchmark/20260314061733/summary.json)
+- [GLM-5 semi-live token summary](evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json)
+- [Hard-stop / replay token summary](evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json)
+- [Completion benchmark summary](evidence/openclaw-completion-benchmark/20260314072335/summary.json)
+- [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
+
+## 5-Minute Quickstart
+
+### 1. Start Aionis Lite
 
 ```bash
 npx @aionis/sdk@0.2.19 dev
 npx @aionis/sdk@0.2.19 health
 ```
 
-2. Install the adapter into OpenClaw from npm:
+Expected Aionis base URL:
+
+- `http://127.0.0.1:3321`
+
+### 2. Install the Adapter into OpenClaw
 
 ```bash
 openclaw plugins install @aionis/openclaw-adapter
 openclaw plugins info openclaw-adapter --json
 ```
 
-3. Add the plugin config shown below.
+You should see:
 
-Reference files:
+- plugin id: `openclaw-adapter`
+- status: `loaded`
 
-- `examples/openclaw.json`
-- `docs/2026-03-14-install-and-config.md`
+### 3. Add the Minimal OpenClaw Config
 
-Expected Aionis endpoint:
+Reference example:
 
-- `http://127.0.0.1:3321`
-
-Minimum plugin config:
+- [examples/openclaw.json](examples/openclaw.json)
+- [Install and Config Guide](docs/2026-03-14-install-and-config.md)
 
 ```json
 {
@@ -53,35 +122,54 @@ Minimum plugin config:
 }
 ```
 
-## Release Status
+### 4. Run a First Turn
 
-Current package metadata is prepared for publish:
+```bash
+openclaw agent --local --message "Inspect the task, avoid broad scans, and proceed carefully." --json
+```
 
-1. `CHANGELOG.md` exists
-2. install/config example exists
-3. package `files` includes `CHANGELOG.md` and `examples/`
-4. package metadata includes `repository`, `bugs`, and `homepage`
+## How Aionis Changes an OpenClaw Run
 
-Current boundary:
+### Before the run
 
-1. publish workflow is not set up in this repo yet
-2. registry users need `0.1.1` or later to get the aligned `openclaw-adapter` plugin id
+Aionis assembles a compact execution context so the model starts from the right task state instead of re-reading the same surface area.
 
-## What it is
+### Before a tool call
 
-This project provides:
+Aionis applies policy gating. This is where the adapter can suppress:
+
+- repeated calls to the same tool
+- broad repo search when a focused query is enough
+- broad test runs when a targeted test is available
+- obviously no-progress paths that should stop or reroute
+
+### After a tool call
+
+Aionis writes back:
+
+- tool feedback
+- evidence
+- loop state updates
+
+That lets later steps reason from actual execution history, not just the transient conversation buffer.
+
+### When the run degrades
+
+The adapter can escape through:
+
+- **replay dispatch** when the task matches a reusable path
+- **handoff** when the right behavior is to preserve a structured continuation point
+
+## What This Product Is
+
+This package gives you:
 
 1. a reusable `AionisLoopControlAdapter`
-2. an `OpenClaw` host binding
-3. loop-control heuristics for high-cost tool paths
-4. replay and handoff escape-hatch orchestration
+2. an OpenClaw host binding
+3. policy and loop heuristics for expensive tool paths
+4. replay and handoff orchestration around OpenClaw runs
 
-## What it is not
-
-1. not a generic memory package
-2. not a planner-internal reasoning controller
-
-## Current hook coverage
+Current hook coverage:
 
 1. `session_start`
 2. `session_end`
@@ -92,250 +180,45 @@ This project provides:
 7. `tool_result_persist`
 8. `before_message_write`
 
-## Current capabilities
+## What It Does Not Claim
 
-1. pre-tool policy gating
-2. repeated-tool blocking
-3. duplicate/no-progress tracking
-4. broad scan and broad test suppression
-5. replay dispatch escape hatch
-6. handoff fallback
-7. structured stop reasons
+This adapter currently controls the **tool-loop boundary**.
 
-## Boundary
+It does **not** claim to:
 
-This adapter controls the tool loop boundary.
-It does not control planner-internal reasoning steps that never emit tools.
+- control planner-internal reasoning steps that never emit a tool call
+- solve every OpenClaw failure mode
+- guarantee token wins on every provider and every task shape
 
-## Project structure
+The current evidence is strong on:
 
-1. `src/adapter/`
-2. `src/binding/`
-3. `src/types/`
+- tool-loop control
+- token reduction on benchmarked slices
+- completion uplift on current benchmark slices
+- real OpenClaw runtime activity
 
-## Verification
+## Verification and Benchmark Commands
 
-1. `npm run test`
+Core checks:
+
+1. `npm test`
 2. `npm run smoke:openclaw-load`
-3. `npm run bench:openclaw-ab`
-4. `npm run bench:live-task`
-5. `npm run bench:semi-live-token`
-6. `npm run bench:loader-backed-semi-live-token`
-7. `npm run smoke:gateway-backed-feasibility`
-8. `npm run smoke:adapter-activity`
-9. `npm run bench:google-runtime`
-10. `npm run bench:google-runtime-ab`
+3. `npm run smoke:adapter-activity`
 
-`bench:live-task` is the first scenario-backed benchmark layer:
+Benchmarks:
 
-1. keepalive poll churn
-2. transport retry churn
-3. real-repo broad-search / broad-test drift
+1. `npm run bench:openclaw-ab`
+2. `npm run bench:live-task`
+3. `npm run bench:semi-live-token`
+4. `npm run bench:loader-backed-semi-live-token`
+5. `npm run bench:completion`
+6. `npm run bench:google-runtime`
+7. `npm run bench:google-runtime-ab`
 
-## Current Evidence
+## Repo Guide
 
-Benchmark overview:
-- `docs/2026-03-14-benchmark-evidence-overview.md`
-- `docs/2026-03-14-openclaw-aionis-benchmark-summary.md`
-- `docs/2026-03-14-openclaw-completion-benchmark.md`
-- `docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md`
-- `docs/2026-03-14-openclaw-adapter-activity-probe.md`
-- `docs/2026-03-14-openclaw-gateway-backed-feasibility.md`
-- `docs/2026-03-14-openclaw-google-runtime-benchmark.md`
-- `docs/2026-03-14-openclaw-google-runtime-case-study.md`
-- `docs/2026-03-14-openclaw-gateway-backed-benchmark-plan.md`
-
-### Live-task A/B
-
-Artifact:
-- `evidence/openclaw-live-task-benchmark/20260314061733/summary.json`
-
-Current result:
-
-- baseline:
-  - `avg_executed_steps = 7.33`
-  - `controlled_stop_rate = 0`
-  - `avg_broad_tool_calls = 1.33`
-- treatment:
-  - `avg_executed_steps = 3`
-  - `controlled_stop_rate = 0.6667`
-  - `replay_dispatch_rate = 0.3333`
-  - `handoff_store_rate = 0.3333`
-  - `avg_broad_tool_calls = 0`
-
-This currently supports:
-
-- Aionis reduces uncontrolled tool-loop churn
-- Aionis suppresses broad repo search and broad test drift
-- Aionis can escape through replay or handoff
-
-### GLM-5 Semi-Live Token Benchmark
-
-Artifact:
-- `evidence/openclaw-semi-live-token-benchmark/20260314064242/summary.json`
-
-Current 3-scenario result:
-
-- baseline:
-  - `avg_total_tokens = 1893`
-  - `avg_executed_steps = 5.67`
-  - `completed_rate = 0.3333`
-- treatment:
-  - `avg_total_tokens = 865.33`
-  - `avg_executed_steps = 2`
-  - `completed_rate = 0.3333`
-  - `avg_broad_tool_calls = 0`
-
-This currently supports:
-
-- Aionis can reduce token burn in semi-live OpenClaw tasks
-- the current token win comes from context and policy shaping plus focused-path execution
-- this result does not yet prove that hard stops or replay are the dominant source of token savings
-
-### Hard-Stop / Replay-Driven Token Slice
-
-Artifact:
-- `evidence/openclaw-semi-live-token-benchmark/20260314070306/summary.json`
-
-Single-scenario result:
-
-- baseline:
-  - `avg_total_tokens = 1659`
-  - `avg_executed_steps = 6`
-  - `controlled_stop_rate = 0`
-- treatment:
-  - `avg_total_tokens = 1267`
-  - `avg_executed_steps = 3`
-  - `controlled_stop_rate = 1`
-  - `replay_dispatch_rate = 1`
-
-This currently supports:
-
-- Aionis can also save tokens through hard-stop and replay-driven control
-- the adapter is not limited to soft context shaping
-
-### Loader-Backed Semi-Live Token Benchmark
-
-Current artifact:
-- `evidence/openclaw-loader-backed-semi-live-token-benchmark/20260314073214/summary.json`
-
-Current result:
-
-- baseline:
-  - `avg_total_tokens = 1836`
-  - `avg_executed_steps = 5.75`
-  - `completed_rate = 0.25`
-- treatment:
-  - `avg_total_tokens = 968.25`
-  - `avg_executed_steps = 2.25`
-  - `completed_rate = 0.25`
-  - `controlled_stop_rate = 0.25`
-  - `replay_dispatch_rate = 0.25`
-  - `handoff_store_rate = 0.5`
-  - `avg_broad_tool_calls = 0`
-
-This currently supports:
-
-- the token reduction result survives a real OpenClaw install/discovery path
-- the adapter still reduces churn and token burn when executed from the installed plugin source path
-
-### Gateway-Backed Runtime Feasibility
-
-Current artifact:
-- `evidence/openclaw-gateway-backed-feasibility/summary.json`
-
-Current result:
-
-- `provider = zai`
-- `model = glm-5`
-- `runtime_path_reached_model = true`
-- `outcome = rate_limited_timeout`
-
-This currently supports:
-
-- the real `openclaw agent --local` runtime path now reaches `zai/glm-5`
-- the earlier Anthropic default-model blocker is resolved
-- the remaining blocker for a full gateway-backed benchmark is provider-side runtime rate limiting
-
-### Adapter Activity Probe
-
-Current artifact:
-- `evidence/openclaw-adapter-activity-probe/summary.json`
-
-Current result:
-
-- `provider = zai`
-- `model = glm-5`
-- `runtime_path_reached_model = true`
-- `mock_paths = ["/v1/memory/context/assemble", "/v1/handoff/store"]`
-- `outcome = adapter_active`
-
-This probe is narrower than a full runtime-backed benchmark.
-
-It is designed to show:
-
-- the installed adapter is active inside a real `openclaw agent --local` turn
-- the runtime emits real Aionis requests such as `context/assemble`
-
-This helps separate:
-
-- plugin activity proof
-- from the still-open provider-side rate-limit blocker on the live runtime path
-
-### Google Runtime-Backed Completion A/B
-
-Current artifact:
-- `evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json`
-
-Current result:
-
-- provider:
-  - `google/gemini-3-flash-preview`
-- baseline:
-  - `completed_rate = 0`
-  - `avg_total_tokens = 4319`
-  - `timed_out_count = 1`
-- treatment:
-  - `completed_rate = 0.8`
-  - `avg_total_tokens = 4287`
-  - `avg_mock_request_count = 1`
-  - `timed_out_count = 0`
-- delta:
-  - `completion_gain = +0.8`
-  - `avg_token_delta = -26.5`
-  - `token_win_rate = 0.5`
-  - `token_pair_count = 4`
-
-This currently supports:
-
-- a real OpenClaw local agent path now has a repeated `baseline vs adapter` runtime-backed completion benchmark
-- adapter-driven externalized context lifts completion on a stable provider-backed path
-- this repo no longer depends only on the `zai/glm-5` feasibility line for runtime evidence
-
-### Completion-Oriented Benchmark
-
-Current artifact:
-- `evidence/openclaw-completion-benchmark/20260314072335/summary.json`
-
-Current result:
-
-- baseline:
-  - `completed_rate = 0`
-  - `avg_executed_steps = 3.67`
-  - `avg_total_tokens = 1125`
-- treatment:
-  - `completed_rate = 1`
-  - `avg_executed_steps = 2`
-  - `avg_total_tokens = 882.67`
-  - `replay_dispatch_success_rate = 0.3333`
-  - `handoff_resume_success_rate = 0.3333`
-
-This currently supports:
-
-- Aionis can improve completion on replay-eligible repeated workflows
-- Aionis can improve completion on tight-budget real-repo focused tasks
-- Aionis can also improve completion on interrupted handoff-resume tasks
-
-## Entry point
-
-Use `createOpenClawAionisAdapter(...)` to attach the adapter to an OpenClaw host API implementation.
+- [Install and Config Guide](docs/2026-03-14-install-and-config.md)
+- [Product Positioning](PRODUCT.md)
+- [Changelog](CHANGELOG.md)
+- [Benchmark Evidence Overview](docs/2026-03-14-benchmark-evidence-overview.md)
+- [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
