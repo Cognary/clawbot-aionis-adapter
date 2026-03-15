@@ -28,6 +28,8 @@ const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
 const LIVE_AIONIS_BASE_URL = (process.env.BENCH_AIONIS_BASE_URL ?? '').trim();
 const CONTINUITY_MODE = (process.env.BENCH_CONTINUITY_MODE ?? 'packet').trim() || 'packet';
 const ARM_SELECTION = (process.env.BENCH_ARM_SELECTION ?? 'both').trim() || 'both';
+const AGENT_WALL_CLOCK_TIMEOUT_MS = Number(process.env.BENCH_AGENT_TIMEOUT_MS ?? 150000);
+const ARM_WALL_CLOCK_TIMEOUT_MS = Number(process.env.BENCH_ARM_TIMEOUT_MS ?? 900000);
 
 if (!API_KEY) {
   if (MODEL_PROVIDER === 'gemini') {
@@ -492,6 +494,25 @@ function buildSynthesisMessages({ scenario, agent, history, carryover }) {
   ];
 }
 
+function timeoutStageResult(agentName, reason) {
+  return {
+    agent: agentName,
+    success: false,
+    artifact: null,
+    note: null,
+    executed_steps: 0,
+    broad_tool_calls: 0,
+    rediscovery_reads: 0,
+    controlled_stop: true,
+    stop_reason: reason,
+    prompt_tokens: 0,
+    completion_tokens: 0,
+    total_tokens: 0,
+    token_breakdown: [],
+    history: [],
+  };
+}
+
 function validateArtifact(agentName, artifact, expected) {
   if (!artifact || typeof artifact !== 'object') return false;
   if (agentName === 'orchestrator') {
@@ -762,7 +783,7 @@ async function resolveTreatmentCarryover(aionis, scenario, agentName, pluginConf
   return await recoverRealAionisHandoff(aionis.baseUrl, scenario, agentName, pluginConfig, scope, repoPath);
 }
 
-async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId }) {
+async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId, agentDeadlineMs }) {
   const toolset = materializeToolset(agent.toolset, { REPO_PATH: repoPath, RUN_DIR: runDir });
   const profile = controlProfile(agent);
   const preferredTools = preferredToolList(profile, toolset);
@@ -778,6 +799,9 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   let injectedContext = shouldInjectRawCarryover(mode, carryover) ? carryoverText(carryover) : '';
   const seenHashes = new Set();
   const ctx = stageCtx(baseId, repoPath, agent.name);
+  const startedAt = Date.now();
+
+  const hasTimedOut = () => (Date.now() - startedAt) > agentDeadlineMs;
 
   if (mode === 'treatment') {
     const startResult = await host.emit('before_agent_start', {
@@ -799,6 +823,11 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   }
 
   for (let step = 1; step <= Number(agent.max_steps ?? 1); step += 1) {
+    if (hasTimedOut()) {
+      controlledStop = true;
+      stopReason = 'agent_timeout_exceeded';
+      break;
+    }
     const { parsed, usage } = await callModel(buildMessages({ scenario, agent, toolset, history, carryover: injectedContext }));
     tokenBreakdown.push({ step, ...usage, model_decision: parsed });
 
@@ -863,11 +892,16 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   }
 
   if (!artifact) {
-    const { parsed, usage } = await callModel(buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }));
-    tokenBreakdown.push({ step: 'synthesis', ...usage, model_decision: parsed });
-    if (parsed.action === 'finish' && validateArtifact(agent.name, parsed.artifact, scenario.expected)) {
-      artifact = parsed.artifact;
-      note = parsed.note ?? null;
+    if (hasTimedOut()) {
+      controlledStop = true;
+      stopReason = stopReason ?? 'agent_timeout_exceeded';
+    } else {
+      const { parsed, usage } = await callModel(buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }));
+      tokenBreakdown.push({ step: 'synthesis', ...usage, model_decision: parsed });
+      if (parsed.action === 'finish' && validateArtifact(agent.name, parsed.artifact, scenario.expected)) {
+        artifact = parsed.artifact;
+        note = parsed.note ?? null;
+      }
     }
   }
 
@@ -937,12 +971,27 @@ async function runArm({ scenario, mode, repetition, artifactDir }) {
 
   try {
     for (const agent of scenario.agents) {
+      if ((Date.now() - t0) > ARM_WALL_CLOCK_TIMEOUT_MS) {
+        stageResults.push(timeoutStageResult(agent.name, 'arm_timeout_exceeded'));
+        break;
+      }
       const agentCtx = stageCtx(baseId, repoPath, agent.name);
       const scope = mode === 'treatment' ? resolveScope(pluginConfig, agentCtx) : null;
       if (mode === 'treatment') {
         await prepareTreatmentStage(aionis, scenario, agent.name, pluginConfig, scope);
       }
-      const result = await runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId });
+      const result = await runAgent({
+        scenario,
+        agent,
+        mode,
+        host,
+        aionis,
+        repoPath,
+        runDir,
+        carryover,
+        baseId,
+        agentDeadlineMs: AGENT_WALL_CLOCK_TIMEOUT_MS,
+      });
       stageResults.push(result);
       if (!result.success) break;
       if (mode === 'treatment') {
