@@ -98,7 +98,8 @@ Interpretation:
 
 Evidence:
 
-- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
+- [Real workflow scenario summary: dashboard auth drift](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
+- [Real workflow scenario summary: pairing / approval recovery (`Gemini`)](../evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
 Supporting signal:
@@ -107,9 +108,9 @@ Supporting signal:
 
 Interpretation:
 
-- this is positive completion evidence
-- but it is weaker than the two strongest one-prompt multi-agent slices
-- it should support the overall completion story, not define the headline claim by itself
+- realistic workflow evidence is now positive on two workflow shapes
+- dashboard auth drift remains the stronger reviewer-ready workflow slice
+- the Gemini pairing / approval recovery run is supporting product-level evidence, not the headline claim by itself
 
 ### 5. Real runtime activity is proven
 

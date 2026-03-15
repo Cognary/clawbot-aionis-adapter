@@ -60,6 +60,8 @@ A run is counted as `reviewer_ready` only when the workflow produces a reviewer-
 
 ## Current Result
 
+### Primary workflow slice: dashboard auth drift
+
 Evidence:
 
 - [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
@@ -81,6 +83,29 @@ Other signals:
 - treatment `avg_handoff_store_count = 5`
 - treatment `avg_context_assemble_count = 4`
 
+### Supporting workflow slice: pairing / approval recovery (`Gemini`)
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315052250/cases.jsonl)
+
+Headline result (`3` repeats):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 0.6667`
+
+Other signals:
+
+- baseline `avg_total_tokens = 14751.33`
+- treatment `avg_total_tokens = 21894.33`
+- baseline `avg_broad_tool_call_count = 2`
+- treatment `avg_broad_tool_call_count = 0`
+- treatment `avg_handoff_store_count = 4`
+- treatment `avg_context_assemble_count = 4`
+
 ## Interpretation
 
 This is a **continuity win**, not a token win.
@@ -97,9 +122,9 @@ That is the right way to read this benchmark:
 
 This benchmark proves:
 
-1. Aionis can improve completion on a realistic one-prompt multi-agent workflow
-2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence, not only a single lucky run
-3. the product story holds outside narrow benchmark slices
+1. Aionis can improve completion on a realistic reviewer-ready workflow, not only narrow harness slices
+2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence
+3. the product story holds across more than one realistic workflow shape, including a second supporting Gemini slice
 
 ## What It Does Not Prove
 
@@ -111,6 +136,15 @@ This benchmark does not prove:
 
 ## Run Command
 
+Primary workflow slice:
+
 ```bash
 BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_dashboard_auth_drift_reviewer_ready_workflow npm run bench:real-workflow
+```
+
+Supporting Gemini slice:
+
+```bash
+BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_pairing_approval_recovery_reviewer_ready_workflow \
+  BENCH_MODEL_PROVIDER=gemini npm run bench:real-workflow
 ```

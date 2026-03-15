@@ -1,0 +1,35 @@
+{
+  "benchmark": "openclaw_real_workflow_scenario_v1",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "repetitions": 3,
+  "cases": 3,
+  "baseline": {
+    "reviewer_ready_rate": 0,
+    "workflow_completed_rate": 0,
+    "avg_total_tokens": 14751.333333333334,
+    "avg_wall_clock_ms": 56251,
+    "avg_tool_call_count": 4.666666666666667,
+    "avg_broad_tool_call_count": 2,
+    "avg_rediscovery_reads": 0,
+    "tokens_per_reviewer_ready_run": null
+  },
+  "treatment": {
+    "reviewer_ready_rate": 0.6666666666666666,
+    "workflow_completed_rate": 0.6666666666666666,
+    "avg_total_tokens": 21894.333333333332,
+    "avg_wall_clock_ms": 70104.33333333333,
+    "avg_tool_call_count": 4.333333333333333,
+    "avg_broad_tool_call_count": 0,
+    "avg_rediscovery_reads": 0.3333333333333333,
+    "avg_handoff_store_count": 4,
+    "avg_context_assemble_count": 4,
+    "tokens_per_reviewer_ready_run": 17628.5
+  },
+  "delta": {
+    "reviewer_ready_gain": 0.6666666666666666,
+    "workflow_completion_gain": 0.6666666666666666,
+    "avg_token_delta": 7142.999999999998,
+    "avg_rediscovery_delta": 0.3333333333333333
+  }
+}

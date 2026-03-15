@@ -4,6 +4,245 @@
   "model": "glm-5",
   "scenarios": [
     {
+      "id": "glm_pairing_approval_recovery_reviewer_ready_workflow",
+      "kind": "pairing_approval_recovery_reviewer_ready_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "pairing-approval-recovery",
+      "issue_url": "https://docs.openclaw.ai/gateway/pairing",
+      "top_level_prompt": "Investigate the gateway pairing and approval recovery workflow when a node or dashboard client hits pending approval, stale token rotation, or pairing retry confusion, identify the exact pairing boundary and the smallest safe remediation or operator recovery direction, define focused validation, and leave a reviewer-ready summary with rollback notes.",
+      "agents": [
+        {
+          "name": "orchestrator",
+          "goal": "Turn the single high-level pairing recovery request into a concrete workflow plan, target surface, and exit criteria without broad rediscovery.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-pairing-scan",
+              "description": "Broad scan across pairing docs, protocol, troubleshooting, and changelog for pending approval, token rotation, and recovery behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"pairing|pending approval|pair-ok|hello-ok|token rotate|re-approval|device token|operator.pairing|approve|pairing request\" docs/gateway/pairing.md docs/gateway/protocol.md docs/gateway/troubleshooting.md docs/gateway/discovery.md ui/src/ui/gateway.ts CHANGELOG.md | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-pairing-doc",
+              "description": "Read the gateway pairing doc that explains request, approval, token issuance, and re-pair behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/pairing.md"
+              }
+            },
+            {
+              "name": "read-protocol-doc",
+              "description": "Read the gateway protocol sections for pairing and operator approval scopes.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,235p' docs/gateway/protocol.md"
+              }
+            },
+            {
+              "name": "read-troubleshooting-doc",
+              "description": "Read troubleshooting guidance for pairing required, token mismatch, and approval flows.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '240,370p' docs/gateway/troubleshooting.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "triage",
+          "goal": "Isolate the pairing boundary and evidence chain that best explains pending approval, stale token rotation, and recovery confusion, using the orchestrator handoff rather than restarting the search.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-pairing-scan",
+              "description": "Broad pairing scan across docs, protocol, UI gateway scopes, and changelog.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"pairing|approve|device token|rotate|re-approval|operator.pairing|operator.approvals|token mismatch|pending approval\" docs/gateway/pairing.md docs/gateway/protocol.md docs/gateway/troubleshooting.md docs/gateway/discovery.md ui/src/ui/gateway.ts CHANGELOG.md | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-pairing-doc",
+              "description": "Read the pairing flow and re-pair/token rotation behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/pairing.md"
+              }
+            },
+            {
+              "name": "read-troubleshooting-doc",
+              "description": "Read troubleshooting entries for pairing required, pending approval, and token drift recovery.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '240,370p' docs/gateway/troubleshooting.md"
+              }
+            },
+            {
+              "name": "read-ui-gateway-scopes",
+              "description": "Read the UI gateway operator scope setup to confirm pairing and approval control paths.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '220,275p' ui/src/ui/gateway.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "patch",
+          "goal": "Propose the smallest safe remediation direction or operator recovery path, focused validation, and rollback notes from the triage handoff.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-remediation-scan",
+              "description": "Broad scan for pairing recovery, token rotation repair, and approval handling anchors.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"pairing|approve|token rotate|re-approval|device token|operator.pairing|operator.approvals|token mismatch|pending approval\" docs/gateway/pairing.md docs/gateway/protocol.md docs/gateway/troubleshooting.md docs/gateway/discovery.md ui/src/ui/gateway.ts CHANGELOG.md | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-pairing-doc",
+              "description": "Read the main pairing lifecycle and operator recovery path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/pairing.md"
+              }
+            },
+            {
+              "name": "read-protocol-doc",
+              "description": "Read the protocol scope and token rotation boundary for precise remediation notes.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '180,235p' docs/gateway/protocol.md"
+              }
+            },
+            {
+              "name": "read-changelog-pairing-slice",
+              "description": "Read changelog slices for pairing token rotation and approval recovery hardening.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '96,108p' CHANGELOG.md && printf -- '\n---\n' && sed -n '486,492p' CHANGELOG.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "review",
+          "goal": "Produce a reviewer-ready package with pairing hypothesis, target files, remediation direction, focused validation, rollback notes, and final verdict.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "read-workflow-artifacts",
+              "description": "Read the orchestrator, triage, and patch artifacts together as a reviewer packet source.",
+              "params": {
+                "command": "printf -- '--- orchestrator ---\\n' && cat ${RUN_DIR}/orchestrator.json && printf -- '\\n--- triage ---\\n' && cat ${RUN_DIR}/triage.json && printf -- '\\n--- patch ---\\n' && cat ${RUN_DIR}/patch.json"
+              }
+            },
+            {
+              "name": "read-orchestrator-artifact",
+              "description": "Read the orchestrator workflow plan artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/orchestrator.json"
+              }
+            },
+            {
+              "name": "read-triage-artifact",
+              "description": "Read the triage artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/triage.json"
+              }
+            },
+            {
+              "name": "read-patch-artifact",
+              "description": "Read the patch artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/patch.json"
+              }
+            },
+            {
+              "name": "focused-review-scan",
+              "description": "Run a focused evidence scan over pairing lifecycle, troubleshooting, protocol scopes, and recovery notes.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"pairing|approve|device token|rotate|re-approval|operator.pairing|operator.approvals|pending approval|token mismatch\" docs/gateway/pairing.md docs/gateway/protocol.md docs/gateway/troubleshooting.md ui/src/ui/gateway.ts CHANGELOG.md | sed -n '1,240p'"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "pairing",
+          "pending approval",
+          "device token",
+          "operator.pairing",
+          "operator.approvals",
+          "re-approval",
+          "token rotate",
+          "pair-ok"
+        ],
+        "file_terms": [
+          "docs/gateway/pairing.md",
+          "docs/gateway/protocol.md",
+          "docs/gateway/troubleshooting.md",
+          "docs/gateway/discovery.md",
+          "ui/src/ui/gateway.ts",
+          "CHANGELOG.md",
+          "pairing.md",
+          "protocol.md",
+          "troubleshooting.md",
+          "gateway.ts"
+        ],
+        "validation_terms": [
+          "pending approval",
+          "approve",
+          "pair-ok",
+          "device token",
+          "rotate",
+          "re-approval",
+          "operator.pairing"
+        ],
+        "rollback_terms": [
+          "rollback",
+          "revert",
+          "restore",
+          "fallback",
+          "previous pairing behavior",
+          "safe rollback"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "real-workflow",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 2,
+        "maxDuplicateObservationStreak": 2,
+        "maxNoProgressStreak": 2,
+        "maxEstimatedTokenBurn": 26000
+      },
+      "aionis": {
+        "orchestrator": {
+          "context_text": "Start on docs/gateway/pairing.md, docs/gateway/protocol.md, and docs/gateway/troubleshooting.md. The workflow should finish with a reviewer-ready packet, not a loose summary.",
+          "selection_map": {
+            "broad-pairing-scan": "read-pairing-doc"
+          }
+        },
+        "triage": {
+          "context_text": "Use the orchestrator handoff. Stay on the pairing boundary between pending approval, device token issuance, and re-approval after rotation. Do not restart a broad repo search.",
+          "selection_map": {
+            "broad-pairing-scan": "read-troubleshooting-doc"
+          }
+        },
+        "patch": {
+          "context_text": "Use the triage handoff. Focus on the smallest safe remediation direction or operator recovery path, focused validation, and rollback notes. Avoid broad remediation scans if the likely files are already known.",
+          "selection_map": {
+            "broad-remediation-scan": "read-changelog-pairing-slice"
+          }
+        },
+        "review": {
+          "context_text": "Assemble a reviewer-ready packet. Prefer prior artifacts and focused evidence over rediscovery.",
+          "selection_map": {
+            "focused-review-scan": "read-workflow-artifacts",
+            "read-triage-artifact": "read-workflow-artifacts",
+            "read-orchestrator-artifact": "read-workflow-artifacts"
+          }
+        }
+      }
+    },
+    {
       "id": "glm_dashboard_auth_drift_reviewer_ready_workflow",
       "kind": "dashboard_auth_drift_reviewer_ready_workflow",
       "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",

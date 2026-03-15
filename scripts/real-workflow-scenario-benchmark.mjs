@@ -11,16 +11,27 @@ import plugin from '../dist/plugin.js';
 const execFile = promisify(execFileCb);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE_PATH = path.join(ROOT, 'fixtures', 'real-workflow-scenarios-v1.json');
-const API_BASE_URL = process.env.GLM_BASE_URL ?? 'https://open.bigmodel.cn/api/paas/v4';
-const API_KEY = process.env.ZHIPU_API_KEY ?? process.env.GLM_API_KEY;
-const MODEL = process.env.GLM_MODEL ?? 'glm-5';
-const MAX_GLM_RETRIES = Number(process.env.GLM_MAX_RETRIES ?? 3);
-const GLM_REQUEST_TIMEOUT_MS = Number(process.env.GLM_REQUEST_TIMEOUT_MS ?? 30000);
+const MODEL_PROVIDER = process.env.BENCH_MODEL_PROVIDER ?? ((process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY) ? 'gemini' : 'glm');
+const API_BASE_URL = MODEL_PROVIDER === 'gemini'
+  ? (process.env.GEMINI_BASE_URL ?? process.env.GOOGLE_OPENAI_BASE_URL ?? 'https://generativelanguage.googleapis.com/v1beta/openai')
+  : (process.env.GLM_BASE_URL ?? 'https://open.bigmodel.cn/api/paas/v4');
+const API_KEY = MODEL_PROVIDER === 'gemini'
+  ? (process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? process.env.GOOGLE_GENAI_API_KEY)
+  : (process.env.ZHIPU_API_KEY ?? process.env.GLM_API_KEY);
+const MODEL = MODEL_PROVIDER === 'gemini'
+  ? (process.env.GEMINI_MODEL ?? 'gemini-2.5-flash')
+  : (process.env.GLM_MODEL ?? 'glm-5');
+const MAX_MODEL_RETRIES = Number(process.env.MODEL_MAX_RETRIES ?? process.env.GLM_MAX_RETRIES ?? process.env.GEMINI_MAX_RETRIES ?? 3);
+const MODEL_REQUEST_TIMEOUT_MS = Number(process.env.MODEL_REQUEST_TIMEOUT_MS ?? process.env.GLM_REQUEST_TIMEOUT_MS ?? process.env.GEMINI_REQUEST_TIMEOUT_MS ?? 30000);
 const REPEATS = Math.max(Number(process.env.BENCH_REPEATS ?? 1), 1);
 const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
 
 if (!API_KEY) {
-  console.error('Missing ZHIPU_API_KEY or GLM_API_KEY');
+  if (MODEL_PROVIDER === 'gemini') {
+    console.error('Missing GEMINI_API_KEY, GOOGLE_API_KEY, or GOOGLE_GENAI_API_KEY');
+  } else {
+    console.error('Missing ZHIPU_API_KEY or GLM_API_KEY');
+  }
   process.exit(1);
 }
 
@@ -79,38 +90,41 @@ function materializeToolset(toolset, variables) {
   }));
 }
 
-async function callGlm(messages) {
+async function callModel(messages) {
   let lastError = null;
-  for (let attempt = 1; attempt <= MAX_GLM_RETRIES; attempt += 1) {
+  for (let attempt = 1; attempt <= MAX_MODEL_RETRIES; attempt += 1) {
     let timer = null;
     try {
       const controller = new AbortController();
-      timer = setTimeout(() => controller.abort(), GLM_REQUEST_TIMEOUT_MS);
+      timer = setTimeout(() => controller.abort(), MODEL_REQUEST_TIMEOUT_MS);
+      const requestBody = {
+        model: MODEL,
+        temperature: 0,
+        response_format: { type: 'json_object' },
+        messages,
+      };
+      if (MODEL_PROVIDER !== 'gemini') {
+        requestBody.thinking = { type: 'disabled' };
+      }
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
         signal: controller.signal,
-        body: JSON.stringify({
-          model: MODEL,
-          temperature: 0,
-          thinking: { type: 'disabled' },
-          response_format: { type: 'json_object' },
-          messages,
-        }),
+        body: JSON.stringify(requestBody),
       });
       clearTimeout(timer);
       timer = null;
       const data = await response.json();
       if (!response.ok) {
         const retryable = response.status >= 500 || response.status === 429;
-        const error = new Error(`GLM request failed: ${response.status} ${JSON.stringify(data)}`);
-        if (!retryable || attempt === MAX_GLM_RETRIES) throw error;
+        const error = new Error(`${MODEL_PROVIDER.toUpperCase()} request failed: ${response.status} ${JSON.stringify(data)}`);
+        if (!retryable || attempt === MAX_MODEL_RETRIES) throw error;
         lastError = error;
         await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
         continue;
       }
       const content = data?.choices?.[0]?.message?.content;
-      if (typeof content !== 'string') throw new Error(`GLM response missing content: ${JSON.stringify(data)}`);
+      if (typeof content !== 'string') throw new Error(`${MODEL_PROVIDER.toUpperCase()} response missing content: ${JSON.stringify(data)}`);
       const parsed = JSON.parse(content);
       return {
         parsed,
@@ -123,11 +137,11 @@ async function callGlm(messages) {
     } catch (error) {
       lastError = error;
       if (timer) clearTimeout(timer);
-      if (attempt === MAX_GLM_RETRIES) break;
+      if (attempt === MAX_MODEL_RETRIES) break;
       await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
     }
   }
-  throw lastError ?? new Error('GLM request failed');
+  throw lastError ?? new Error(`${MODEL_PROVIDER.toUpperCase()} request failed`);
 }
 
 async function executeShell(command, cwd) {
@@ -425,7 +439,7 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   }
 
   for (let step = 1; step <= Number(agent.max_steps ?? 1); step += 1) {
-    const { parsed, usage } = await callGlm(buildMessages({ scenario, agent, toolset, history, carryover: injectedContext }));
+    const { parsed, usage } = await callModel(buildMessages({ scenario, agent, toolset, history, carryover: injectedContext }));
     tokenBreakdown.push({ step, ...usage, model_decision: parsed });
 
     if (parsed.action === 'finish') {
@@ -480,7 +494,7 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   }
 
   if (!artifact) {
-    const { parsed, usage } = await callGlm(buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }));
+    const { parsed, usage } = await callModel(buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }));
     tokenBreakdown.push({ step: 'synthesis', ...usage, model_decision: parsed });
     if (parsed.action === 'finish' && validateArtifact(agent.name, parsed.artifact, scenario.expected)) {
       artifact = parsed.artifact;
@@ -596,7 +610,7 @@ function summarize(cases) {
   const treatmentCompleted = treatmentRows.filter((row) => row.workflow_completed);
   return {
     benchmark: 'openclaw_real_workflow_scenario_v1',
-    provider: 'glm',
+    provider: MODEL_PROVIDER,
     model: MODEL,
     repetitions: REPEATS,
     cases: cases.length,

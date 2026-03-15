@@ -128,21 +128,21 @@ What this proves:
 
 Evidence:
 
-- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
+- [Real workflow scenario summary: dashboard auth drift](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
+- [Real workflow scenario summary: pairing / approval recovery (`Gemini`)](../evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
-Headline result:
+Headline results:
 
-- baseline `reviewer_ready_rate = 0.3333`
-- treatment `reviewer_ready_rate = 1`
-- baseline `workflow_completed_rate = 0.3333`
-- treatment `workflow_completed_rate = 1`
+- dashboard auth drift: baseline `reviewer_ready_rate = 0.3333`, treatment `reviewer_ready_rate = 1`
+- pairing / approval recovery (`Gemini`): baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`
 
 What this proves:
 
 - Aionis can carry a realistic multi-agent workflow through to a reviewer-ready package
-- this is a product-validating scenario, not only a narrow benchmark slice
+- this is a product-validating scenario family, not only a narrow benchmark slice
 - the strongest treatment advantage here is continuity, not token reduction
+- the second Gemini slice extends this story onto a second workflow shape and provider path, but remains supporting evidence
 
 ## What This Does Not Yet Prove
 
