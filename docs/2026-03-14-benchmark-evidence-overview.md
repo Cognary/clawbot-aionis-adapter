@@ -109,6 +109,7 @@ Evidence:
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
+- [Repeated continuity A/B: markdown parser fallback (real Lite, supporting completion slice)](../evidence/openclaw-real-workflow-continuity-ab/20260315123154/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 - [Execution continuity validation](2026-03-15-openclaw-execution-continuity-validation.md)
 - [Execution continuity A/B](2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
@@ -126,6 +127,7 @@ Interpretation:
 - the new execution-continuity contract has now been validated on four real Lite workflow shapes, not only in unit or integration tests
 - these are continuity wins, not token wins
 - after tightening the continuity-path A/B so packet mode no longer carries raw legacy handoff text, `execution_packet_v1` now also beats the older legacy continuity path on token and wall-clock for three repeated real Lite slices while keeping completion flat at `1.0`
+- markdown parser fallback has now been recovered to a supporting repeated continuity slice: packet continuity improves completion from `0.6667` to `1.0`, but with worse token and wall-clock, so it should not be merged into the three-slice core efficiency headline
 
 ### 5. Real runtime activity is proven
 

@@ -68,6 +68,7 @@ Headline results:
   - dashboard auth drift: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24750.67` to `22974`
   - pairing / approval recovery: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `22704` to `22091.33`
   - service token drift repair: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24974.67` to `23043`
+  - markdown parser fallback: baseline `reviewer_ready_rate = 0.6667`, packet continuity `reviewer_ready_rate = 1`, but with higher average total tokens from `20920.67` to `30203` (`supporting completion slice`, not a core efficiency slice)
 
 Supporting docs:
 
@@ -106,6 +107,7 @@ Public evidence files:
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
+- [Repeated continuity A/B: markdown parser fallback (real Lite, supporting completion slice)](evidence/openclaw-real-workflow-continuity-ab/20260315123154/summary.json)
 
 ## 5-Minute Quickstart
 

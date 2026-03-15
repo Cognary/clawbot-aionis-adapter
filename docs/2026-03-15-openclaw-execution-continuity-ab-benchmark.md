@@ -109,6 +109,31 @@ Interpretation:
 - the packet path again uses fewer tokens
 - the packet path again finishes faster
 
+### 4. Markdown parser fallback
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-continuity-ab/20260315123154/summary.json)
+- [Runs JSONL](../evidence/openclaw-real-workflow-continuity-ab/20260315123154/runs.jsonl)
+
+Result:
+
+- legacy continuity:
+  - `reviewer_ready_rate = 0.6667`
+  - `avg_total_tokens = 20920.67`
+  - `avg_wall_clock_ms = 62881.33`
+- packet continuity:
+  - `reviewer_ready_rate = 1`
+  - `avg_total_tokens = 30203`
+  - `avg_wall_clock_ms = 91863`
+
+Interpretation:
+
+- this slice now flips positive on completion
+- the packet path is more reliable here
+- but it is not yet an efficiency win
+- this slice should be treated as supporting completion evidence, not part of the three-slice core efficiency headline
+
 ## What Changed
 
 The first packet-vs-legacy compare was noisy because the packet arm still carried legacy handoff text through two extra paths:
@@ -131,6 +156,7 @@ This made the A/B clean enough to measure the actual continuity contract.
 1. the new continuity contract is not only wired into the real Lite path
 2. on three repeated real workflow slices, it now matches legacy completion
 3. on those same slices, it improves token use and wall-clock over the old continuity path
+4. on a fourth narrow rendering slice, it now improves completion, but with worse token use and wall-clock
 
 ## What This Does Not Prove
 
@@ -142,7 +168,7 @@ This made the A/B clean enough to measure the actual continuity contract.
 
 The right reading is:
 
-**The new `execution_packet_v1` continuity path is now competitive with, and currently better than, the legacy continuity path on repeated real Lite workflow A/B for three core scenarios.**
+**The new `execution_packet_v1` continuity path is now better than the legacy continuity path on repeated real Lite workflow A/B for three core efficiency-positive scenarios, and it also produces a supporting completion win on a fourth narrow rendering slice.**
 
 The wrong reading would be:
 
