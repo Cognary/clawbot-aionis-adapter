@@ -85,6 +85,30 @@ Interpretation:
 - the packet path again uses fewer tokens
 - the packet path again finishes faster
 
+### 3. Service token drift repair
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
+- [Runs JSONL](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/runs.jsonl)
+
+Result:
+
+- legacy continuity:
+  - `reviewer_ready_rate = 1`
+  - `avg_total_tokens = 24974.67`
+  - `avg_wall_clock_ms = 68372.67`
+- packet continuity:
+  - `reviewer_ready_rate = 1`
+  - `avg_total_tokens = 23043`
+  - `avg_wall_clock_ms = 65621.33`
+
+Interpretation:
+
+- completion still stays flat at `1.0`
+- the packet path again uses fewer tokens
+- the packet path again finishes faster
+
 ## What Changed
 
 The first packet-vs-legacy compare was noisy because the packet arm still carried legacy handoff text through two extra paths:
@@ -105,7 +129,7 @@ This made the A/B clean enough to measure the actual continuity contract.
 ## What This Proves
 
 1. the new continuity contract is not only wired into the real Lite path
-2. on two repeated real workflow slices, it now matches legacy completion
+2. on three repeated real workflow slices, it now matches legacy completion
 3. on those same slices, it improves token use and wall-clock over the old continuity path
 
 ## What This Does Not Prove
@@ -118,7 +142,7 @@ This made the A/B clean enough to measure the actual continuity contract.
 
 The right reading is:
 
-**The new `execution_packet_v1` continuity path is now competitive with, and currently better than, the legacy continuity path on repeated real Lite workflow A/B for two core scenarios.**
+**The new `execution_packet_v1` continuity path is now competitive with, and currently better than, the legacy continuity path on repeated real Lite workflow A/B for three core scenarios.**
 
 The wrong reading would be:
 

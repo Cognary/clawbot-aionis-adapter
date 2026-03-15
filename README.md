@@ -67,6 +67,7 @@ Headline results:
 - **Repeated continuity A/B on the real Lite path (`legacy` vs `execution_packet_v1`)**:
   - dashboard auth drift: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24750.67` to `22974`
   - pairing / approval recovery: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `22704` to `22091.33`
+  - service token drift repair: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24974.67` to `23043`
 
 Supporting docs:
 
@@ -104,6 +105,7 @@ Public evidence files:
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
+- [Repeated continuity A/B: service token drift repair (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
 
 ## 5-Minute Quickstart
 

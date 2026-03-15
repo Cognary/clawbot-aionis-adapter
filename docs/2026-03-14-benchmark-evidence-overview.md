@@ -108,6 +108,7 @@ Evidence:
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
+- [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 - [Execution continuity validation](2026-03-15-openclaw-execution-continuity-validation.md)
 - [Execution continuity A/B](2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
@@ -124,7 +125,7 @@ Interpretation:
 - markdown parser fallback remains a supporting slice, not a headline slice
 - the new execution-continuity contract has now been validated on four real Lite workflow shapes, not only in unit or integration tests
 - these are continuity wins, not token wins
-- after tightening the continuity-path A/B so packet mode no longer carries raw legacy handoff text, `execution_packet_v1` now also beats the older legacy continuity path on token and wall-clock for two repeated real Lite slices while keeping completion flat at `1.0`
+- after tightening the continuity-path A/B so packet mode no longer carries raw legacy handoff text, `execution_packet_v1` now also beats the older legacy continuity path on token and wall-clock for three repeated real Lite slices while keeping completion flat at `1.0`
 
 ### 5. Real runtime activity is proven
 
