@@ -47,6 +47,35 @@ The harness now has explicit upper bounds:
 
 This keeps nightly validation useful for regression detection without allowing a single run to stall indefinitely.
 
+## Fixed-Format Output
+
+Each successful nightly run now also writes a fixed-format report bundle under:
+
+- `artifacts/openclaw-real-workflow-nightly/latest.json`
+- `artifacts/openclaw-real-workflow-nightly/latest.md`
+- `artifacts/openclaw-real-workflow-nightly/history.jsonl`
+
+The intent is simple:
+
+1. `latest.json`
+   - machine-readable latest nightly result
+2. `latest.md`
+   - human-readable one-page summary
+3. `history.jsonl`
+   - append-only trend log for later regression analysis
+
+Current report fields include:
+
+1. scenario id
+2. source `summary.json` path
+3. baseline/treatment reviewer-ready rate
+4. baseline/treatment workflow completion rate
+5. baseline/treatment token and wall-clock averages
+6. deltas for reviewer-ready, completion, token, and rediscovery
+7. simple regression flags
+
+The history file is deduplicated by `source_summary_path`, so re-running the report step for the same artifact does not append duplicates.
+
 ## Correct Reading
 
 This path is for:

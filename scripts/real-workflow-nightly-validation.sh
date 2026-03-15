@@ -35,6 +35,8 @@ if [[ -f "$SUMMARY_PATH" ]]; then
   echo
   echo "summary_path=$SUMMARY_PATH"
   cat "$SUMMARY_PATH"
+  echo
+  node scripts/real-workflow-nightly-report.mjs "$SUMMARY_PATH"
 else
   echo
   echo "No summary.json was produced. Check artifact directory:"
