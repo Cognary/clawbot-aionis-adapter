@@ -162,6 +162,15 @@ After the first four real-Lite workflow publications, the adapter was updated to
 
 These are not new headline benchmark slices. They are single-run, real-path validations that prove the new continuity contract is live on the actual workflow route.
 
+After tightening the benchmark so the packet arm no longer carries raw legacy handoff text, the continuity path was also re-run as a repeated treatment-only A/B:
+
+- `legacy continuity`
+- `execution_packet_v1 continuity`
+
+For those repeated compares, see:
+
+- [Execution continuity A/B](2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
+
 ### Validation slice: dashboard auth drift with continuity packet enabled
 
 Evidence:
@@ -215,6 +224,7 @@ That is the right way to read this benchmark:
 For the narrower page that focuses specifically on the new `execution_packet_v1` path, see:
 
 - [Execution continuity validation](2026-03-15-openclaw-execution-continuity-validation.md)
+- [Execution continuity A/B](2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
 
 ## What This Proves
 

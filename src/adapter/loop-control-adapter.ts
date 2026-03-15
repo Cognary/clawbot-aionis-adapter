@@ -90,7 +90,7 @@ export class AionisLoopControlAdapter {
         session_key: ctx.sessionKey,
         session_id: ctx.sessionId,
         trigger: ctx.trigger,
-        continuity_handoff_text: event.continuity?.handoffText ?? null,
+        continuity_handoff_text: this.resolveContinuityHandoffText(event),
       },
       toolCandidates: candidates,
       executionStateV1: this.resolveContinuityState(event),
@@ -353,6 +353,11 @@ export class AionisLoopControlAdapter {
 
   private resolveContinuityPacket(event: BeforeAgentStartEvent): ExecutionPacketV1 | undefined {
     return event.continuity?.execution_packet_v1 ?? undefined;
+  }
+
+  private resolveContinuityHandoffText(event: BeforeAgentStartEvent): string | null {
+    if (this.resolveContinuityPacket(event) || this.resolveContinuityState(event)) return null;
+    return event.continuity?.handoffText ?? null;
   }
 
 

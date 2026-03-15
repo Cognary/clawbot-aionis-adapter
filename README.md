@@ -64,6 +64,9 @@ Headline results:
   - pairing / approval recovery with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
   - service token drift repair with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
   - markdown parser fallback with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
+- **Repeated continuity A/B on the real Lite path (`legacy` vs `execution_packet_v1`)**:
+  - dashboard auth drift: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24750.67` to `22974`
+  - pairing / approval recovery: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `22704` to `22091.33`
 
 Supporting docs:
 
@@ -77,6 +80,7 @@ Supporting docs:
 - [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
 - [Real Workflow Scenario v1](docs/2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 - [Execution Continuity Validation](docs/2026-03-15-openclaw-execution-continuity-validation.md)
+- [Execution Continuity A/B](docs/2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
 
 Public evidence files:
 
@@ -98,6 +102,8 @@ Public evidence files:
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
+- [Repeated continuity A/B: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
+- [Repeated continuity A/B: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 
 ## 5-Minute Quickstart
 

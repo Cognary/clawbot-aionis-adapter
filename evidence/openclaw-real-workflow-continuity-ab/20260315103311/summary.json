@@ -1,0 +1,29 @@
+{
+  "benchmark": "openclaw_real_workflow_continuity_ab_v1",
+  "provider": "gemini",
+  "repeats": 3,
+  "scenarios": [
+    "glm_pairing_approval_recovery_reviewer_ready_workflow"
+  ],
+  "arm_selection": "treatment-only",
+  "legacy_continuity": {
+    "avg_reviewer_ready_rate": 1,
+    "avg_workflow_completed_rate": 1,
+    "avg_total_tokens": 22704,
+    "avg_wall_clock_ms": 62025,
+    "full_success_rate": 1
+  },
+  "packet_continuity": {
+    "avg_reviewer_ready_rate": 1,
+    "avg_workflow_completed_rate": 1,
+    "avg_total_tokens": 22091.333333333332,
+    "avg_wall_clock_ms": 61313.333333333336,
+    "full_success_rate": 1
+  },
+  "delta": {
+    "reviewer_ready_gain": 0,
+    "workflow_completion_gain": 0,
+    "avg_token_delta": -612.6666666666679,
+    "avg_wall_clock_delta_ms": -711.6666666666642
+  }
+}

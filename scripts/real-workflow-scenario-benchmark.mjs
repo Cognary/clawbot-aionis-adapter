@@ -84,6 +84,13 @@ function carryoverText(carryover) {
   return String(carryover.text ?? carryover.handoffText ?? '');
 }
 
+function shouldInjectRawCarryover(mode, carryover) {
+  if (mode !== 'treatment') return Boolean(carryoverText(carryover));
+  if (CONTINUITY_MODE === 'legacy') return Boolean(carryoverText(carryover));
+  const hasStructuredContinuity = Boolean(carryover?.execution_packet_v1 || carryover?.execution_state_v1);
+  return !hasStructuredContinuity && Boolean(carryoverText(carryover));
+}
+
 function matchesExpectedFileTerms(value, expectedTerms) {
   const candidates = asStringArray(value)
     .flatMap((item) => String(item).split(/[,\n]/))
@@ -598,7 +605,7 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   let note = null;
   let controlledStop = false;
   let stopReason = null;
-  let injectedContext = carryoverText(carryover);
+  let injectedContext = shouldInjectRawCarryover(mode, carryover) ? carryoverText(carryover) : '';
   const seenHashes = new Set();
   const ctx = stageCtx(baseId, repoPath, agent.name);
 
@@ -609,12 +616,15 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
       continuity: carryover ? (CONTINUITY_MODE === 'legacy'
         ? { handoffText: carryover.handoffText ?? carryover.text ?? null }
         : {
-            handoffText: carryover.handoffText ?? carryover.text ?? null,
+            handoffText: undefined,
             execution_packet_v1: carryover.execution_packet_v1 ?? undefined,
             execution_state_v1: carryover.execution_state_v1 ?? undefined,
           }) : undefined,
     }, ctx);
-    injectedContext = [carryoverText(carryover), startResult?.prependContext].filter(Boolean).join('\n');
+    injectedContext = [
+      shouldInjectRawCarryover(mode, carryover) ? carryoverText(carryover) : '',
+      startResult?.prependContext,
+    ].filter(Boolean).join('\n');
   }
 
   for (let step = 1; step <= Number(agent.max_steps ?? 1); step += 1) {

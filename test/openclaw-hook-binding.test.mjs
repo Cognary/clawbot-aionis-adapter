@@ -153,7 +153,7 @@ test('before_agent_start forwards recovered execution continuity into context as
   assert.equal(calls.contextAssemble.length, 1);
   assert.equal(calls.contextAssemble[0].executionStateV1?.state_id, 'state-auth-1');
   assert.equal(calls.contextAssemble[0].executionPacketV1?.stage, 'triage');
-  assert.equal(calls.contextAssemble[0].context.continuity_handoff_text, 'Resume from auth drift handoff');
+  assert.equal(calls.contextAssemble[0].context.continuity_handoff_text ?? null, null);
 });
 
 test('after_tool_call writes feedback and evidence', async () => {

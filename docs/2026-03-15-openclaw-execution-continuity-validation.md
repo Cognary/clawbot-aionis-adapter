@@ -37,6 +37,10 @@ These are single-run validations.
 
 They are useful because they show the new continuity contract is live on the real workflow route, not only in unit or integration tests.
 
+For the repeated `legacy continuity` vs `execution_packet_v1` comparison, see:
+
+- [Execution Continuity A/B](2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
+
 ## Validation Slices
 
 ### 1. Dashboard auth drift
@@ -139,3 +143,7 @@ The wrong reading would be:
 - this replaces the repeated benchmark publication sets
 - this proves universal improvement
 - this is a token benchmark
+
+The repeated A/B page answers a different question:
+
+- whether the new packet path is actually better than the old continuity path

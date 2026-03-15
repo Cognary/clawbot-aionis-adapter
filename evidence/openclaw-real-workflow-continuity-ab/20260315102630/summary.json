@@ -1,0 +1,29 @@
+{
+  "benchmark": "openclaw_real_workflow_continuity_ab_v1",
+  "provider": "gemini",
+  "repeats": 3,
+  "scenarios": [
+    "glm_dashboard_auth_drift_reviewer_ready_workflow"
+  ],
+  "arm_selection": "treatment-only",
+  "legacy_continuity": {
+    "avg_reviewer_ready_rate": 1,
+    "avg_workflow_completed_rate": 1,
+    "avg_total_tokens": 24750.666666666668,
+    "avg_wall_clock_ms": 64654.333333333336,
+    "full_success_rate": 1
+  },
+  "packet_continuity": {
+    "avg_reviewer_ready_rate": 1,
+    "avg_workflow_completed_rate": 1,
+    "avg_total_tokens": 22974,
+    "avg_wall_clock_ms": 64220.666666666664,
+    "full_success_rate": 1
+  },
+  "delta": {
+    "reviewer_ready_gain": 0,
+    "workflow_completion_gain": 0,
+    "avg_token_delta": -1776.6666666666679,
+    "avg_wall_clock_delta_ms": -433.6666666666715
+  }
+}
