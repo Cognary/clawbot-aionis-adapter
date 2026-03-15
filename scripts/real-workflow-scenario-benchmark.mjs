@@ -26,6 +26,8 @@ const MODEL_REQUEST_TIMEOUT_MS = Number(process.env.MODEL_REQUEST_TIMEOUT_MS ?? 
 const REPEATS = Math.max(Number(process.env.BENCH_REPEATS ?? 1), 1);
 const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
 const LIVE_AIONIS_BASE_URL = (process.env.BENCH_AIONIS_BASE_URL ?? '').trim();
+const CONTINUITY_MODE = (process.env.BENCH_CONTINUITY_MODE ?? 'packet').trim() || 'packet';
+const ARM_SELECTION = (process.env.BENCH_ARM_SELECTION ?? 'both').trim() || 'both';
 
 if (!API_KEY) {
   if (MODEL_PROVIDER === 'gemini') {
@@ -604,11 +606,13 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
     const startResult = await host.emit('before_agent_start', {
       prompt: scenario.top_level_prompt,
       messages: toolset.map((tool) => ({ toolName: tool.name })),
-      continuity: carryover ? {
-        handoffText: carryover.handoffText ?? carryover.text ?? null,
-        execution_packet_v1: carryover.execution_packet_v1 ?? undefined,
-        execution_state_v1: carryover.execution_state_v1 ?? undefined,
-      } : undefined,
+      continuity: carryover ? (CONTINUITY_MODE === 'legacy'
+        ? { handoffText: carryover.handoffText ?? carryover.text ?? null }
+        : {
+            handoffText: carryover.handoffText ?? carryover.text ?? null,
+            execution_packet_v1: carryover.execution_packet_v1 ?? undefined,
+            execution_state_v1: carryover.execution_state_v1 ?? undefined,
+          }) : undefined,
     }, ctx);
     injectedContext = [carryoverText(carryover), startResult?.prependContext].filter(Boolean).join('\n');
   }
@@ -788,19 +792,21 @@ async function runArm({ scenario, mode, repetition, artifactDir }) {
 }
 
 function summarize(cases) {
-  const baselineRows = cases.map((row) => row.baseline);
-  const treatmentRows = cases.map((row) => row.treatment);
+  const baselineRows = cases.map((row) => row.baseline).filter(Boolean);
+  const treatmentRows = cases.map((row) => row.treatment).filter(Boolean);
   const baselineReady = baselineRows.filter((row) => row.reviewer_ready);
   const treatmentReady = treatmentRows.filter((row) => row.reviewer_ready);
   const baselineCompleted = baselineRows.filter((row) => row.workflow_completed);
   const treatmentCompleted = treatmentRows.filter((row) => row.workflow_completed);
   return {
     benchmark: 'openclaw_real_workflow_scenario_v1',
+    continuity_mode: CONTINUITY_MODE,
+    arm_selection: ARM_SELECTION,
     provider: MODEL_PROVIDER,
     model: MODEL,
     repetitions: REPEATS,
     cases: cases.length,
-    baseline: {
+    baseline: baselineRows.length > 0 ? {
       reviewer_ready_rate: ratio(baselineReady.length, baselineRows.length),
       workflow_completed_rate: ratio(baselineCompleted.length, baselineRows.length),
       avg_total_tokens: mean(baselineRows, 'total_tokens'),
@@ -809,8 +815,8 @@ function summarize(cases) {
       avg_broad_tool_call_count: mean(baselineRows, 'broad_tool_call_count'),
       avg_rediscovery_reads: mean(baselineRows, 'rediscovery_reads'),
       tokens_per_reviewer_ready_run: baselineReady.length > 0 ? sum(baselineReady, 'total_tokens') / baselineReady.length : null,
-    },
-    treatment: {
+    } : null,
+    treatment: treatmentRows.length > 0 ? {
       reviewer_ready_rate: ratio(treatmentReady.length, treatmentRows.length),
       workflow_completed_rate: ratio(treatmentCompleted.length, treatmentRows.length),
       avg_total_tokens: mean(treatmentRows, 'total_tokens'),
@@ -821,7 +827,7 @@ function summarize(cases) {
       avg_handoff_store_count: mean(treatmentRows, 'handoff_store_count'),
       avg_context_assemble_count: mean(treatmentRows, 'context_assemble_count'),
       tokens_per_reviewer_ready_run: treatmentReady.length > 0 ? sum(treatmentReady, 'total_tokens') / treatmentReady.length : null,
-    },
+    } : null,
     delta: {
       reviewer_ready_gain: ratio(treatmentReady.length, treatmentRows.length) - ratio(baselineReady.length, baselineRows.length),
       workflow_completion_gain: ratio(treatmentCompleted.length, treatmentRows.length) - ratio(baselineCompleted.length, baselineRows.length),
@@ -840,8 +846,12 @@ async function main() {
   const cases = [];
   for (const scenario of scenarios) {
     for (let repetition = 1; repetition <= REPEATS; repetition += 1) {
-      const baseline = await runArm({ scenario, mode: 'baseline', repetition, artifactDir });
-      const treatment = await runArm({ scenario, mode: 'treatment', repetition, artifactDir });
+      const baseline = ARM_SELECTION === 'both' || ARM_SELECTION === 'baseline-only'
+        ? await runArm({ scenario, mode: 'baseline', repetition, artifactDir })
+        : null;
+      const treatment = ARM_SELECTION === 'both' || ARM_SELECTION === 'treatment-only'
+        ? await runArm({ scenario, mode: 'treatment', repetition, artifactDir })
+        : null;
       cases.push({ scenario_id: scenario.id, repetition, baseline, treatment });
     }
   }
