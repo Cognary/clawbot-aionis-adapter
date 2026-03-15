@@ -37,6 +37,7 @@ if [[ -f "$SUMMARY_PATH" ]]; then
   cat "$SUMMARY_PATH"
   echo
   node scripts/real-workflow-nightly-report.mjs "$SUMMARY_PATH"
+  node scripts/real-workflow-nightly-review.mjs "$ROOT_DIR/artifacts/openclaw-real-workflow-nightly/latest.json"
 else
   echo
   echo "No summary.json was produced. Check artifact directory:"

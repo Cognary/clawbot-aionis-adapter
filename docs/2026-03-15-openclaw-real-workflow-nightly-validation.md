@@ -54,6 +54,8 @@ Each successful nightly run now also writes a fixed-format report bundle under:
 - `artifacts/openclaw-real-workflow-nightly/latest.json`
 - `artifacts/openclaw-real-workflow-nightly/latest.md`
 - `artifacts/openclaw-real-workflow-nightly/history.jsonl`
+- `artifacts/openclaw-real-workflow-nightly/review.json`
+- `artifacts/openclaw-real-workflow-nightly/review.md`
 
 The intent is simple:
 
@@ -63,6 +65,10 @@ The intent is simple:
    - human-readable one-page summary
 3. `history.jsonl`
    - append-only trend log for later regression analysis
+4. `review.json`
+   - machine-readable nightly decision
+5. `review.md`
+   - human-readable nightly triage page
 
 Current report fields include:
 
@@ -75,6 +81,40 @@ Current report fields include:
 7. simple regression flags
 
 The history file is deduplicated by `source_summary_path`, so re-running the report step for the same artifact does not append duplicates.
+
+## Review Flow
+
+Nightly review is now a fixed decision step, not an ad hoc manual read of `summary.json`.
+
+Current decision outputs:
+
+1. `status = pass`
+   - no completion regression detected
+2. `status = watch`
+   - completion is flat, but efficiency drift needs attention
+3. `status = regress`
+   - reviewer-ready or workflow completion regressed
+
+Current decision rules:
+
+1. if reviewer-ready or workflow completion regresses:
+   - `regress`
+2. else if completion improves:
+   - `pass`
+3. else if completion is flat but token and wall-clock are both worse:
+   - `watch`
+4. else if only one efficiency axis worsens:
+   - `watch`
+5. otherwise:
+   - `pass`
+
+This is intentionally narrow.
+
+The review output is meant to answer:
+
+- do we trust the latest nightly?
+- do we need to triage before citing it?
+- is this a normal positive run, a watch signal, or a regression?
 
 ## Correct Reading
 
