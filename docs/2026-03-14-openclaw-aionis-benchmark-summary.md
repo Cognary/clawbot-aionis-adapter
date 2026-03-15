@@ -9,7 +9,7 @@ Package: `@aionis/openclaw-adapter`
 
 The current public evidence supports this product claim:
 
-**Aionis reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices, and is active on real OpenClaw runtime paths.**
+**Aionis reduces uncontrolled tool-loop churn in OpenClaw, lowers token burn on the benchmarked slices, improves completion on the current replay, focused-repo, handoff-resume, one-prompt multi-agent, and realistic reviewer-ready workflow slices, and is active on real OpenClaw runtime paths.**
 
 That is the right claim to make today.
 
@@ -124,6 +124,26 @@ What this proves:
 - the runtime path reaches actual provider/model execution
 - the remaining blocker on the `zai/glm-5` path is provider-side rate limiting, not missing adapter integration
 
+### 6. Reviewer-ready workflow completion goes up on a more realistic workflow scenario
+
+Evidence:
+
+- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260314172725/summary.json)
+- [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
+
+Headline result:
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+
+What this proves:
+
+- Aionis can carry a realistic multi-agent workflow through to a reviewer-ready package
+- this is a product-validating scenario, not only a narrow benchmark slice
+- the strongest treatment advantage here is continuity, not token reduction
+
 ## What This Does Not Yet Prove
 
 The current evidence does **not** prove:
@@ -132,6 +152,7 @@ The current evidence does **not** prove:
 2. identical behavior across all providers and models
 3. that every complex OpenClaw failure mode is solved
 4. that token reduction is universal across all runtime-backed paths
+5. that every realistic workflow scenario will show the same magnitude of reviewer-ready uplift
 
 Those would be overclaims.
 
@@ -144,6 +165,7 @@ Use language like:
 - less uncontrolled tool churn
 - lower token burn on benchmarked slices
 - higher completion on current slices
+- reviewer-ready workflow completion on the current realistic workflow scenario
 
 Do not use language like:
 

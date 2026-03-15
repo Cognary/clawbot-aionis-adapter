@@ -35,12 +35,13 @@ Instead of letting each run improvise from scratch, the adapter gives OpenClaw:
 
 ## What Is Proven Today
 
-Current benchmark evidence supports four concrete claims:
+Current benchmark evidence supports five concrete claims:
 
 1. **Tool-loop churn goes down**
 2. **Token burn goes down on benchmarked slices**
 3. **Completion goes up on current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices**
-4. **The adapter is active on real OpenClaw runtime paths, not just mock harnesses**
+4. **Reviewer-ready completion goes up on the current realistic workflow scenario**
+5. **The adapter is active on real OpenClaw runtime paths, not just mock harnesses**
 
 Headline results:
 
@@ -53,6 +54,7 @@ Headline results:
   - dashboard auth drift: baseline `completed_rate = 0`, treatment `completed_rate = 1`
   - markdown fallback: baseline `completed_rate = 0.3333`, treatment `completed_rate = 1` (`supporting slice`)
 - **Repeated Google runtime-backed A/B**: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
+- **Real workflow scenario v1**: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
 
 Supporting docs:
 
@@ -64,6 +66,7 @@ Supporting docs:
 - [Loader-Backed Semi-Live Token Benchmark](docs/2026-03-14-openclaw-loader-backed-semi-live-token-benchmark.md)
 - [Google Runtime Benchmark](docs/2026-03-14-openclaw-google-runtime-benchmark.md)
 - [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
+- [Real Workflow Scenario v1](docs/2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
 Public evidence files:
 
@@ -77,6 +80,7 @@ Public evidence files:
 - [One-prompt multi-agent summary: markdown fallback](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314130932/summary.json)
 - [One-prompt multi-agent case study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
+- [Real workflow scenario summary](evidence/openclaw-real-workflow-scenario/20260314172725/summary.json)
 
 ## 5-Minute Quickstart
 
@@ -224,6 +228,7 @@ Benchmarks:
 5. `npm run bench:completion`
 6. `npm run bench:google-runtime`
 7. `npm run bench:google-runtime-ab`
+8. `npm run bench:real-workflow`
 
 ## Repo Guide
 
@@ -234,3 +239,4 @@ Benchmarks:
 - [Benchmark Summary](docs/2026-03-14-openclaw-aionis-benchmark-summary.md)
 - [One-Prompt Multi-Agent Benchmark](docs/2026-03-14-openclaw-one-prompt-multi-agent-benchmark.md)
 - [One-Prompt Multi-Agent Case Study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
+- [Real Workflow Scenario v1](docs/2026-03-15-openclaw-real-workflow-scenario-benchmark.md)

@@ -1,0 +1,35 @@
+{
+  "benchmark": "openclaw_real_workflow_scenario_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "repetitions": 1,
+  "cases": 1,
+  "baseline": {
+    "reviewer_ready_rate": 0,
+    "workflow_completed_rate": 0,
+    "avg_total_tokens": 4584,
+    "avg_wall_clock_ms": 60644,
+    "avg_tool_call_count": 4,
+    "avg_broad_tool_call_count": 0,
+    "avg_rediscovery_reads": 0,
+    "tokens_per_reviewer_ready_run": null
+  },
+  "treatment": {
+    "reviewer_ready_rate": 1,
+    "workflow_completed_rate": 1,
+    "avg_total_tokens": 11865,
+    "avg_wall_clock_ms": 117855,
+    "avg_tool_call_count": 7,
+    "avg_broad_tool_call_count": 0,
+    "avg_rediscovery_reads": 0,
+    "avg_handoff_store_count": 5,
+    "avg_context_assemble_count": 4,
+    "tokens_per_reviewer_ready_run": 11865
+  },
+  "delta": {
+    "reviewer_ready_gain": 1,
+    "workflow_completion_gain": 1,
+    "avg_token_delta": 7281,
+    "avg_rediscovery_delta": 0
+  }
+}

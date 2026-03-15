@@ -1,0 +1,242 @@
+{
+  "benchmark": "openclaw_real_workflow_scenario_v1",
+  "provider": "glm",
+  "model": "glm-5",
+  "scenarios": [
+    {
+      "id": "glm_dashboard_auth_drift_reviewer_ready_workflow",
+      "kind": "dashboard_auth_drift_reviewer_ready_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "control-ui-auth-drift",
+      "issue_url": "https://github.com/openclaw/openclaw/pull/37382",
+      "top_level_prompt": "Investigate the Control UI dashboard auth drift after restart or token rotation, identify the most likely auth boundary causing AUTH_TOKEN_MISMATCH or unauthorized behavior, prepare the smallest safe remediation direction, define focused validation, and leave a reviewer-ready summary with rollback notes.",
+      "agents": [
+        {
+          "name": "orchestrator",
+          "goal": "Turn the single high-level request into a concrete workflow plan, target surface, and exit criteria without broad rediscovery.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-auth-scan",
+              "description": "Broad scan across docs, UI code, tests, and changelog references for auth drift terms.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|unauthorized|token rotation|device token|sessionStorage|dashboard|gateway.auth.token\" CHANGELOG.md docs/web/dashboard.md docs/web/control-ui.md docs/gateway/troubleshooting.md docs/gateway/authentication.md ui/src/ui/gateway.ts ui/src/ui/app-gateway.ts ui/src/ui/gateway.node.test.ts ui/src/ui/app-gateway.node.test.ts | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-dashboard-doc",
+              "description": "Read the dashboard documentation that describes auth behavior and unauthorized recovery.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/web/dashboard.md"
+              }
+            },
+            {
+              "name": "read-troubleshooting",
+              "description": "Read the gateway troubleshooting page for AUTH_TOKEN_MISMATCH and unauthorized drift behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '120,220p' docs/gateway/troubleshooting.md"
+              }
+            },
+            {
+              "name": "read-ui-gateway",
+              "description": "Read the browser gateway client auth and reconnect logic.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/gateway.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "triage",
+          "goal": "Isolate the auth boundary and evidence chain that best explains the drift, using the orchestrator handoff rather than restarting the search.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-auth-scan",
+              "description": "Broad auth drift scan across docs and UI code.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|unauthorized|device token|sessionStorage|gateway.auth.token|token rotation\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/gateway/authentication.md ui/src/ui/gateway.ts ui/src/ui/app-gateway.ts CHANGELOG.md | sed -n '1,220p'"
+              }
+            },
+            {
+              "name": "read-ui-gateway",
+              "description": "Read the core browser gateway auth path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/gateway.ts"
+              }
+            },
+            {
+              "name": "read-app-gateway",
+              "description": "Read the app-level gateway connection flow and auth propagation path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/app-gateway.ts"
+              }
+            },
+            {
+              "name": "read-auth-doc",
+              "description": "Read the gateway authentication doc for token lifecycle expectations.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,220p' docs/gateway/authentication.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "patch",
+          "goal": "Propose the smallest safe remediation direction, focused validation, and rollback notes from the triage handoff.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-remediation-scan",
+              "description": "Broad scan for auth reset, token invalidation, and reconnect handling across UI code.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|reset|invalidate|sessionStorage|device token|gateway.auth.token|reconnect|unauthorized\" ui/src/ui/gateway.ts ui/src/ui/app-gateway.ts ui/src/ui/gateway.node.test.ts ui/src/ui/app-gateway.node.test.ts docs/gateway/troubleshooting.md CHANGELOG.md | sed -n '1,240p'"
+              }
+            },
+            {
+              "name": "read-ui-gateway",
+              "description": "Read the browser gateway file where remediation is most likely to land.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/gateway.ts"
+              }
+            },
+            {
+              "name": "read-gateway-tests",
+              "description": "Read focused gateway node tests to anchor a regression path.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/gateway.node.test.ts"
+              }
+            },
+            {
+              "name": "read-app-gateway-tests",
+              "description": "Read app-gateway node tests for reconnect and auth flow coverage.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '1,260p' ui/src/ui/app-gateway.node.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "review",
+          "goal": "Produce a reviewer-ready package with issue hypothesis, target files, remediation direction, focused validation, rollback notes, and final verdict.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "read-orchestrator-artifact",
+              "description": "Read the orchestrator workflow plan artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/orchestrator.json"
+              }
+            },
+            {
+              "name": "read-triage-artifact",
+              "description": "Read the triage artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/triage.json"
+              }
+            },
+            {
+              "name": "read-patch-artifact",
+              "description": "Read the patch artifact.",
+              "params": {
+                "command": "cat ${RUN_DIR}/patch.json"
+              }
+            },
+            {
+              "name": "focused-review-scan",
+              "description": "Run a focused evidence scan over the dashboard doc, troubleshooting doc, and gateway files.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"AUTH_TOKEN_MISMATCH|unauthorized|device token|sessionStorage|gateway.auth.token|token rotation\" docs/web/dashboard.md docs/gateway/troubleshooting.md docs/gateway/authentication.md ui/src/ui/gateway.ts ui/src/ui/app-gateway.ts ui/src/ui/gateway.node.test.ts ui/src/ui/app-gateway.node.test.ts | sed -n '1,220p'"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "AUTH_TOKEN_MISMATCH",
+          "unauthorized",
+          "device token",
+          "gateway auth token",
+          "sessionStorage",
+          "token rotation",
+          "gateway.ts",
+          "app-gateway.ts"
+        ],
+        "file_terms": [
+          "ui/src/ui/gateway.ts",
+          "ui/src/ui/app-gateway.ts",
+          "ui/src/ui/device-auth.ts",
+          "docs/web/dashboard.md",
+          "docs/gateway/troubleshooting.md",
+          "docs/gateway/authentication.md",
+          "ui/src/ui/gateway.node.test.ts",
+          "ui/src/ui/app-gateway.node.test.ts",
+          "src/shared/device-auth",
+          "src/shared/device-auth-store",
+          "src/gateway/auth",
+          "src/gateway/startup-auth",
+          "gateway-token-drift",
+          "device-auth",
+          "gateway.ts",
+          "app-gateway.ts"
+        ],
+        "validation_terms": [
+          "restart",
+          "token rotation",
+          "unauthorized",
+          "AUTH_TOKEN_MISMATCH",
+          "reconnect",
+          "dashboard"
+        ],
+        "rollback_terms": [
+          "rollback",
+          "revert",
+          "restore",
+          "fallback",
+          "previous auth behavior",
+          "safe rollback"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "real-workflow",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 2,
+        "maxDuplicateObservationStreak": 2,
+        "maxNoProgressStreak": 2,
+        "maxEstimatedTokenBurn": 26000
+      },
+      "aionis": {
+        "orchestrator": {
+          "context_text": "Start on docs/web/dashboard.md, docs/gateway/troubleshooting.md, and ui/src/ui/gateway.ts. The workflow should finish with a reviewer-ready packet, not a loose summary.",
+          "selection_map": {
+            "broad-auth-scan": "read-dashboard-doc"
+          }
+        },
+        "triage": {
+          "context_text": "Use the orchestrator handoff. Stay on the auth boundary between cached device token state and shared gateway auth token flow. Do not restart a broad repo search.",
+          "selection_map": {
+            "broad-auth-scan": "read-ui-gateway"
+          }
+        },
+        "patch": {
+          "context_text": "Use the triage handoff. Focus on the smallest safe remediation direction, focused validation, and rollback notes. Avoid broad remediation scans if the likely files are already known.",
+          "selection_map": {
+            "broad-remediation-scan": "read-gateway-tests"
+          }
+        },
+        "review": {
+          "context_text": "Assemble a reviewer-ready packet. Prefer prior artifacts and focused evidence over rediscovery.",
+          "selection_map": {
+            "focused-review-scan": "read-patch-artifact"
+          }
+        }
+      }
+    }
+  ]
+}
