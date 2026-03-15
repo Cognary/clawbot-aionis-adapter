@@ -139,6 +139,32 @@ function materializeToolset(toolset, variables) {
   }));
 }
 
+function parseJsonObjectLoose(content) {
+  const candidates = [];
+  const direct = String(content ?? '').trim();
+  if (direct) candidates.push(direct);
+
+  const fenced = direct.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced?.[1]) candidates.push(fenced[1].trim());
+
+  const firstBrace = direct.indexOf('{');
+  const lastBrace = direct.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    candidates.push(direct.slice(firstBrace, lastBrace + 1));
+  }
+
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError ?? new SyntaxError('model output is not valid JSON');
+}
+
 async function callModel(messages) {
   let lastError = null;
   for (let attempt = 1; attempt <= MAX_MODEL_RETRIES; attempt += 1) {
@@ -174,7 +200,7 @@ async function callModel(messages) {
       }
       const content = data?.choices?.[0]?.message?.content;
       if (typeof content !== 'string') throw new Error(`${MODEL_PROVIDER.toUpperCase()} response missing content: ${JSON.stringify(data)}`);
-      const parsed = JSON.parse(content);
+      const parsed = parseJsonObjectLoose(content);
       return {
         parsed,
         usage: {
