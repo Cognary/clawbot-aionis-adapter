@@ -7,7 +7,7 @@ Included here:
 1. `summary.json` files for published benchmark slices
 2. `cases.jsonl` files only where the docs explicitly discuss per-case results
 3. one-prompt multi-agent A/B evidence for the published completion-oriented slices
-4. realistic workflow scenario evidence for the published reviewer-ready slice
+4. realistic workflow scenario evidence for the published reviewer-ready slice, including the repeated `3`-run publication set
 
 Not included here:
 

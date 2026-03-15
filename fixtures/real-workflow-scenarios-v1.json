@@ -122,6 +122,13 @@
           "max_steps": 2,
           "toolset": [
             {
+              "name": "read-workflow-artifacts",
+              "description": "Read the orchestrator, triage, and patch artifacts together as a reviewer packet source.",
+              "params": {
+                "command": "printf -- '--- orchestrator ---\\n' && cat ${RUN_DIR}/orchestrator.json && printf -- '\\n--- triage ---\\n' && cat ${RUN_DIR}/triage.json && printf -- '\\n--- patch ---\\n' && cat ${RUN_DIR}/patch.json"
+              }
+            },
+            {
               "name": "read-orchestrator-artifact",
               "description": "Read the orchestrator workflow plan artifact.",
               "params": {
@@ -233,7 +240,9 @@
         "review": {
           "context_text": "Assemble a reviewer-ready packet. Prefer prior artifacts and focused evidence over rediscovery.",
           "selection_map": {
-            "focused-review-scan": "read-patch-artifact"
+            "focused-review-scan": "read-workflow-artifacts",
+            "read-triage-artifact": "read-workflow-artifacts",
+            "read-orchestrator-artifact": "read-workflow-artifacts"
           }
         }
       }

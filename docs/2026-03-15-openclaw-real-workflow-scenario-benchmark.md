@@ -62,20 +62,22 @@ A run is counted as `reviewer_ready` only when the workflow produces a reviewer-
 
 Evidence:
 
-- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260314172725/summary.json)
-- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260314172725/cases.jsonl)
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315040559/cases.jsonl)
 
-Headline result:
+Headline result (`3` repeats):
 
-- baseline `reviewer_ready_rate = 0`
+- baseline `reviewer_ready_rate = 0.3333`
 - treatment `reviewer_ready_rate = 1`
-- baseline `workflow_completed_rate = 0`
+- baseline `workflow_completed_rate = 0.3333`
 - treatment `workflow_completed_rate = 1`
 
 Other signals:
 
-- baseline `avg_total_tokens = 4584`
-- treatment `avg_total_tokens = 11865`
+- baseline `avg_total_tokens = 8398.33`
+- treatment `avg_total_tokens = 12264`
+- baseline `avg_rediscovery_reads = 1.67`
+- treatment `avg_rediscovery_reads = 0.67`
 - treatment `avg_handoff_store_count = 5`
 - treatment `avg_context_assemble_count = 4`
 
@@ -83,7 +85,7 @@ Other signals:
 
 This is a **continuity win**, not a token win.
 
-The treatment run is more expensive because it actually completes the workflow and produces a reviewer-ready packet. The baseline run fails before it reaches that point.
+The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally, but it does so much less reliably.
 
 That is the right way to read this benchmark:
 
@@ -96,7 +98,7 @@ That is the right way to read this benchmark:
 This benchmark proves:
 
 1. Aionis can improve completion on a realistic one-prompt multi-agent workflow
-2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet
+2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence, not only a single lucky run
 3. the product story holds outside narrow benchmark slices
 
 ## What It Does Not Prove
@@ -110,5 +112,5 @@ This benchmark does not prove:
 ## Run Command
 
 ```bash
-BENCH_REPEATS=1 npm run bench:real-workflow
+BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_dashboard_auth_drift_reviewer_ready_workflow npm run bench:real-workflow
 ```

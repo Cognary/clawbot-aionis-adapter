@@ -128,14 +128,14 @@ What this proves:
 
 Evidence:
 
-- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260314172725/summary.json)
+- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
 Headline result:
 
-- baseline `reviewer_ready_rate = 0`
+- baseline `reviewer_ready_rate = 0.3333`
 - treatment `reviewer_ready_rate = 1`
-- baseline `workflow_completed_rate = 0`
+- baseline `workflow_completed_rate = 0.3333`
 - treatment `workflow_completed_rate = 1`
 
 What this proves:

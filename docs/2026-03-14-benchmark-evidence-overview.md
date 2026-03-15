@@ -88,17 +88,17 @@ Current signal:
 - one-prompt multi-agent issue `#10864`: `0 -> 1`
 - one-prompt multi-agent dashboard auth drift: `0 -> 1`
 - repeated Google runtime-backed A/B: `0 -> 0.8`
-- realistic workflow scenario reviewer-ready rate: `0 -> 1`
+- realistic workflow scenario reviewer-ready rate: `0.3333 -> 1`
 
 Interpretation:
 
 - Aionis improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices
-- Aionis also improves reviewer-ready completion on the current realistic workflow scenario
+- Aionis also improves reviewer-ready completion on the current realistic workflow scenario, with stronger stability than the original single-run bring-up
 - there is now repeated runtime-backed completion evidence, not only harness-only evidence
 
 Evidence:
 
-- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260314172725/summary.json)
+- [Real workflow scenario summary](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
 Supporting signal:

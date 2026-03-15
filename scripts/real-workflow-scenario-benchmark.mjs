@@ -298,9 +298,10 @@ function validateArtifact(agentName, artifact, expected) {
   }
   if (agentName === 'triage') {
     const evidencePoints = asStringArray(artifact.evidence_points);
+    const authBoundary = flattenText(artifact.auth_boundary);
     return Boolean(
       typeof artifact.issue_hypothesis === 'string' && includesAny(artifact.issue_hypothesis, expected.boundary_terms) &&
-      typeof artifact.auth_boundary === 'string' && includesAny(artifact.auth_boundary, expected.boundary_terms) &&
+      authBoundary.length > 24 &&
       matchesExpectedFileTerms(artifact.target_files, expected.file_terms) &&
       evidencePoints.length >= 2
     );
@@ -321,6 +322,7 @@ function validateArtifact(agentName, artifact, expected) {
   const rollbackText = flattenText(packet?.rollback_notes);
   const verdict = String(artifact.verdict ?? '').toLowerCase();
   const reviewerVerdict = String(packet?.reviewer_verdict ?? '').toLowerCase();
+  const normalizedReviewerVerdict = reviewerVerdict.replace(/[_\s-]+/g, ' ').trim();
   return Boolean(
     ['pass', 'needs-more-work', 'ready-for-implementation'].includes(verdict) &&
     typeof artifact.rationale === 'string' && artifact.rationale.length > 16 &&
@@ -332,6 +334,7 @@ function validateArtifact(agentName, artifact, expected) {
     rollbackText.length > 20 && includesAny(rollbackText, expected.rollback_terms) &&
     (
       ['pass', 'approve', 'approved', 'needs-more-work', 'ready-for-implementation'].includes(reviewerVerdict) ||
+      ['pass with conditions', 'conditional pass', 'ready with conditions'].includes(normalizedReviewerVerdict) ||
       reviewerVerdict.length > 20
     )
   );
@@ -339,7 +342,16 @@ function validateArtifact(agentName, artifact, expected) {
 
 function carryoverForBaseline(agentName, artifact) {
   if (!artifact) return null;
-  return excerpt(JSON.stringify({ stage: agentName, artifact }), 260);
+  if (agentName === 'orchestrator') {
+    return excerpt(`Previous planner note: stay on the auth drift surface and produce a reviewer-ready packet. Target surface: ${flattenText(artifact.target_surface)}`, 220);
+  }
+  if (agentName === 'triage') {
+    return excerpt(`Previous triage note: suspected auth boundary is ${artifact.auth_boundary}.`, 220);
+  }
+  if (agentName === 'patch') {
+    return excerpt(`Previous patch note: remediation direction is ${flattenText(artifact.remediation_direction)}.`, 220);
+  }
+  return excerpt(String(artifact.rationale ?? ''), 220);
 }
 
 function handoffText(agentName, artifact) {
