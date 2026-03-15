@@ -212,6 +212,10 @@ That is the right way to read this benchmark:
 - the value here is not cheaper failure
 - the value is successful multi-agent completion on a realistic workflow using the actual `adapter + Lite` path
 
+For the narrower page that focuses specifically on the new `execution_packet_v1` path, see:
+
+- [Execution continuity validation](2026-03-15-openclaw-execution-continuity-validation.md)
+
 ## What This Proves
 
 This benchmark proves:

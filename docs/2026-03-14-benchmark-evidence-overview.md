@@ -104,7 +104,9 @@ Evidence:
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow continuity validation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
+- [Real workflow continuity validation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
+- [Execution continuity validation](2026-03-15-openclaw-execution-continuity-validation.md)
 
 Supporting signal:
 

@@ -74,6 +74,7 @@ Supporting docs:
 - [Google Runtime Benchmark](docs/2026-03-14-openclaw-google-runtime-benchmark.md)
 - [Google Runtime Case Study](docs/2026-03-14-openclaw-google-runtime-case-study.md)
 - [Real Workflow Scenario v1](docs/2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
+- [Execution Continuity Validation](docs/2026-03-15-openclaw-execution-continuity-validation.md)
 
 Public evidence files:
 
@@ -93,6 +94,7 @@ Public evidence files:
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow continuity validation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
+- [Real workflow continuity validation: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 
 ## 5-Minute Quickstart
 
