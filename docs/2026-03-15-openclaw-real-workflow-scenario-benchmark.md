@@ -156,6 +156,50 @@ Other signals:
 
 This slice is positive, but weaker than the first two real-workflow slices. It should be treated as supporting evidence, not a headline slice.
 
+## Execution Continuity Contract Validation
+
+After the first four real-Lite workflow publications, the adapter was updated to thread recovered `execution_state_v1` / `execution_packet_v1` into `before_agent_start -> context_assemble`.
+
+These are not new headline benchmark slices. They are single-run, real-path validations that prove the new continuity contract is live on the actual workflow route.
+
+### Validation slice: dashboard auth drift with continuity packet enabled
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315090950/cases.jsonl)
+
+Single-run result:
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+
+Interpretation:
+
+- this confirms that `handoff/recover -> execution_packet_v1 -> context_assemble` is active on the real Lite workflow path
+- this is a continuity-path validation, not a new repeated publication set
+
+### Validation slice: pairing / approval recovery with continuity packet enabled
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315091709/cases.jsonl)
+
+Single-run result:
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+
+Interpretation:
+
+- the new continuity contract is not only wired; it remains positive on a second real workflow shape
+- this is still a validation slice, not a replacement for the stronger repeated `3`-run publication sets above
+
 ## Interpretation
 
 These are **continuity wins**, not token wins.

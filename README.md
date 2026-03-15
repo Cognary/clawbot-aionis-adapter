@@ -59,6 +59,9 @@ Headline results:
   - pairing / approval recovery with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
   - service token drift repair with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`
   - markdown parser fallback with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667` (`supporting slice`)
+- **Execution continuity validation on the real Lite path (single-run checks)**:
+  - dashboard auth drift with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
+  - pairing / approval recovery with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
 
 Supporting docs:
 
@@ -88,6 +91,8 @@ Public evidence files:
 - [Real workflow scenario summary: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
 - [Real workflow scenario summary: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315074101/summary.json)
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
+- [Real workflow continuity validation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
+- [Real workflow continuity validation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 
 ## 5-Minute Quickstart
 
