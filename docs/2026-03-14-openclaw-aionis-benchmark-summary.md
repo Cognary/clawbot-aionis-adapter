@@ -130,6 +130,7 @@ Evidence:
 
 - [Real workflow scenario summary: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
 - [Real workflow scenario summary: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
+- [Real workflow scenario summary: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315074101/summary.json)
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
@@ -137,6 +138,7 @@ Headline results:
 
 - dashboard auth drift: baseline `reviewer_ready_rate = 0.6667`, treatment `reviewer_ready_rate = 1`
 - pairing / approval recovery: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
+- service token drift repair: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`
 - markdown parser fallback: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667` (`supporting slice`)
 
 What this proves:
@@ -145,7 +147,8 @@ What this proves:
 - this is a product-validating scenario family, not only a narrow benchmark slice
 - the strongest treatment advantage here is continuity, not token reduction
 - dashboard auth drift and pairing / approval recovery are the strongest real-workflow slices
-- markdown parser fallback extends the same story as a supporting real-workflow slice
+- service token drift repair extends the same story as an additional positive real-workflow slice
+- markdown parser fallback remains a supporting real-workflow slice
 
 ## What This Does Not Yet Prove
 

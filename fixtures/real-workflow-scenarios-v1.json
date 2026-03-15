@@ -709,6 +709,235 @@
           }
         }
       }
+    },
+    {
+      "id": "gemini_service_token_drift_repair_reviewer_ready_workflow",
+      "kind": "service_token_drift_repair_reviewer_ready_workflow",
+      "repo_path": "/Users/lucio/Desktop/clawbot-aionis-adapter/workspaces/openclaw",
+      "issue_anchor": "gateway-service-token-drift-repair",
+      "issue_url": "https://github.com/openclaw/openclaw/pull/28428",
+      "top_level_prompt": "Investigate gateway service token drift after token rotation or reboot, identify the exact repair boundary between config, service environment, and doctor/service audit logic, prepare the smallest safe remediation direction, define focused regression validation, and leave a reviewer-ready summary with rollback notes.",
+      "agents": [
+        {
+          "name": "orchestrator",
+          "goal": "Turn the token drift repair request into a concrete workflow plan, target surface, and exit criteria without broad repo rediscovery.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-token-drift-scan",
+              "description": "Broad scan across changelog, doctor docs, troubleshooting, service audit, repair logic, and systemd precedence tests for service token drift anchors.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"service token|token drift|EnvironmentFile|embedded service token|gateway.auth.token|stale token|reinstall|OPENCLAW_GATEWAY_TOKEN\" CHANGELOG.md docs/gateway/doctor.md docs/gateway/troubleshooting.md src/daemon/service-audit.ts src/commands/doctor-gateway-services.ts src/commands/doctor-gateway-services.test.ts src/daemon/systemd.test.ts | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-changelog-token-slice",
+              "description": "Read changelog entries for service token drift repair and auth follow-up hardening.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '488,492p' CHANGELOG.md"
+              }
+            },
+            {
+              "name": "read-doctor-doc",
+              "description": "Read doctor documentation for token drift checks and EnvironmentFile precedence.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '292,324p' docs/gateway/doctor.md"
+              }
+            },
+            {
+              "name": "read-troubleshooting-doc",
+              "description": "Read troubleshooting guidance for repeated unauthorized after trusted retry and token drift recovery.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '108,132p' docs/gateway/troubleshooting.md"
+              }
+            }
+          ]
+        },
+        {
+          "name": "triage",
+          "goal": "Isolate the exact token drift repair boundary across config, service environment, and doctor/service audit logic, using the orchestrator handoff rather than restarting the search.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-token-drift-scan",
+              "description": "Broad scan across docs, service audit, doctor repairs, and tests for service token drift behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"service token|token drift|EnvironmentFile|embedded service token|gateway.auth.token|stale token|reinstall|OPENCLAW_GATEWAY_TOKEN\" CHANGELOG.md docs/gateway/doctor.md docs/gateway/troubleshooting.md src/daemon/service-audit.ts src/commands/doctor-gateway-services.ts src/commands/doctor-gateway-services.test.ts src/daemon/systemd.test.ts | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-service-audit",
+              "description": "Read the service audit code that flags embedded and stale gateway tokens.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '212,245p' src/daemon/service-audit.ts"
+              }
+            },
+            {
+              "name": "read-doctor-repair",
+              "description": "Read the doctor repair logic that chooses expected token source and repair behavior.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '229,380p' src/commands/doctor-gateway-services.ts"
+              }
+            },
+            {
+              "name": "read-token-drift-tests",
+              "description": "Read focused tests that define source-of-truth, embedded fallback, and EnvironmentFile precedence.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '165,210p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '399,455p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '481,520p' src/daemon/systemd.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "patch",
+          "goal": "Propose the smallest safe remediation direction, focused regression validation, and rollback notes from the triage handoff without broad rediscovery.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "broad-token-drift-remediation-scan",
+              "description": "Broad scan for token drift repair anchors across docs, audit, repair logic, and tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"service token|token drift|EnvironmentFile|embedded service token|gateway.auth.token|stale token|reinstall|OPENCLAW_GATEWAY_TOKEN\" CHANGELOG.md docs/gateway/doctor.md docs/gateway/troubleshooting.md src/daemon/service-audit.ts src/commands/doctor-gateway-services.ts src/commands/doctor-gateway-services.test.ts src/daemon/systemd.test.ts | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-service-audit",
+              "description": "Read the service audit implementation boundary for remediation framing.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '212,245p' src/daemon/service-audit.ts"
+              }
+            },
+            {
+              "name": "read-doctor-repair",
+              "description": "Read the doctor repair path to define the smallest safe remediation direction.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '229,380p' src/commands/doctor-gateway-services.ts"
+              }
+            },
+            {
+              "name": "read-token-drift-tests",
+              "description": "Read the focused tests to ground the validation plan and rollback expectations.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '165,210p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '399,455p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '481,520p' src/daemon/systemd.test.ts"
+              }
+            }
+          ]
+        },
+        {
+          "name": "review",
+          "goal": "Produce a reviewer-ready packet with token drift hypothesis, target files, remediation direction, focused validation, rollback notes, and verdict.",
+          "max_steps": 2,
+          "toolset": [
+            {
+              "name": "read-workflow-artifacts",
+              "description": "Read orchestrator, triage, and patch artifacts together as reviewer packet input.",
+              "params": {
+                "command": "printf -- \"--- orchestrator ---\\n\" && cat ${RUN_DIR}/orchestrator.json && printf -- \"\\n--- triage ---\\n\" && cat ${RUN_DIR}/triage.json && printf -- \"\\n--- patch ---\\n\" && cat ${RUN_DIR}/patch.json"
+              }
+            },
+            {
+              "name": "focused-review-scan",
+              "description": "Run a focused evidence scan over service token drift docs, repair logic, and tests.",
+              "params": {
+                "command": "cd ${REPO_PATH} && rg -n \"service token|token drift|EnvironmentFile|embedded service token|gateway.auth.token|stale token|reinstall|OPENCLAW_GATEWAY_TOKEN\" docs/gateway/doctor.md docs/gateway/troubleshooting.md src/daemon/service-audit.ts src/commands/doctor-gateway-services.ts src/commands/doctor-gateway-services.test.ts src/daemon/systemd.test.ts CHANGELOG.md | sed -n '1,260p'"
+              }
+            },
+            {
+              "name": "read-service-audit",
+              "description": "Read the service audit snippet directly during review.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '212,245p' src/daemon/service-audit.ts"
+              }
+            },
+            {
+              "name": "read-token-drift-tests",
+              "description": "Read token drift tests directly during review.",
+              "params": {
+                "command": "cd ${REPO_PATH} && sed -n '165,210p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '399,455p' src/commands/doctor-gateway-services.test.ts && printf -- \"\\n---\\n\" && sed -n '481,520p' src/daemon/systemd.test.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "boundary_terms": [
+          "service token",
+          "token drift",
+          "EnvironmentFile",
+          "gateway.auth.token",
+          "embedded service token",
+          "OPENCLAW_GATEWAY_TOKEN",
+          "stale token"
+        ],
+        "file_terms": [
+          "docs/gateway/doctor.md",
+          "docs/gateway/troubleshooting.md",
+          "src/daemon/service-audit.ts",
+          "src/commands/doctor-gateway-services.ts",
+          "src/commands/doctor-gateway-services.test.ts",
+          "src/daemon/systemd.test.ts",
+          "service-audit.ts",
+          "doctor-gateway-services.ts",
+          "doctor.md",
+          "troubleshooting.md"
+        ],
+        "validation_terms": [
+          "EnvironmentFile",
+          "source of truth",
+          "embedded service token",
+          "reinstall",
+          "gateway.auth.token",
+          "stale token",
+          "OPENCLAW_GATEWAY_TOKEN"
+        ],
+        "rollback_terms": [
+          "rollback",
+          "revert",
+          "restore",
+          "fallback",
+          "previous service token behavior",
+          "safe rollback"
+        ]
+      },
+      "plugin_config": {
+        "scopeMode": "session",
+        "scopePrefix": "real-workflow",
+        "replayDispatchEnabled": false,
+        "handoffFallbackEnabled": true,
+        "strictToolBlocking": true,
+        "maxBroadScanInvocations": 1,
+        "maxBroadTestInvocations": 0,
+        "maxSameToolStreak": 2,
+        "maxDuplicateObservationStreak": 2,
+        "maxNoProgressStreak": 2,
+        "maxEstimatedTokenBurn": 26000
+      },
+      "aionis": {
+        "orchestrator": {
+          "context_text": "Start on docs/gateway/doctor.md, docs/gateway/troubleshooting.md, src/daemon/service-audit.ts, and src/commands/doctor-gateway-services.ts. The workflow should finish with a reviewer-ready packet, not a loose summary.",
+          "selection_map": {
+            "broad-token-drift-scan": "read-doctor-doc"
+          }
+        },
+        "triage": {
+          "context_text": "Use the orchestrator handoff. Stay on the repair boundary between config token precedence, EnvironmentFile-backed service env, embedded service tokens, and doctor repair behavior. Do not restart a broad repo scan.",
+          "selection_map": {
+            "broad-token-drift-scan": "read-service-audit"
+          }
+        },
+        "patch": {
+          "context_text": "Use the triage handoff. Focus on the smallest safe remediation direction, focused regression validation, and rollback notes. Avoid broad remediation scans if the likely files are already known.",
+          "selection_map": {
+            "broad-token-drift-remediation-scan": "read-token-drift-tests"
+          }
+        },
+        "review": {
+          "context_text": "Assemble a reviewer-ready packet. Prefer prior artifacts and focused token drift evidence over rediscovery.",
+          "selection_map": {
+            "focused-review-scan": "read-workflow-artifacts"
+          }
+        }
+      }
     }
   ]
 }

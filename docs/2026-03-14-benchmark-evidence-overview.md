@@ -100,6 +100,7 @@ Evidence:
 
 - [Real workflow scenario summary: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
 - [Real workflow scenario summary: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
+- [Real workflow scenario summary: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315074101/summary.json)
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
@@ -109,9 +110,10 @@ Supporting signal:
 
 Interpretation:
 
-- realistic workflow evidence is now positive on three workflow shapes under real Lite
+- realistic workflow evidence is now positive on four workflow shapes under real Lite
 - dashboard auth drift and pairing / approval recovery remain the strongest real-workflow signals on the actual runtime path
-- markdown parser fallback is a positive supporting slice, not a headline slice
+- service token drift repair is a positive additional real-workflow slice
+- markdown parser fallback remains a supporting slice, not a headline slice
 - these are continuity wins, not token wins
 
 ### 5. Real runtime activity is proven
