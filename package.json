@@ -42,7 +42,8 @@
     "bench:multi-agent": "npm run build && node scripts/multi-agent-benchmark.mjs",
     "bench:one-prompt-multi-agent": "npm run build && node scripts/one-prompt-multi-agent-benchmark.mjs",
     "bench:real-workflow": "npm run build && node scripts/real-workflow-scenario-benchmark.mjs",
-    "bench:real-workflow-continuity-ab": "npm run build && node scripts/real-workflow-continuity-ab-benchmark.mjs"
+    "bench:real-workflow-continuity-ab": "npm run build && node scripts/real-workflow-continuity-ab-benchmark.mjs",
+    "bench:real-workflow-nightly": "bash scripts/real-workflow-nightly-validation.sh"
   },
   "exports": {
     ".": "./dist/index.js",
