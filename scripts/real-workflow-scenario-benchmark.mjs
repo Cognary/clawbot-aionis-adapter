@@ -78,6 +78,39 @@ function asStringArray(value) {
   return [];
 }
 
+function uniqueStrings(values) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    const normalized = String(value ?? '').trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
+}
+
+function extractRepoPaths(value) {
+  const text = flattenText(value);
+  const matches = text.match(/[A-Za-z0-9._/-]+\.[A-Za-z0-9]+/g) ?? [];
+  return uniqueStrings(matches.filter((item) => item.includes('/')));
+}
+
+function toChecklist(value) {
+  return uniqueStrings(
+    asStringArray(value)
+      .flatMap((item) => String(item).split(/[\n;]+/))
+      .map((item) => item.trim())
+      .filter(Boolean),
+  );
+}
+
+function summarizeValidationPlan(validationPlan) {
+  const items = toChecklist(validationPlan);
+  if (items.length === 0) return null;
+  return items.slice(0, 3).join(' ; ');
+}
+
 function carryoverText(carryover) {
   if (!carryover) return '';
   if (typeof carryover === 'string') return carryover;
@@ -489,6 +522,79 @@ function handoffText(agentName, artifact) {
   return `Verdict: ${artifact.verdict}\nRationale: ${artifact.rationale}`;
 }
 
+function handoffEnvelope(agentName, artifact) {
+  if (agentName === 'orchestrator') {
+    const targetFiles = uniqueStrings(extractRepoPaths(artifact.target_surface));
+    return {
+      targetFiles,
+      nextAction: uniqueStrings([
+        targetFiles.length > 0 ? `Read ${targetFiles.join(', ')} and isolate the exact rendering or parsing boundary before proposing changes.` : '',
+        'Do not restart a broad scan once the primary markdown boundary is visible.',
+      ]).join(' '),
+      acceptanceChecks: toChecklist(artifact.exit_criteria),
+      mustChange: targetFiles,
+      mustKeep: [
+        'Keep the workflow reviewer-ready.',
+        'Preserve valid markdown rendering behavior.',
+      ],
+      mustRemove: [],
+    };
+  }
+
+  if (agentName === 'triage') {
+    const targetFiles = uniqueStrings(asStringArray(artifact.target_files));
+    return {
+      targetFiles,
+      nextAction: uniqueStrings([
+        targetFiles.length > 0 ? `Stay on ${targetFiles.join(', ')} and isolate the failure boundary instead of rereading the same implementation slice.` : '',
+        typeof artifact.auth_boundary === 'string' ? `Prove the exact boundary: ${artifact.auth_boundary}` : '',
+      ]).join(' '),
+      acceptanceChecks: toChecklist(artifact.evidence_points),
+      mustChange: targetFiles,
+      mustKeep: [
+        'Keep the issue hypothesis and concrete evidence aligned.',
+      ],
+      mustRemove: [],
+    };
+  }
+
+  if (agentName === 'patch') {
+    const targetFiles = uniqueStrings(asStringArray(artifact.target_files));
+    const validationSummary = summarizeValidationPlan(artifact.validation_plan);
+    return {
+      targetFiles,
+      nextAction: uniqueStrings([
+        targetFiles.length > 0 ? `Propose the smallest safe remediation on ${targetFiles.join(', ')}.` : '',
+        validationSummary ? `Keep validation focused on ${validationSummary}.` : '',
+      ]).join(' '),
+      acceptanceChecks: toChecklist(artifact.validation_plan),
+      mustChange: targetFiles,
+      mustKeep: [
+        'Keep rollback notes explicit.',
+        'Do not weaken valid rendering behavior.',
+      ],
+      mustRemove: [],
+    };
+  }
+
+  const packet = artifact.reviewer_ready_packet ?? {};
+  const targetFiles = uniqueStrings(asStringArray(packet.target_files));
+  return {
+    targetFiles,
+    nextAction: uniqueStrings([
+      'Produce a reviewer-ready packet with verdict, validation, and rollback notes.',
+      typeof packet.reviewer_verdict === 'string' ? `Reviewer verdict target: ${packet.reviewer_verdict}` : '',
+    ]).join(' '),
+    acceptanceChecks: toChecklist(packet.validation_plan),
+    mustChange: targetFiles,
+    mustKeep: [
+      'Keep the packet reviewer-ready.',
+      'Keep rollback notes and reviewer verdict explicit.',
+    ],
+    mustRemove: [],
+  };
+}
+
 async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath, pluginConfig, scope) {
   const summary = flattenText(agentName === 'orchestrator'
     ? artifact.workflow_plan
@@ -497,7 +603,7 @@ async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath, pl
       : agentName === 'patch'
         ? artifact.remediation_direction
         : artifact.rationale);
-  const targetFiles = Array.isArray(artifact.target_files)
+  const fallbackTargetFiles = Array.isArray(artifact.target_files)
     ? artifact.target_files
     : Array.isArray(artifact.target_surface)
       ? artifact.target_surface
@@ -510,6 +616,13 @@ async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath, pl
   const packetTargetFiles = Array.isArray(artifact.reviewer_ready_packet?.target_files)
         ? artifact.reviewer_ready_packet.target_files
         : [];
+  const structured = handoffEnvelope(agentName, artifact);
+  const targetFiles = structured.targetFiles.length > 0
+    ? structured.targetFiles
+    : uniqueStrings([
+        ...fallbackTargetFiles,
+        ...packetTargetFiles,
+      ]);
   const response = await fetch(`${baseUrl}/v1/handoff/store`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -523,8 +636,12 @@ async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath, pl
       handoff_kind: 'task_handoff',
       repo_root: repoPath,
       file_path: targetFiles[0] ?? packetTargetFiles[0] ?? 'unknown',
-      target_files: targetFiles.length > 0 ? targetFiles : packetTargetFiles,
-      next_action: handoffText(agentName, artifact),
+      target_files: targetFiles,
+      next_action: structured.nextAction || handoffText(agentName, artifact),
+      acceptance_checks: structured.acceptanceChecks,
+      must_change: structured.mustChange,
+      must_remove: structured.mustRemove,
+      must_keep: structured.mustKeep,
     }),
   });
   if (!response.ok) throw new Error(`handoff/store failed: ${response.status}`);
