@@ -96,11 +96,30 @@ Interpretation:
 - the continuity packet also stays positive on a service-audit / repair workflow
 - this gives the contract validation a third real workflow shape
 
+### 4. Markdown parser fallback
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315093238/cases.jsonl)
+
+Result:
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+
+Interpretation:
+
+- the continuity packet also stays positive on the narrower markdown fallback workflow
+- this rounds the validation set out to four real workflow shapes
+
 ## What This Proves
 
 1. the new execution continuity contract is active on the actual Lite workflow route
 2. the adapter can recover structured continuity and feed it into real `context/assemble`
-3. the new path stays positive on more than one real workflow shape
+3. the new path stays positive on four real workflow shapes
 
 ## What This Does Not Prove
 
