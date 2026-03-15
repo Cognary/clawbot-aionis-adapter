@@ -57,6 +57,7 @@ Headline results:
 - **Real workflow scenario v1 (3 repeats)**:
   - dashboard auth drift with real Lite: baseline `reviewer_ready_rate = 0.6667`, treatment `reviewer_ready_rate = 1`
   - pairing / approval recovery with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
+  - markdown parser fallback with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667` (`supporting slice`)
 
 Supporting docs:
 
@@ -84,6 +85,7 @@ Public evidence files:
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
 - [Real workflow scenario summary: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
 - [Real workflow scenario summary: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
+- [Real workflow scenario summary: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 
 ## 5-Minute Quickstart
 

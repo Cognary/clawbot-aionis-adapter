@@ -106,11 +106,36 @@ Other signals:
 - treatment `avg_handoff_store_count = 4`
 - treatment `avg_context_assemble_count = 4`
 
+### Workflow slice: markdown parser fallback (real Lite, supporting)
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315072548/cases.jsonl)
+
+Result (`3` repeats):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 0.6667`
+
+Other signals:
+
+- baseline `avg_total_tokens = 10896`
+- treatment `avg_total_tokens = 24172.67`
+- baseline `avg_broad_tool_call_count = 1`
+- treatment `avg_broad_tool_call_count = 1`
+- treatment `avg_handoff_store_count = 3.33`
+- treatment `avg_context_assemble_count = 3.33`
+
+This slice is positive, but weaker than the first two real-workflow slices. It should be treated as supporting evidence, not a headline slice.
+
 ## Interpretation
 
 These are **continuity wins**, not token wins.
 
-The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally on dashboard auth drift, but it does so less reliably. On pairing / approval recovery, baseline does not produce reviewer-ready output at all.
+The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally on dashboard auth drift, but it does so less reliably. On pairing / approval recovery, baseline does not produce reviewer-ready output at all. The markdown parser fallback workflow is also positive, but its uplift is smaller, so it belongs in the supporting tier.
 
 That is the right way to read this benchmark:
 
@@ -125,6 +150,7 @@ This benchmark proves:
 1. Aionis can improve completion on a realistic reviewer-ready workflow, not only narrow harness slices
 2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence on the real Lite path
 3. the product story holds across more than one realistic workflow shape under real runtime conditions
+4. supporting workflow slices can also stay positive on the real Lite path without being overstated as headline proof
 
 ## What It Does Not Prove
 
@@ -147,5 +173,12 @@ Pairing / approval recovery slice:
 
 ```bash
 BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_pairing_approval_recovery_reviewer_ready_workflow \
+  BENCH_MODEL_PROVIDER=gemini BENCH_AIONIS_BASE_URL=http://127.0.0.1:3321 npm run bench:real-workflow
+```
+
+Markdown parser fallback slice:
+
+```bash
+BENCH_REPEATS=3 BENCH_SCENARIO_ID=gemini_markdown_parser_fallback_reviewer_ready_workflow \
   BENCH_MODEL_PROVIDER=gemini BENCH_AIONIS_BASE_URL=http://127.0.0.1:3321 npm run bench:real-workflow
 ```
