@@ -209,9 +209,83 @@ Interpretation:
 - the new continuity contract is not only wired; it remains positive on a second real workflow shape
 - this is still a validation slice, not a replacement for the stronger repeated `3`-run publication sets above
 
+## ControlProfile-Active Revalidation
+
+After `ControlProfile` was projected through handoff continuity and consumed by the real adapter runtime, the strongest real-workflow slices were re-run under the same controlled `3`-repeat setup.
+
+These runs answer a narrower question than the original publication set:
+
+**Does the strongest real workflow story stay positive once continuity-delivered runtime profiles are active on the actual Lite path?**
+
+### Revalidated slice: dashboard auth drift
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315133004/summary.json)
+
+Result (`3` repeats):
+
+- baseline `reviewer_ready_rate = 0.6667`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0.6667`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 23888.33`
+- treatment `avg_total_tokens = 21865.67`
+- baseline `avg_wall_clock_ms = 94546`
+- treatment `avg_wall_clock_ms = 68498.33`
+
+Interpretation:
+
+- `ControlProfile` stays positive on the strongest real workflow slice
+- this slice is both a completion win and an efficiency win
+
+### Revalidated slice: pairing / approval recovery
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
+
+Result (`3` repeats):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 18851.67`
+- treatment `avg_total_tokens = 23374.67`
+- baseline `avg_wall_clock_ms = 73891.67`
+- treatment `avg_wall_clock_ms = 74177.33`
+
+Interpretation:
+
+- the completion story remains strong with `ControlProfile` active
+- this slice is not an efficiency win; the cost is higher because treatment is consistently finishing the workflow
+
+### Revalidated slice: service token drift repair
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
+
+Result (`3` repeats):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 0.6667`
+- baseline `avg_total_tokens = 17623`
+- treatment `avg_total_tokens = 24731.33`
+- baseline `avg_wall_clock_ms = 69066.67`
+- treatment `avg_wall_clock_ms = 77386.33`
+
+Interpretation:
+
+- this slice also remains positive with `ControlProfile` active
+- like pairing / approval recovery, it is currently a completion win rather than an efficiency win
+
 ## Interpretation
 
-These are **continuity wins**, not token wins.
+The original real-workflow publication set is best read as **continuity wins**, not token wins.
 
 The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally on dashboard auth drift, but it does so less reliably. On pairing / approval recovery, baseline does not produce reviewer-ready output at all. Service token drift repair is also positive on the real Lite path, though weaker than the two strongest slices. The markdown parser fallback workflow is also positive, but its uplift is smaller, so it remains in the supporting tier.
 
@@ -220,6 +294,12 @@ That is the right way to read this benchmark:
 - Aionis helps OpenClaw preserve enough structured execution state across agents to finish the workflow
 - the value here is not cheaper failure
 - the value is successful multi-agent completion on a realistic workflow using the actual `adapter + Lite` path
+
+The `ControlProfile`-active refreshed set should be read a little more narrowly:
+
+- the completion story survives `ControlProfile` adoption on all three strongest slices
+- dashboard auth drift remains both a completion and efficiency win
+- pairing / approval recovery and service token drift repair remain completion wins, but not efficiency wins
 
 For the narrower page that focuses specifically on the new `execution_packet_v1` path, see:
 

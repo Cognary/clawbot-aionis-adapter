@@ -106,6 +106,9 @@ Evidence:
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
+- [ControlProfile revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315133004/summary.json)
+- [ControlProfile revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
+- [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
@@ -124,6 +127,8 @@ Interpretation:
 - dashboard auth drift and pairing / approval recovery remain the strongest real-workflow signals on the actual runtime path
 - service token drift repair is a positive additional real-workflow slice
 - markdown parser fallback remains a supporting slice, not a headline slice
+- the strongest three real-workflow slices have now also been refreshed with `ControlProfile` active on the real path, and all three remain positive on reviewer-ready completion
+- only dashboard auth drift currently retains both completion and efficiency wins after `ControlProfile` adoption; the other two refreshed slices should still be read as completion wins, not efficiency wins
 - the new execution-continuity contract has now been validated on four real Lite workflow shapes, not only in unit or integration tests
 - these are continuity wins, not token wins
 - after tightening the continuity-path A/B so packet mode no longer carries raw legacy handoff text, `execution_packet_v1` now also beats the older legacy continuity path on token and wall-clock for three repeated real Lite slices while keeping completion flat at `1.0`

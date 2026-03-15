@@ -11,6 +11,7 @@ Included here:
 5. newer real-Lite workflow publication sets where the treatment path uses the actual Aionis Lite runtime, including additional positive slices and supporting slices that are explicitly marked when they are non-headline evidence
 6. real-Lite continuity-contract validation runs that prove `handoff/recover -> execution_packet_v1 -> context/assemble` is active on the actual workflow path
 7. repeated real-Lite continuity A/B runs that compare the older legacy continuity path against the newer `execution_packet_v1` path
+8. controlled real-Lite revalidation runs for the strongest reviewer-ready workflow slices after `ControlProfile` adoption on the actual runtime path
 
 Not included here:
 

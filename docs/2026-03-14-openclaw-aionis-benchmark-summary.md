@@ -136,6 +136,9 @@ Evidence:
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
+- [ControlProfile revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315133004/summary.json)
+- [ControlProfile revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
+- [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
@@ -150,6 +153,10 @@ Headline results:
 - pairing / approval recovery: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
 - service token drift repair: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`
 - markdown parser fallback: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667` (`supporting slice`)
+- `ControlProfile`-active refreshed strongest set:
+  - dashboard auth drift: `0.6667 -> 1` with lower token and lower wall-clock
+  - pairing / approval recovery: `0 -> 1`
+  - service token drift repair: `0 -> 0.6667`
 
 What this proves:
 
@@ -159,6 +166,10 @@ What this proves:
 - dashboard auth drift and pairing / approval recovery are the strongest real-workflow slices
 - service token drift repair extends the same story as an additional positive real-workflow slice
 - markdown parser fallback remains a supporting real-workflow slice
+- after `ControlProfile` adoption, the strongest real-workflow story remains positive on all three strongest slices
+- the efficiency story after `ControlProfile` adoption is mixed:
+  - dashboard auth drift remains both a completion and efficiency win
+  - pairing / approval recovery and service token drift repair remain completion wins, but not efficiency wins
 - the new `execution_packet_v1` continuity path has now been validated on the actual Lite workflow route across four single-run real checks
 - after removing the old handoff-text duplication from the packet arm, the repeated real Lite continuity A/B now shows `execution_packet_v1` matching legacy completion while reducing token use and wall-clock on three core scenarios
 - markdown parser fallback has now also turned positive on repeated continuity A/B, but only as a supporting completion slice: `0.6667 -> 1.0` on reviewer-ready rate with higher token and wall-clock
