@@ -3,6 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# launchd starts with a minimal PATH that often omits Homebrew/npm.
+export PATH="/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
 export BENCH_SCENARIO_ID="${BENCH_SCENARIO_ID:-glm_dashboard_auth_drift_reviewer_ready_workflow}"
 export BENCH_REPEATS="${BENCH_REPEATS:-3}"
 export BENCH_AGENT_TIMEOUT_MS="${BENCH_AGENT_TIMEOUT_MS:-120000}"
@@ -17,6 +20,11 @@ echo "repeats=$BENCH_REPEATS"
 echo "agent_timeout_ms=$BENCH_AGENT_TIMEOUT_MS"
 echo "arm_timeout_ms=$BENCH_ARM_TIMEOUT_MS"
 echo "aionis_base_url=$BENCH_AIONIS_BASE_URL"
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm is not available in PATH=$PATH" >&2
+  exit 127
+fi
 
 npm run bench:real-workflow
 
