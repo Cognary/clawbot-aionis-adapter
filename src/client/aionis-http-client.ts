@@ -3,6 +3,7 @@ import type {
   AionisHttpClientOptions,
   AionisLoopControlClient,
   AionisToolDecision,
+  ControlProfileV1,
 } from "../types/aionis.js";
 
 const DEFAULT_TIMEOUT_MS = 20_000;
@@ -145,10 +146,14 @@ export class AionisHttpLoopControlClient implements AionisLoopControlClient {
     runId: string;
     context: Record<string, unknown>;
     candidates: string[];
+    controlProfileV1?: ControlProfileV1;
   }): Promise<AionisToolDecision | null> {
     const payload = await this.post<Record<string, unknown>>("/v1/memory/tools/select", this.withIdentity(args.scope, {
       run_id: args.runId,
-      context: args.context,
+      context: {
+        ...args.context,
+        ...(args.controlProfileV1 ? { control_profile_v1: args.controlProfileV1 } : {}),
+      },
       candidates: args.candidates,
       strict: true,
     }));

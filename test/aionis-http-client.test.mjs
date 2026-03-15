@@ -98,3 +98,50 @@ test('http client shapes context and replay requests against Aionis endpoints', 
     assert.equal(requests[2].headers['x-api-key'], 'test-key');
   });
 });
+
+test('http client includes continuity-delivered control profile in tools/select context', async () => {
+  await withServer((req, res) => {
+    res.setHeader('content-type', 'application/json');
+    if (req.url === '/v1/memory/tools/select') {
+      res.end(JSON.stringify({
+        selection: { selected: 'read-dashboard-doc', denied: [{ name: 'broad-auth-scan', reason: 'control_profile' }] },
+        decision: { decision_id: 'dec-tools', decision_uri: 'aionis://decision/tools', selected_tool: 'read-dashboard-doc' },
+      }));
+      return;
+    }
+    res.statusCode = 404;
+    res.end(JSON.stringify({ error: 'unexpected_route' }));
+  }, async ({ baseUrl, requests }) => {
+    const client = createAionisHttpLoopControlClient({
+      baseUrl,
+      tenantId: 'tenant-test',
+      actor: 'adapter-test',
+    });
+
+    const decision = await client.toolsSelect({
+      scope: 'openclaw:test',
+      runId: 'run-1',
+      context: { source: 'test-tools-select' },
+      candidates: ['broad-auth-scan', 'read-dashboard-doc'],
+      controlProfileV1: {
+        version: 1,
+        profile: 'triage',
+        max_same_tool_streak: 2,
+        max_no_progress_streak: 2,
+        max_duplicate_observation_streak: 2,
+        max_steps: 8,
+        allow_broad_scan: false,
+        allow_broad_test: false,
+        escalate_on_blocker: true,
+        reviewer_ready_required: false,
+      },
+    });
+
+    assert.equal(decision.selected_tool, 'read-dashboard-doc');
+    assert.deepEqual(decision.denied_tools, ['broad-auth-scan']);
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].body.context.control_profile_v1.profile, 'triage');
+    assert.equal(requests[0].body.context.control_profile_v1.allow_broad_scan, false);
+    assert.deepEqual(requests[0].body.candidates, ['broad-auth-scan', 'read-dashboard-doc']);
+  });
+});

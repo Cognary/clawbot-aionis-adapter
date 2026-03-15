@@ -163,6 +163,7 @@ export class AionisLoopControlAdapter {
           runId: event.runId ?? ctx.runId ?? state.stateId,
           context,
           candidates,
+          controlProfileV1: state.controlProfileV1,
         })
       : undefined;
     this.captureDecision(state, decision ?? undefined);
