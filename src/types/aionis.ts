@@ -1,3 +1,33 @@
+export type ExecutionStateV1 = {
+  state_id?: string;
+  scope?: string;
+  task_brief?: string;
+  current_stage?: string;
+  active_role?: string;
+  owned_files?: string[];
+  pending_validations?: string[];
+  accepted_hypothesis?: string;
+  unresolved_blockers?: string[];
+  reviewer_contract?: Record<string, unknown> | null;
+  resume_anchor?: Record<string, unknown> | null;
+  [key: string]: unknown;
+};
+
+export type ExecutionPacketV1 = {
+  state_id?: string;
+  stage?: string;
+  role?: string;
+  task_brief?: string;
+  hard_constraints?: string[];
+  accepted_facts?: string[];
+  rejected_paths?: string[];
+  pending_validations?: string[];
+  rollback_notes?: string[];
+  review_contract?: Record<string, unknown> | null;
+  static_context_blocks?: Array<Record<string, unknown>>;
+  [key: string]: unknown;
+};
+
 export type AionisToolDecision = {
   decision_id?: string;
   decision_uri?: string;
@@ -41,6 +71,8 @@ export type AionisLoopControlClient = {
     queryText: string;
     context: Record<string, unknown>;
     toolCandidates?: string[];
+    executionStateV1?: ExecutionStateV1;
+    executionPacketV1?: ExecutionPacketV1;
   }) => Promise<{ layered_context?: { merged_text?: string }; tools?: AionisToolDecision } | null | undefined>;
   rulesEvaluate?: (args: {
     scope: string;

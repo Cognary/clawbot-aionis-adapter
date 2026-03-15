@@ -121,6 +121,41 @@ test('before_agent_start injects assembled context', async () => {
   assert.match(result.prependContext, /focused repo context/);
 });
 
+test('before_agent_start forwards recovered execution continuity into context assembly', async () => {
+  const { client, calls } = createFakeClient();
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  await host.emit(
+    'before_agent_start',
+    {
+      prompt: 'resume the reviewer-ready auth workflow',
+      messages: [{ toolName: 'rg' }],
+      continuity: {
+        handoffText: 'Resume from auth drift handoff',
+        execution_state_v1: {
+          state_id: 'state-auth-1',
+          current_stage: 'triage',
+          active_role: 'triage',
+        },
+        execution_packet_v1: {
+          state_id: 'state-auth-1',
+          stage: 'triage',
+          role: 'triage',
+          pending_validations: ['validate auth boundary'],
+        },
+      },
+    },
+    { agentId: 'agent-1', sessionId: 'sess-1b', sessionKey: 'sess-key-1b', workspaceDir: '/repo/click', trigger: 'resume' },
+  );
+
+  assert.equal(calls.contextAssemble.length, 1);
+  assert.equal(calls.contextAssemble[0].executionStateV1?.state_id, 'state-auth-1');
+  assert.equal(calls.contextAssemble[0].executionPacketV1?.stage, 'triage');
+  assert.equal(calls.contextAssemble[0].context.continuity_handoff_text, 'Resume from auth drift handoff');
+});
+
 test('after_tool_call writes feedback and evidence', async () => {
   const { client, calls } = createFakeClient();
   const host = new MockOpenClawHost();

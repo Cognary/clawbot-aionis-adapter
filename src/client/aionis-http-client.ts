@@ -109,6 +109,8 @@ export class AionisHttpLoopControlClient implements AionisLoopControlClient {
     queryText: string;
     context: Record<string, unknown>;
     toolCandidates?: string[];
+    executionStateV1?: Record<string, unknown>;
+    executionPacketV1?: Record<string, unknown>;
   }): Promise<{ layered_context?: { merged_text?: string }; tools?: AionisToolDecision } | null> {
     const payload = await this.post<Record<string, unknown>>("/v1/memory/context/assemble", this.withIdentity(args.scope, {
       query_text: args.queryText,
@@ -116,6 +118,8 @@ export class AionisHttpLoopControlClient implements AionisLoopControlClient {
       tool_candidates: args.toolCandidates,
       include_rules: true,
       return_layered_context: true,
+      execution_state_v1: args.executionStateV1,
+      execution_packet_v1: args.executionPacketV1,
     }));
     return {
       layered_context: isRecord(payload.layered_context) ? { merged_text: typeof payload.layered_context.merged_text === "string" ? payload.layered_context.merged_text : undefined } : undefined,

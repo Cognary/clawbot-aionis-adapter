@@ -1,3 +1,5 @@
+import type { ExecutionPacketV1, ExecutionStateV1 } from "./aionis.js";
+
 export type OpenClawLogger = {
   info: (msg: string) => void;
   warn: (msg: string) => void;
@@ -37,6 +39,11 @@ export type OpenClawToolCallContext = OpenClawAgentRunContext & {
 export type BeforeAgentStartEvent = {
   prompt: string;
   messages?: unknown[];
+  continuity?: {
+    handoffText?: string | null;
+    execution_state_v1?: ExecutionStateV1;
+    execution_packet_v1?: ExecutionPacketV1;
+  };
 };
 
 export type BeforeAgentStartResult = {

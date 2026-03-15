@@ -9,7 +9,13 @@ import type {
   OpenClawAgentRunContext,
   OpenClawToolCallContext,
 } from "../types/openclaw.js";
-import type { AionisLoopControlClient, AionisToolDecision, ReplayPlaybookHint } from "../types/aionis.js";
+import type {
+  AionisLoopControlClient,
+  AionisToolDecision,
+  ExecutionPacketV1,
+  ExecutionStateV1,
+  ReplayPlaybookHint,
+} from "../types/aionis.js";
 import { DEFAULT_THRESHOLDS, type AdapterConfig, type LoopStopReasonCode } from "../types/config.js";
 import { classifyBroadScan, classifyBroadTest, inferProgress, summarizeToolResult } from "./heuristics.js";
 import { createRunState, hashStable, LoopStateStore, type LoopRunState } from "./state.js";
@@ -84,8 +90,11 @@ export class AionisLoopControlAdapter {
         session_key: ctx.sessionKey,
         session_id: ctx.sessionId,
         trigger: ctx.trigger,
+        continuity_handoff_text: event.continuity?.handoffText ?? null,
       },
       toolCandidates: candidates,
+      executionStateV1: this.resolveContinuityState(event),
+      executionPacketV1: this.resolveContinuityPacket(event),
     });
 
     const merged = out?.layered_context?.merged_text?.trim();
@@ -336,6 +345,14 @@ export class AionisLoopControlAdapter {
       if (typeof toolName === "string" && toolName.trim()) out.add(toolName.trim());
     }
     return [...out];
+  }
+
+  private resolveContinuityState(event: BeforeAgentStartEvent): ExecutionStateV1 | undefined {
+    return event.continuity?.execution_state_v1 ?? undefined;
+  }
+
+  private resolveContinuityPacket(event: BeforeAgentStartEvent): ExecutionPacketV1 | undefined {
+    return event.continuity?.execution_packet_v1 ?? undefined;
   }
 
 

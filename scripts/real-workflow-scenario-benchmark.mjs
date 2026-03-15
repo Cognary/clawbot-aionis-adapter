@@ -76,6 +76,12 @@ function asStringArray(value) {
   return [];
 }
 
+function carryoverText(carryover) {
+  if (!carryover) return '';
+  if (typeof carryover === 'string') return carryover;
+  return String(carryover.text ?? carryover.handoffText ?? '');
+}
+
 function matchesExpectedFileTerms(value, expectedTerms) {
   const candidates = asStringArray(value)
     .flatMap((item) => String(item).split(/[,\n]/))
@@ -310,7 +316,10 @@ async function startAionisMock() {
     baseUrl: `http://127.0.0.1:${address.port}`,
     calls,
     setStage(config) { currentStage = config ?? { context_text: '', selection_map: {} }; },
-    latestHandoff() { return handoffs.at(-1) ?? null; },
+    latestHandoff() {
+      const handoff = handoffs.at(-1);
+      return handoff ? { text: handoff.handoff_text ?? '', handoffText: handoff.handoff_text ?? '' } : null;
+    },
     async close() { await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve())); },
   };
 }
@@ -358,7 +367,7 @@ function buildMessages({ scenario, agent, toolset, history, carryover }) {
       content: [
         `Top-level task: ${scenario.top_level_prompt}`,
         `Current agent goal: ${agent.goal}`,
-        carryover ? `Carryover context: ${carryover}` : null,
+        carryoverText(carryover) ? `Carryover context: ${carryoverText(carryover)}` : null,
         `Available tools:\n${toolList}`,
         `History:\n${historyText}`,
       ].filter(Boolean).join('\n\n'),
@@ -384,7 +393,7 @@ function buildSynthesisMessages({ scenario, agent, history, carryover }) {
       content: [
         `Top-level task: ${scenario.top_level_prompt}`,
         `Current agent goal: ${agent.goal}`,
-        carryover ? `Carryover context: ${carryover}` : null,
+        carryoverText(carryover) ? `Carryover context: ${carryoverText(carryover)}` : null,
         `Collected evidence:\n${historyText}`,
       ].filter(Boolean).join('\n\n'),
     },
@@ -450,15 +459,15 @@ function validateArtifact(agentName, artifact, expected) {
 function carryoverForBaseline(agentName, artifact) {
   if (!artifact) return null;
   if (agentName === 'orchestrator') {
-    return excerpt(`Previous planner note: stay on the auth drift surface and produce a reviewer-ready packet. Target surface: ${flattenText(artifact.target_surface)}`, 220);
+    return { text: excerpt(`Previous planner note: stay on the auth drift surface and produce a reviewer-ready packet. Target surface: ${flattenText(artifact.target_surface)}`, 220) };
   }
   if (agentName === 'triage') {
-    return excerpt(`Previous triage note: suspected auth boundary is ${artifact.auth_boundary}.`, 220);
+    return { text: excerpt(`Previous triage note: suspected auth boundary is ${artifact.auth_boundary}.`, 220) };
   }
   if (agentName === 'patch') {
-    return excerpt(`Previous patch note: remediation direction is ${flattenText(artifact.remediation_direction)}.`, 220);
+    return { text: excerpt(`Previous patch note: remediation direction is ${flattenText(artifact.remediation_direction)}.`, 220) };
   }
-  return excerpt(String(artifact.rationale ?? ''), 220);
+  return { text: excerpt(String(artifact.rationale ?? ''), 220) };
 }
 
 function handoffText(agentName, artifact) {
@@ -548,10 +557,17 @@ async function recoverRealAionisHandoff(baseUrl, scenario, agentName, pluginConf
     repo_root: repoPath,
     limit: 1,
   });
-  return recovered?.execution_ready_handoff?.next_action
+  const text = recovered?.execution_ready_handoff?.next_action
     ?? recovered?.handoff?.handoff_text
     ?? recovered?.prompt_safe_handoff?.handoff_text
     ?? null;
+  if (!text && !recovered?.execution_packet_v1 && !recovered?.execution_state_v1) return null;
+  return {
+    text,
+    handoffText: recovered?.handoff?.handoff_text ?? recovered?.prompt_safe_handoff?.handoff_text ?? text,
+    execution_packet_v1: recovered?.execution_packet_v1 ?? null,
+    execution_state_v1: recovered?.execution_state_v1 ?? null,
+  };
 }
 
 async function prepareTreatmentStage(aionis, scenario, agentName, pluginConfig, scope) {
@@ -565,7 +581,7 @@ async function prepareTreatmentStage(aionis, scenario, agentName, pluginConfig, 
 
 async function resolveTreatmentCarryover(aionis, scenario, agentName, pluginConfig, scope, repoPath) {
   if (!aionis) return null;
-  if (aionis.kind === 'mock') return aionis.latestHandoff()?.handoff_text ?? null;
+  if (aionis.kind === 'mock') return aionis.latestHandoff() ?? null;
   return await recoverRealAionisHandoff(aionis.baseUrl, scenario, agentName, pluginConfig, scope, repoPath);
 }
 
@@ -580,7 +596,7 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   let note = null;
   let controlledStop = false;
   let stopReason = null;
-  let injectedContext = carryover;
+  let injectedContext = carryoverText(carryover);
   const seenHashes = new Set();
   const ctx = stageCtx(baseId, repoPath, agent.name);
 
@@ -588,8 +604,13 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
     const startResult = await host.emit('before_agent_start', {
       prompt: scenario.top_level_prompt,
       messages: toolset.map((tool) => ({ toolName: tool.name })),
+      continuity: carryover ? {
+        handoffText: carryover.handoffText ?? carryover.text ?? null,
+        execution_packet_v1: carryover.execution_packet_v1 ?? undefined,
+        execution_state_v1: carryover.execution_state_v1 ?? undefined,
+      } : undefined,
     }, ctx);
-    injectedContext = [carryover, startResult?.prependContext].filter(Boolean).join('\n');
+    injectedContext = [carryoverText(carryover), startResult?.prependContext].filter(Boolean).join('\n');
   }
 
   for (let step = 1; step <= Number(agent.max_steps ?? 1); step += 1) {
