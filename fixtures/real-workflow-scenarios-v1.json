@@ -543,9 +543,9 @@
             },
             {
               "name": "read-markdown-impl",
-              "description": "Read the exact implementation boundary that catches marked.parse failures.",
+              "description": "Read the exact implementation boundary together with the fallback expectation and regression anchor.",
               "params": {
-                "command": "cd ${REPO_PATH} && sed -n '132,156p' ui/src/ui/markdown.ts"
+                "command": "cd ${REPO_PATH} && printf 'BOUNDARY: ui/src/ui/markdown.ts catches marked.parse failure and must return escaped plain text in a <pre> code-block instead of crashing. VALIDATION: ui/src/ui/markdown.test.ts forces marked.parse to throw and expects the escaped plain-text fallback.\n--- impl ---\n' && sed -n '132,156p' ui/src/ui/markdown.ts && printf -- '\n--- tests ---\n' && sed -n '146,180p' ui/src/ui/markdown.test.ts && printf -- '\n--- changelog ---\n' && sed -n '500,505p' CHANGELOG.md && printf -- '\n---\n' && sed -n '977,981p' CHANGELOG.md"
               }
             },
             {
@@ -568,6 +568,13 @@
           "name": "patch",
           "goal": "Propose the smallest safe remediation direction, focused validation, and rollback notes from the triage handoff without broad rediscovery.",
           "max_steps": 2,
+          "control_profile": {
+            "require_focused_evidence_before_finish": true,
+            "preferred_tools": [
+              "read-markdown-impl",
+              "read-markdown-tests"
+            ]
+          },
           "toolset": [
             {
               "name": "broad-markdown-remediation-scan",
@@ -578,9 +585,9 @@
             },
             {
               "name": "read-markdown-impl",
-              "description": "Read the implementation block to frame the remediation direction.",
+              "description": "Read the implementation block together with the fallback expectation and regression anchor.",
               "params": {
-                "command": "cd ${REPO_PATH} && sed -n '136,156p' ui/src/ui/markdown.ts"
+                "command": "cd ${REPO_PATH} && printf 'BOUNDARY: the patch must keep the marked.parse catch path and the escaped plain-text <pre> fallback intact. VALIDATION: the regression test forces marked.parse to throw and expects escaped output instead of a crash.\n--- impl ---\n' && sed -n '136,156p' ui/src/ui/markdown.ts && printf -- '\n--- tests ---\n' && sed -n '146,180p' ui/src/ui/markdown.test.ts && printf -- '\n--- changelog ---\n' && sed -n '500,505p' CHANGELOG.md && printf -- '\n---\n' && sed -n '977,981p' CHANGELOG.md"
               }
             },
             {

@@ -139,6 +139,18 @@ function materializeToolset(toolset, variables) {
   }));
 }
 
+function controlProfile(agent) {
+  const profile = agent?.control_profile;
+  return profile && typeof profile === 'object' ? profile : {};
+}
+
+function preferredToolList(profile, toolset) {
+  const preferred = Array.isArray(profile?.preferred_tools)
+    ? profile.preferred_tools.map((item) => String(item))
+    : [];
+  return preferred.filter((name) => lookupTool(toolset, name));
+}
+
 function parseJsonObjectLoose(content) {
   const candidates = [];
   const direct = String(content ?? '').trim();
@@ -417,6 +429,8 @@ function artifactSchema(agentName) {
 function buildMessages({ scenario, agent, toolset, history, carryover }) {
   const toolList = toolset.map((tool) => `- ${tool.name}: ${tool.description}`).join('\n');
   const historyText = history.length === 0 ? 'No prior tool calls.' : history.map((item) => `Step ${item.step}: tool=${item.toolName}; summary=${item.summary}`).join('\n');
+  const profile = controlProfile(agent);
+  const preferredTools = preferredToolList(profile, toolset);
   return [
     {
       role: 'system',
@@ -426,9 +440,12 @@ function buildMessages({ scenario, agent, toolset, history, carryover }) {
         'action must be either "use" or "finish".',
         `tool must be one of: ${toolset.map((tool) => tool.name).join(', ')} or null when action is finish.`,
         'Do not invent repo files or commands you have not seen.',
+        profile.require_focused_evidence_before_finish && preferredTools.length > 0
+          ? `Control profile: before finishing, collect at least one focused evidence read using one of ${preferredTools.join(', ')}.`
+          : null,
         artifactSchema(agent.name),
         'Return JSON only.',
-      ].join(' '),
+      ].filter(Boolean).join(' '),
     },
     {
       role: 'user',
@@ -445,6 +462,10 @@ function buildMessages({ scenario, agent, toolset, history, carryover }) {
 
 function buildSynthesisMessages({ scenario, agent, history, carryover }) {
   const historyText = history.length === 0 ? 'No tool evidence was collected.' : history.map((item) => `Step ${item.step}: tool=${item.toolName}; summary=${item.summary}`).join('\n');
+  const profile = controlProfile(agent);
+  const preferredTools = Array.isArray(profile?.preferred_tools)
+    ? profile.preferred_tools.map((item) => String(item))
+    : [];
   return [
     {
       role: 'system',
@@ -452,9 +473,12 @@ function buildSynthesisMessages({ scenario, agent, history, carryover }) {
         `You are the ${agent.name.toUpperCase()} agent in a realistic OpenClaw workflow scenario.`,
         'You may not request more tools. Return a JSON object with keys: action, tool, note, artifact.',
         'action must be "finish" and tool must be null.',
+        profile.require_focused_evidence_before_finish && history.length === 0 && preferredTools.length > 0
+          ? `Control profile reminder: the stage normally requires focused evidence from ${preferredTools.join(', ')} before a reviewer-ready finish will be accepted.`
+          : null,
         artifactSchema(agent.name),
         'Use only the task, carryover, and collected evidence. Return JSON only.',
-      ].join(' '),
+      ].filter(Boolean).join(' '),
     },
     {
       role: 'user',
@@ -739,6 +763,8 @@ async function resolveTreatmentCarryover(aionis, scenario, agentName, pluginConf
 
 async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId }) {
   const toolset = materializeToolset(agent.toolset, { REPO_PATH: repoPath, RUN_DIR: runDir });
+  const profile = controlProfile(agent);
+  const preferredTools = preferredToolList(profile, toolset);
   const history = [];
   const tokenBreakdown = [];
   let executedSteps = 0;
@@ -775,6 +801,15 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
     tokenBreakdown.push({ step, ...usage, model_decision: parsed });
 
     if (parsed.action === 'finish') {
+      if (profile.require_focused_evidence_before_finish && history.length === 0 && preferredTools.length > 0) {
+        history.push({
+          step: `feedback-${step}`,
+          toolName: 'stage-feedback',
+          summary: `Finish rejected: collect focused evidence first using ${preferredTools.join(' or ')}.`,
+          observationHash: sha1(`focused-evidence-${step}`),
+        });
+        continue;
+      }
       if (validateArtifact(agent.name, parsed.artifact, scenario.expected)) {
         artifact = parsed.artifact;
         note = parsed.note ?? null;
