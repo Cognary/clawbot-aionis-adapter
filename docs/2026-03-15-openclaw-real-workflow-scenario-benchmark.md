@@ -239,6 +239,29 @@ Interpretation:
 - `ControlProfile` stays positive on the strongest real workflow slice
 - this slice is both a completion win and an efficiency win
 
+### Post-main-merge revalidation: dashboard auth drift
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
+
+Result (`3` repeats, `Aionis main` after the execution-continuity Phase 1 merge):
+
+- baseline `reviewer_ready_rate = 0.3333`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0.3333`
+- treatment `workflow_completed_rate = 0.6667`
+- baseline `avg_total_tokens = 19741`
+- treatment `avg_total_tokens = 22824.33`
+- baseline `avg_wall_clock_ms = 81124`
+- treatment `avg_wall_clock_ms = 71277.33`
+
+Interpretation:
+
+- the strongest real-workflow slice remains positive after the `Aionis main` merge
+- this revalidation is a completion win and a wall-clock win
+- this run is not a token win, so it should be read as a post-merge stability check rather than a new efficiency headline
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:

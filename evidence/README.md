@@ -12,6 +12,7 @@ Included here:
 6. real-Lite continuity-contract validation runs that prove `handoff/recover -> execution_packet_v1 -> context/assemble` is active on the actual workflow path
 7. repeated real-Lite continuity A/B runs that compare the older legacy continuity path against the newer `execution_packet_v1` path
 8. controlled real-Lite revalidation runs for the strongest reviewer-ready workflow slices after `ControlProfile` adoption on the actual runtime path
+9. post-merge real-Lite stability checks that re-run the strongest slice after the corresponding Aionis kernel changes have landed on `main`
 
 Not included here:
 

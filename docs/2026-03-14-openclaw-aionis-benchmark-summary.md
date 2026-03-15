@@ -139,6 +139,7 @@ Evidence:
 - [ControlProfile revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315133004/summary.json)
 - [ControlProfile revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
 - [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
+- [Post-main-merge revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
@@ -157,6 +158,7 @@ Headline results:
   - dashboard auth drift: `0.6667 -> 1` with lower token and lower wall-clock
   - pairing / approval recovery: `0 -> 1`
   - service token drift repair: `0 -> 0.6667`
+  - post-main-merge dashboard auth drift: `0.3333 -> 0.6667` with lower wall-clock but higher token
 
 What this proves:
 
@@ -167,6 +169,7 @@ What this proves:
 - service token drift repair extends the same story as an additional positive real-workflow slice
 - markdown parser fallback remains a supporting real-workflow slice
 - after `ControlProfile` adoption, the strongest real-workflow story remains positive on all three strongest slices
+- after merging the execution-continuity Phase 1 foundation into `Aionis main`, dashboard auth drift still remains positive on reviewer-ready completion
 - the efficiency story after `ControlProfile` adoption is mixed:
   - dashboard auth drift remains both a completion and efficiency win
   - pairing / approval recovery and service token drift repair remain completion wins, but not efficiency wins
