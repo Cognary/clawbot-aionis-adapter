@@ -70,6 +70,7 @@ export class AionisLoopControlAdapter {
       sessionId: ctx.sessionId,
       workspaceDir: ctx.workspaceDir,
     });
+    this.resetExecutionWindow(state, ctx.agentId, event.prompt);
 
     if (!this.client.contextAssemble) return undefined;
 
@@ -302,6 +303,28 @@ export class AionisLoopControlAdapter {
     state.lastDecisionId = decision.decision_id ?? state.lastDecisionId;
     state.lastDecisionUri = decision.decision_uri ?? state.lastDecisionUri;
     state.lastSelectedTool = decision.selected_tool ?? decision.selected ?? state.lastSelectedTool;
+  }
+
+  private resetExecutionWindow(state: LoopRunState, agentId: string | undefined, prompt: string | undefined): void {
+    state.agentId = agentId ?? state.agentId;
+    state.promptHash = prompt ? hashStable(prompt) : state.promptHash;
+    state.stepCount = 0;
+    state.sameToolStreak = 0;
+    state.duplicateObservationStreak = 0;
+    state.noProgressStreak = 0;
+    state.broadTestCount = 0;
+    state.broadScanCount = 0;
+    state.estimatedTokenBurn = 0;
+    state.estimatedLatencyBurnMs = 0;
+    state.lastToolName = undefined;
+    state.lastToolParamsHash = undefined;
+    state.lastObservationHash = undefined;
+    state.lastDecisionId = undefined;
+    state.lastDecisionUri = undefined;
+    state.lastSelectedTool = undefined;
+    state.forcedStopReason = undefined;
+    state.handoffTriggered = false;
+    state.replayDispatchAttempted = false;
   }
 
   private extractCandidateTools(messages?: unknown[]): string[] {

@@ -183,3 +183,26 @@ test('threshold stop falls back to handoff when replay path is unavailable', asy
   assert.equal(stop.blockReason, 'handoff stored after loop-control stop');
   assert.equal(calls.handoffStore.length, 1);
 });
+
+test('before_agent_start resets execution-local loop streaks across agents', async () => {
+  const { client } = createFakeClient();
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const sessionCtx = { sessionId: 'sess-5', sessionKey: 'sess-key-5', workspaceDir: '/repo/click', trigger: 'user' };
+  await host.emit('session_start', { sessionId: 'sess-5', sessionKey: 'sess-key-5' }, sessionCtx);
+
+  const agentOneCtx = { ...sessionCtx, agentId: 'agent-1', runId: 'run-a', toolName: 'rg', toolCallId: 'call-a' };
+  const event = { toolName: 'rg', params: { q: 'OptionParser' }, runId: 'run-a', toolCallId: 'call-a' };
+
+  await host.emit('before_agent_start', { prompt: 'first agent prompt', messages: [{ toolName: 'rg' }] }, agentOneCtx);
+  await host.emit('before_tool_call', event, agentOneCtx);
+  await host.emit('before_tool_call', event, agentOneCtx);
+
+  const agentTwoCtx = { ...sessionCtx, agentId: 'agent-2', runId: 'run-b', toolName: 'rg', toolCallId: 'call-b' };
+  await host.emit('before_agent_start', { prompt: 'second agent prompt', messages: [{ toolName: 'rg' }] }, agentTwoCtx);
+  const result = await host.emit('before_tool_call', { ...event, runId: 'run-b', toolCallId: 'call-b' }, agentTwoCtx);
+
+  assert.equal(result?.block, undefined);
+});

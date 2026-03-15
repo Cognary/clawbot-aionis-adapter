@@ -25,6 +25,7 @@ const MAX_MODEL_RETRIES = Number(process.env.MODEL_MAX_RETRIES ?? process.env.GL
 const MODEL_REQUEST_TIMEOUT_MS = Number(process.env.MODEL_REQUEST_TIMEOUT_MS ?? process.env.GLM_REQUEST_TIMEOUT_MS ?? process.env.GEMINI_REQUEST_TIMEOUT_MS ?? 30000);
 const REPEATS = Math.max(Number(process.env.BENCH_REPEATS ?? 1), 1);
 const SCENARIO_FILTER = process.env.BENCH_SCENARIO_ID ?? '';
+const LIVE_AIONIS_BASE_URL = (process.env.BENCH_AIONIS_BASE_URL ?? '').trim();
 
 if (!API_KEY) {
   if (MODEL_PROVIDER === 'gemini') {
@@ -160,6 +161,97 @@ async function executeShell(command, cwd) {
   }
 }
 
+async function postJson(baseUrl, routePath, body) {
+  const response = await fetch(`${baseUrl}${routePath}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const text = await response.text();
+  const json = text ? JSON.parse(text) : {};
+  if (!response.ok) {
+    throw new Error(`${routePath} failed: ${response.status} ${JSON.stringify(json)}`);
+  }
+  return json;
+}
+
+function resolveScope(pluginConfig, ctx) {
+  const scopePrefix = String(pluginConfig.scopePrefix ?? 'openclaw');
+  const scopeMode = String(pluginConfig.scopeMode ?? 'project');
+  const fixedScope = String(pluginConfig.scope ?? `${scopePrefix}:default`);
+  if (scopeMode === 'fixed') return fixedScope;
+  if (scopeMode === 'session') {
+    const key = ctx.sessionKey ?? ctx.sessionId ?? 'default';
+    return `${scopePrefix}:${key}`;
+  }
+  const workspace = String(ctx.workspaceDir ?? '').trim();
+  if (!workspace) return `${scopePrefix}:default`;
+  const normalized = workspace.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
+  return `${scopePrefix}:${normalized || 'workspace'}`;
+}
+
+async function startAionisForwardProxy(targetBaseUrl) {
+  const calls = {
+    contextAssemble: 0,
+    rulesEvaluate: 0,
+    toolsSelect: 0,
+    toolsFeedback: 0,
+    write: 0,
+    handoffStore: 0,
+    handoffRecover: 0,
+  };
+
+  const routeToCounter = {
+    '/v1/memory/context/assemble': 'contextAssemble',
+    '/v1/memory/rules/evaluate': 'rulesEvaluate',
+    '/v1/memory/tools/select': 'toolsSelect',
+    '/v1/memory/tools/feedback': 'toolsFeedback',
+    '/v1/memory/write': 'write',
+    '/v1/handoff/store': 'handoffStore',
+    '/v1/handoff/recover': 'handoffRecover',
+  };
+
+  const server = http.createServer(async (req, res) => {
+    try {
+      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+      const counterKey = routeToCounter[url.pathname];
+      if (counterKey) calls[counterKey] += 1;
+
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const body = chunks.length > 0 ? Buffer.concat(chunks) : null;
+
+      const upstream = await fetch(`${targetBaseUrl}${url.pathname}${url.search}`, {
+        method: req.method,
+        headers: {
+          'content-type': req.headers['content-type'] ?? 'application/json',
+          accept: req.headers.accept ?? 'application/json',
+        },
+        body: body && body.length > 0 ? body : undefined,
+      });
+
+      res.statusCode = upstream.status;
+      const contentType = upstream.headers.get('content-type');
+      if (contentType) res.setHeader('content-type', contentType);
+      const payload = Buffer.from(await upstream.arrayBuffer());
+      res.end(payload);
+    } catch (error) {
+      res.statusCode = 502;
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify({ error: 'proxy_failed', message: String(error?.message ?? error) }));
+    }
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address();
+  return {
+    kind: 'live',
+    baseUrl: `http://127.0.0.1:${address.port}`,
+    calls,
+    async close() { await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve())); },
+  };
+}
+
 async function startAionisMock() {
   const calls = { contextAssemble: 0, rulesEvaluate: 0, toolsSelect: 0, toolsFeedback: 0, write: 0, handoffStore: 0 };
   const handoffs = [];
@@ -214,6 +306,7 @@ async function startAionisMock() {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   return {
+    kind: 'mock',
     baseUrl: `http://127.0.0.1:${address.port}`,
     calls,
     setStage(config) { currentStage = config ?? { context_text: '', selection_map: {} }; },
@@ -378,14 +471,14 @@ function handoffText(agentName, artifact) {
   return `Verdict: ${artifact.verdict}\nRationale: ${artifact.rationale}`;
 }
 
-async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath) {
-  const summary = agentName === 'orchestrator'
+async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath, pluginConfig, scope) {
+  const summary = flattenText(agentName === 'orchestrator'
     ? artifact.workflow_plan
     : agentName === 'triage'
       ? artifact.issue_hypothesis
       : agentName === 'patch'
         ? artifact.remediation_direction
-        : artifact.rationale;
+        : artifact.rationale);
   const targetFiles = Array.isArray(artifact.target_files)
     ? artifact.target_files
     : Array.isArray(artifact.target_surface)
@@ -403,15 +496,77 @@ async function storeHandoff(baseUrl, scenario, agentName, artifact, repoPath) {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
+      tenant_id: pluginConfig?.tenantId,
+      scope,
+      actor: pluginConfig?.actor,
       anchor: `${scenario.id}-${agentName}`,
       summary,
       handoff_text: handoffText(agentName, artifact),
       handoff_kind: 'task_handoff',
       repo_root: repoPath,
       file_path: targetFiles[0] ?? packetTargetFiles[0] ?? 'unknown',
+      target_files: targetFiles.length > 0 ? targetFiles : packetTargetFiles,
+      next_action: handoffText(agentName, artifact),
     }),
   });
   if (!response.ok) throw new Error(`handoff/store failed: ${response.status}`);
+}
+
+async function seedRealAionisStage(baseUrl, scenario, agentName, pluginConfig, scope) {
+  const stage = scenario.aionis?.[agentName];
+  const contextText = typeof stage?.context_text === 'string' ? stage.context_text.trim() : '';
+  if (!contextText) return;
+  await postJson(baseUrl, '/v1/memory/write', {
+    tenant_id: pluginConfig.tenantId,
+    scope,
+    actor: pluginConfig.actor,
+    auto_embed: true,
+    input_text: contextText,
+    nodes: [
+      {
+        type: 'event',
+        title: `Workflow seed ${scenario.id}/${agentName}`,
+        text_summary: contextText,
+        slots: {
+          summary_kind: 'workflow_seed',
+          scenario_id: scenario.id,
+          agent: agentName,
+          stage_seed: true,
+        },
+      },
+    ],
+  });
+}
+
+async function recoverRealAionisHandoff(baseUrl, scenario, agentName, pluginConfig, scope, repoPath) {
+  const recovered = await postJson(baseUrl, '/v1/handoff/recover', {
+    tenant_id: pluginConfig.tenantId,
+    scope,
+    actor: pluginConfig.actor,
+    anchor: `${scenario.id}-${agentName}`,
+    handoff_kind: 'task_handoff',
+    repo_root: repoPath,
+    limit: 1,
+  });
+  return recovered?.execution_ready_handoff?.next_action
+    ?? recovered?.handoff?.handoff_text
+    ?? recovered?.prompt_safe_handoff?.handoff_text
+    ?? null;
+}
+
+async function prepareTreatmentStage(aionis, scenario, agentName, pluginConfig, scope) {
+  if (!aionis) return;
+  if (aionis.kind === 'mock') {
+    aionis.setStage(scenario.aionis?.[agentName] ?? { context_text: '', selection_map: {} });
+    return;
+  }
+  await seedRealAionisStage(aionis.baseUrl, scenario, agentName, pluginConfig, scope);
+}
+
+async function resolveTreatmentCarryover(aionis, scenario, agentName, pluginConfig, scope, repoPath) {
+  if (!aionis) return null;
+  if (aionis.kind === 'mock') return aionis.latestHandoff()?.handoff_text ?? null;
+  return await recoverRealAionisHandoff(aionis.baseUrl, scenario, agentName, pluginConfig, scope, repoPath);
 }
 
 async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId }) {
@@ -430,7 +585,6 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   const ctx = stageCtx(baseId, repoPath, agent.name);
 
   if (mode === 'treatment') {
-    aionis.setStage(scenario.aionis?.[agent.name] ?? { context_text: '', selection_map: {} });
     const startResult = await host.emit('before_agent_start', {
       prompt: scenario.top_level_prompt,
       messages: toolset.map((tool) => ({ toolName: tool.name })),
@@ -542,32 +696,43 @@ async function runArm({ scenario, mode, repetition, artifactDir }) {
   const repoPath = scenario.repo_path;
   const runDir = path.join(artifactDir, `${scenario.id}-${mode}-r${repetition}`);
   await fs.mkdir(runDir, { recursive: true });
-  const baseId = `${scenario.id}-${mode}-r${repetition}`;
+  const runStamp = path.basename(artifactDir);
+  const baseId = `${scenario.id}-${mode}-${runStamp}-r${repetition}`;
   const host = mode === 'treatment' ? new MockOpenClawHost() : null;
-  const aionis = mode === 'treatment' ? await startAionisMock() : null;
+  const aionis = mode === 'treatment'
+    ? (LIVE_AIONIS_BASE_URL ? await startAionisForwardProxy(LIVE_AIONIS_BASE_URL) : await startAionisMock())
+    : null;
   const stageResults = [];
   let carryover = null;
   const t0 = Date.now();
+  const pluginConfig = mode === 'treatment'
+    ? {
+        baseUrl: aionis.baseUrl,
+        tenantId: 'tenant-real-workflow',
+        actor: 'real-workflow-benchmark',
+        ...scenario.plugin_config,
+      }
+    : null;
 
   if (mode === 'treatment') {
-    host.pluginConfig = {
-      baseUrl: aionis.baseUrl,
-      tenantId: 'tenant-real-workflow',
-      actor: 'real-workflow-benchmark',
-      ...scenario.plugin_config,
-    };
+    host.pluginConfig = pluginConfig;
     plugin.register(host);
     await host.emit('session_start', { sessionId: `sess-${baseId}`, sessionKey: `sess-${baseId}` }, stageCtx(baseId, repoPath, 'session'));
   }
 
   try {
     for (const agent of scenario.agents) {
+      const agentCtx = stageCtx(baseId, repoPath, agent.name);
+      const scope = mode === 'treatment' ? resolveScope(pluginConfig, agentCtx) : null;
+      if (mode === 'treatment') {
+        await prepareTreatmentStage(aionis, scenario, agent.name, pluginConfig, scope);
+      }
       const result = await runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir, carryover, baseId });
       stageResults.push(result);
       if (!result.success) break;
       if (mode === 'treatment') {
-        await storeHandoff(aionis.baseUrl, scenario, agent.name, result.artifact, repoPath);
-        carryover = aionis.latestHandoff()?.handoff_text ?? null;
+        await storeHandoff(aionis.baseUrl, scenario, agent.name, result.artifact, repoPath, pluginConfig, scope);
+        carryover = await resolveTreatmentCarryover(aionis, scenario, agent.name, pluginConfig, scope, repoPath);
       } else {
         carryover = carryoverForBaseline(agent.name, result.artifact);
       }
