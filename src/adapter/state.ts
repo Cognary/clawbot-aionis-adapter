@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { LoopStopReasonCode } from "../types/config.js";
+import type { ControlProfileV1 } from "../types/aionis.js";
 
 export type LoopRunState = {
   stateId: string;
@@ -24,6 +25,7 @@ export type LoopRunState = {
   lastDecisionId?: string;
   lastDecisionUri?: string;
   lastSelectedTool?: string;
+  controlProfileV1?: ControlProfileV1;
   forcedStopReason?: LoopStopReasonCode;
   handoffTriggered: boolean;
   replayDispatchAttempted: boolean;

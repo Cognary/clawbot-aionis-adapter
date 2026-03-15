@@ -134,6 +134,18 @@ test('before_agent_start forwards recovered execution continuity into context as
       messages: [{ toolName: 'rg' }],
       continuity: {
         handoffText: 'Resume from auth drift handoff',
+        control_profile_v1: {
+          version: 1,
+          profile: 'triage',
+          max_same_tool_streak: 1,
+          max_no_progress_streak: 2,
+          max_duplicate_observation_streak: 2,
+          max_steps: 4,
+          allow_broad_scan: false,
+          allow_broad_test: false,
+          escalate_on_blocker: true,
+          reviewer_ready_required: false,
+        },
         execution_state_v1: {
           state_id: 'state-auth-1',
           current_stage: 'triage',
@@ -153,7 +165,48 @@ test('before_agent_start forwards recovered execution continuity into context as
   assert.equal(calls.contextAssemble.length, 1);
   assert.equal(calls.contextAssemble[0].executionStateV1?.state_id, 'state-auth-1');
   assert.equal(calls.contextAssemble[0].executionPacketV1?.stage, 'triage');
+  assert.equal(calls.contextAssemble[0].context.control_profile, 'triage');
   assert.equal(calls.contextAssemble[0].context.continuity_handoff_text ?? null, null);
+});
+
+test('control profile tightens loop thresholds after continuity recovery', async () => {
+  const { client } = createFakeClient();
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const runCtx = { agentId: 'agent-1', sessionId: 'sess-1c', sessionKey: 'sess-key-1c', workspaceDir: '/repo/click', trigger: 'resume' };
+  await host.emit(
+    'before_agent_start',
+    {
+      prompt: 'resume narrow triage workflow',
+      messages: [{ toolName: 'rg' }],
+      continuity: {
+        control_profile_v1: {
+          version: 1,
+          profile: 'triage',
+          max_same_tool_streak: 1,
+          max_no_progress_streak: 3,
+          max_duplicate_observation_streak: 3,
+          max_steps: 8,
+          allow_broad_scan: true,
+          allow_broad_test: false,
+          escalate_on_blocker: true,
+          reviewer_ready_required: false,
+        },
+      },
+    },
+    runCtx,
+  );
+
+  const toolCtx = { ...runCtx, runId: 'run-profile-1', toolName: 'rg', toolCallId: 'call-profile-1' };
+  const event = { toolName: 'rg', params: { q: 'markdown' }, runId: 'run-profile-1', toolCallId: 'call-profile-1' };
+  const first = await host.emit('before_tool_call', event, toolCtx);
+  const second = await host.emit('before_tool_call', event, toolCtx);
+
+  assert.equal(first?.block ?? false, false);
+  assert.equal(second?.block, true);
+  assert.match(String(second?.blockReason ?? ''), /same_tool_streak_exceeded|handoff stored after loop-control stop/);
 });
 
 test('after_tool_call writes feedback and evidence', async () => {

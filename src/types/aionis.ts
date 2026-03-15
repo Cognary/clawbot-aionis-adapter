@@ -28,6 +28,20 @@ export type ExecutionPacketV1 = {
   [key: string]: unknown;
 };
 
+export type ControlProfileV1 = {
+  version?: 1;
+  profile?: "triage" | "patch" | "review" | "resume";
+  max_same_tool_streak?: number;
+  max_no_progress_streak?: number;
+  max_duplicate_observation_streak?: number;
+  max_steps?: number;
+  allow_broad_scan?: boolean;
+  allow_broad_test?: boolean;
+  escalate_on_blocker?: boolean;
+  reviewer_ready_required?: boolean;
+  [key: string]: unknown;
+};
+
 export type AionisToolDecision = {
   decision_id?: string;
   decision_uri?: string;

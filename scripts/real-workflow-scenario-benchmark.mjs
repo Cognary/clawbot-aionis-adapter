@@ -743,6 +743,7 @@ async function recoverRealAionisHandoff(baseUrl, scenario, agentName, pluginConf
     handoffText: recovered?.handoff?.handoff_text ?? recovered?.prompt_safe_handoff?.handoff_text ?? text,
     execution_packet_v1: recovered?.execution_packet_v1 ?? null,
     execution_state_v1: recovered?.execution_state_v1 ?? null,
+    control_profile_v1: recovered?.control_profile_v1 ?? null,
   };
 }
 
@@ -788,6 +789,7 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
             handoffText: undefined,
             execution_packet_v1: carryover.execution_packet_v1 ?? undefined,
             execution_state_v1: carryover.execution_state_v1 ?? undefined,
+            control_profile_v1: carryover.control_profile_v1 ?? undefined,
           }) : undefined,
     }, ctx);
     injectedContext = [

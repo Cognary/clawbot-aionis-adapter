@@ -1,4 +1,4 @@
-import type { ExecutionPacketV1, ExecutionStateV1 } from "./aionis.js";
+import type { ControlProfileV1, ExecutionPacketV1, ExecutionStateV1 } from "./aionis.js";
 
 export type OpenClawLogger = {
   info: (msg: string) => void;
@@ -43,6 +43,7 @@ export type BeforeAgentStartEvent = {
     handoffText?: string | null;
     execution_state_v1?: ExecutionStateV1;
     execution_packet_v1?: ExecutionPacketV1;
+    control_profile_v1?: ControlProfileV1;
   };
 };
 

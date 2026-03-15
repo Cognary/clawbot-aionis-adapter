@@ -11,6 +11,7 @@ import type {
 } from "../types/openclaw.js";
 import type {
   AionisLoopControlClient,
+  ControlProfileV1,
   AionisToolDecision,
   ExecutionPacketV1,
   ExecutionStateV1,
@@ -77,6 +78,7 @@ export class AionisLoopControlAdapter {
       workspaceDir: ctx.workspaceDir,
     });
     this.resetExecutionWindow(state, ctx.agentId, event.prompt);
+    state.controlProfileV1 = this.resolveContinuityControlProfile(event);
 
     if (!this.client.contextAssemble) return undefined;
 
@@ -91,6 +93,7 @@ export class AionisLoopControlAdapter {
         session_id: ctx.sessionId,
         trigger: ctx.trigger,
         continuity_handoff_text: this.resolveContinuityHandoffText(event),
+        control_profile: state.controlProfileV1?.profile ?? null,
       },
       toolCandidates: candidates,
       executionStateV1: this.resolveContinuityState(event),
@@ -143,6 +146,7 @@ export class AionisLoopControlAdapter {
       broad_test_count: state.broadTestCount,
       broad_scan_count: state.broadScanCount,
       estimated_token_burn: state.estimatedTokenBurn,
+      control_profile: state.controlProfileV1?.profile ?? null,
     } satisfies Record<string, unknown>;
 
     if (this.client.rulesEvaluate) {
@@ -331,6 +335,7 @@ export class AionisLoopControlAdapter {
     state.lastDecisionId = undefined;
     state.lastDecisionUri = undefined;
     state.lastSelectedTool = undefined;
+    state.controlProfileV1 = undefined;
     state.forcedStopReason = undefined;
     state.handoffTriggered = false;
     state.replayDispatchAttempted = false;
@@ -353,6 +358,24 @@ export class AionisLoopControlAdapter {
 
   private resolveContinuityPacket(event: BeforeAgentStartEvent): ExecutionPacketV1 | undefined {
     return event.continuity?.execution_packet_v1 ?? undefined;
+  }
+
+  private resolveContinuityControlProfile(event: BeforeAgentStartEvent): ControlProfileV1 | undefined {
+    const explicit = event.continuity?.control_profile_v1;
+    if (explicit) return explicit;
+    const packet = this.resolveContinuityPacket(event);
+    const packetStage = typeof packet?.current_stage === "string" ? packet.current_stage : typeof packet?.stage === "string" ? packet.stage : undefined;
+    const stateStage = typeof this.resolveContinuityState(event)?.current_stage === "string"
+      ? this.resolveContinuityState(event)?.current_stage
+      : undefined;
+    const stage = packetStage ?? stateStage;
+    if (stage === "triage" || stage === "patch" || stage === "review" || stage === "resume") {
+      return {
+        version: 1,
+        profile: stage,
+      };
+    }
+    return undefined;
   }
 
   private resolveContinuityHandoffText(event: BeforeAgentStartEvent): string | null {
@@ -378,7 +401,7 @@ export class AionisLoopControlAdapter {
   }
 
   private checkThresholds(state: LoopRunState): LoopStopReasonCode | undefined {
-    const t = this.config.thresholds;
+    const t = this.effectiveThresholds(state);
     if (state.stepCount > t.maxSteps) return "max_steps_exceeded";
     if (state.sameToolStreak > t.maxSameToolStreak) return "same_tool_streak_exceeded";
     if (state.duplicateObservationStreak > t.maxDuplicateObservationStreak) return "duplicate_observation_exceeded";
@@ -387,6 +410,24 @@ export class AionisLoopControlAdapter {
     if (state.broadTestCount > t.maxBroadTestInvocations) return "policy_denied_only_path";
     if (state.broadScanCount > t.maxBroadScanInvocations) return "policy_denied_only_path";
     return undefined;
+  }
+
+  private effectiveThresholds(state: LoopRunState): AdapterConfig["thresholds"] {
+    const base = this.config.thresholds;
+    const profile = state.controlProfileV1;
+    if (!profile) return base;
+    return {
+      ...base,
+      maxSteps: Math.min(base.maxSteps, profile.max_steps ?? base.maxSteps),
+      maxSameToolStreak: Math.min(base.maxSameToolStreak, profile.max_same_tool_streak ?? base.maxSameToolStreak),
+      maxDuplicateObservationStreak: Math.min(
+        base.maxDuplicateObservationStreak,
+        profile.max_duplicate_observation_streak ?? base.maxDuplicateObservationStreak,
+      ),
+      maxNoProgressStreak: Math.min(base.maxNoProgressStreak, profile.max_no_progress_streak ?? base.maxNoProgressStreak),
+      maxBroadScanInvocations: profile.allow_broad_scan === false ? 0 : base.maxBroadScanInvocations,
+      maxBroadTestInvocations: profile.allow_broad_test === false ? 0 : base.maxBroadTestInvocations,
+    };
   }
 
   private async makeStopResult(
