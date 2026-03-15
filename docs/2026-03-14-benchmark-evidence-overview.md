@@ -88,18 +88,18 @@ Current signal:
 - one-prompt multi-agent issue `#10864`: `0 -> 1`
 - one-prompt multi-agent dashboard auth drift: `0 -> 1`
 - repeated Google runtime-backed A/B: `0 -> 0.8`
-- realistic workflow scenario reviewer-ready rate: `0.3333 -> 1`
+- realistic workflow scenario reviewer-ready rate on the real Lite path: `0.6667 -> 1`
 
 Interpretation:
 
 - Aionis improves completion on the current replay, focused-repo, handoff-resume, and one-prompt multi-agent slices
-- Aionis also improves reviewer-ready completion on the current realistic workflow scenario, with stronger stability than the original single-run bring-up
+- Aionis also improves reviewer-ready completion on realistic workflow scenarios on the actual Lite path
 - there is now repeated runtime-backed completion evidence, not only harness-only evidence
 
 Evidence:
 
-- [Real workflow scenario summary: dashboard auth drift](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
-- [Real workflow scenario summary: pairing / approval recovery (`Gemini`)](../evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
+- [Real workflow scenario summary: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
+- [Real workflow scenario summary: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
 - [Real workflow scenario benchmark](2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 
 Supporting signal:
@@ -108,9 +108,9 @@ Supporting signal:
 
 Interpretation:
 
-- realistic workflow evidence is now positive on two workflow shapes
-- dashboard auth drift remains the stronger reviewer-ready workflow slice
-- the Gemini pairing / approval recovery run is supporting product-level evidence, not the headline claim by itself
+- realistic workflow evidence is now positive on two workflow shapes under real Lite
+- dashboard auth drift and pairing / approval recovery are both positive product-level signals on the actual runtime path
+- these are continuity wins, not token wins
 
 ### 5. Real runtime activity is proven
 

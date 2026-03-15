@@ -60,71 +60,71 @@ A run is counted as `reviewer_ready` only when the workflow produces a reviewer-
 
 ## Current Result
 
-### Primary workflow slice: dashboard auth drift
+### Workflow slice: dashboard auth drift (real Lite)
 
 Evidence:
 
-- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
-- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315040559/cases.jsonl)
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315063952/cases.jsonl)
 
 Headline result (`3` repeats):
 
-- baseline `reviewer_ready_rate = 0.3333`
+- baseline `reviewer_ready_rate = 0.6667`
 - treatment `reviewer_ready_rate = 1`
-- baseline `workflow_completed_rate = 0.3333`
+- baseline `workflow_completed_rate = 0.6667`
 - treatment `workflow_completed_rate = 1`
 
 Other signals:
 
-- baseline `avg_total_tokens = 8398.33`
-- treatment `avg_total_tokens = 12264`
-- baseline `avg_rediscovery_reads = 1.67`
+- baseline `avg_total_tokens = 20283.67`
+- treatment `avg_total_tokens = 22831.67`
+- baseline `avg_rediscovery_reads = 1`
 - treatment `avg_rediscovery_reads = 0.67`
-- treatment `avg_handoff_store_count = 5`
+- treatment `avg_handoff_store_count = 4`
 - treatment `avg_context_assemble_count = 4`
 
-### Supporting workflow slice: pairing / approval recovery (`Gemini`)
+### Workflow slice: pairing / approval recovery (real Lite)
 
 Evidence:
 
-- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
-- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315052250/cases.jsonl)
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260315065630/cases.jsonl)
 
 Headline result (`3` repeats):
 
 - baseline `reviewer_ready_rate = 0`
-- treatment `reviewer_ready_rate = 0.6667`
+- treatment `reviewer_ready_rate = 1`
 - baseline `workflow_completed_rate = 0`
-- treatment `workflow_completed_rate = 0.6667`
+- treatment `workflow_completed_rate = 1`
 
 Other signals:
 
-- baseline `avg_total_tokens = 14751.33`
-- treatment `avg_total_tokens = 21894.33`
-- baseline `avg_broad_tool_call_count = 2`
-- treatment `avg_broad_tool_call_count = 0`
+- baseline `avg_total_tokens = 15460`
+- treatment `avg_total_tokens = 23506.33`
+- baseline `avg_broad_tool_call_count = 1.67`
+- treatment `avg_broad_tool_call_count = 1.67`
 - treatment `avg_handoff_store_count = 4`
 - treatment `avg_context_assemble_count = 4`
 
 ## Interpretation
 
-This is a **continuity win**, not a token win.
+These are **continuity wins**, not token wins.
 
-The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally, but it does so much less reliably.
+The treatment runs are more expensive because they consistently complete the workflow and produce reviewer-ready packets. The baseline still succeeds occasionally on dashboard auth drift, but it does so less reliably. On pairing / approval recovery, baseline does not produce reviewer-ready output at all.
 
 That is the right way to read this benchmark:
 
 - Aionis helps OpenClaw preserve enough structured execution state across agents to finish the workflow
 - the value here is not cheaper failure
-- the value is successful multi-agent completion on a realistic workflow
+- the value is successful multi-agent completion on a realistic workflow using the actual `adapter + Lite` path
 
 ## What This Proves
 
 This benchmark proves:
 
 1. Aionis can improve completion on a realistic reviewer-ready workflow, not only narrow harness slices
-2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence
-3. the product story holds across more than one realistic workflow shape, including a second supporting Gemini slice
+2. Aionis continuity is strong enough to carry the workflow through to a reviewer-ready packet with repeated evidence on the real Lite path
+3. the product story holds across more than one realistic workflow shape under real runtime conditions
 
 ## What It Does Not Prove
 
@@ -139,12 +139,13 @@ This benchmark does not prove:
 Primary workflow slice:
 
 ```bash
-BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_dashboard_auth_drift_reviewer_ready_workflow npm run bench:real-workflow
+BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_dashboard_auth_drift_reviewer_ready_workflow \
+  BENCH_AIONIS_BASE_URL=http://127.0.0.1:3321 npm run bench:real-workflow
 ```
 
-Supporting Gemini slice:
+Pairing / approval recovery slice:
 
 ```bash
 BENCH_REPEATS=3 BENCH_SCENARIO_ID=glm_pairing_approval_recovery_reviewer_ready_workflow \
-  BENCH_MODEL_PROVIDER=gemini npm run bench:real-workflow
+  BENCH_MODEL_PROVIDER=gemini BENCH_AIONIS_BASE_URL=http://127.0.0.1:3321 npm run bench:real-workflow
 ```

@@ -55,8 +55,8 @@ Headline results:
   - markdown fallback: baseline `completed_rate = 0.3333`, treatment `completed_rate = 1` (`supporting slice`)
 - **Repeated Google runtime-backed A/B**: baseline `completed_rate = 0`, treatment `completed_rate = 0.8`
 - **Real workflow scenario v1 (3 repeats)**:
-  - dashboard auth drift: baseline `reviewer_ready_rate = 0.3333`, treatment `reviewer_ready_rate = 1`
-  - pairing / approval recovery (`Gemini`): baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`
+  - dashboard auth drift with real Lite: baseline `reviewer_ready_rate = 0.6667`, treatment `reviewer_ready_rate = 1`
+  - pairing / approval recovery with real Lite: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
 
 Supporting docs:
 
@@ -82,8 +82,8 @@ Public evidence files:
 - [One-prompt multi-agent summary: markdown fallback](evidence/openclaw-one-prompt-multi-agent-benchmark/20260314130932/summary.json)
 - [One-prompt multi-agent case study](docs/2026-03-14-openclaw-one-prompt-multi-agent-case-study.md)
 - [Repeated Google runtime summary](evidence/openclaw-google-runtime-benchmark/20260314084010/summary.json)
-- [Real workflow scenario summary: dashboard auth drift](evidence/openclaw-real-workflow-scenario/20260315040559/summary.json)
-- [Real workflow scenario summary: pairing / approval recovery (`Gemini`)](evidence/openclaw-real-workflow-scenario/20260315052250/summary.json)
+- [Real workflow scenario summary: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315063952/summary.json)
+- [Real workflow scenario summary: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315065630/summary.json)
 
 ## 5-Minute Quickstart
 
