@@ -83,6 +83,8 @@ Supporting docs:
 - [Real Workflow Scenario v1](docs/2026-03-15-openclaw-real-workflow-scenario-benchmark.md)
 - [Execution Continuity Validation](docs/2026-03-15-openclaw-execution-continuity-validation.md)
 - [Execution Continuity A/B](docs/2026-03-15-openclaw-execution-continuity-ab-benchmark.md)
+- [Controlled Nightly Validation](docs/2026-03-15-openclaw-real-workflow-nightly-validation.md)
+- [Launchd Setup](docs/2026-03-15-openclaw-real-workflow-launchd.md)
 
 Public evidence files:
 

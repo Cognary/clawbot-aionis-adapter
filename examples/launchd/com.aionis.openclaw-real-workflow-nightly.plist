@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.aionis.openclaw-real-workflow-nightly</string>
+
+    <key>WorkingDirectory</key>
+    <string>/ABSOLUTE/PATH/TO/clawbot-aionis-adapter</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>/ABSOLUTE/PATH/TO/clawbot-aionis-adapter/scripts/real-workflow-nightly-validation.sh</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>BENCH_SCENARIO_ID</key>
+      <string>glm_dashboard_auth_drift_reviewer_ready_workflow</string>
+      <key>BENCH_REPEATS</key>
+      <string>3</string>
+      <key>BENCH_AGENT_TIMEOUT_MS</key>
+      <string>120000</string>
+      <key>BENCH_ARM_TIMEOUT_MS</key>
+      <string>420000</string>
+      <key>BENCH_AIONIS_BASE_URL</key>
+      <string>http://127.0.0.1:3321</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+      <key>Hour</key>
+      <integer>2</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/ABSOLUTE/PATH/TO/clawbot-aionis-adapter/artifacts/openclaw-real-workflow-nightly.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/ABSOLUTE/PATH/TO/clawbot-aionis-adapter/artifacts/openclaw-real-workflow-nightly.stderr.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+  </dict>
+</plist>
