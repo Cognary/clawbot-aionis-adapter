@@ -107,6 +107,7 @@ Public evidence files:
 - [Real workflow continuity validation: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
 - [Post-main-merge revalidation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
+- [Post-main-merge revalidation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)

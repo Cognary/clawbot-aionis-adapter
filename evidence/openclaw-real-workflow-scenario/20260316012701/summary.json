@@ -1,0 +1,37 @@
+{
+  "benchmark": "openclaw_real_workflow_scenario_v1",
+  "continuity_mode": "packet",
+  "arm_selection": "both",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "repetitions": 3,
+  "cases": 3,
+  "baseline": {
+    "reviewer_ready_rate": 0.6666666666666666,
+    "workflow_completed_rate": 0.6666666666666666,
+    "avg_total_tokens": 17555,
+    "avg_wall_clock_ms": 66750.66666666667,
+    "avg_tool_call_count": 6.666666666666667,
+    "avg_broad_tool_call_count": 2.6666666666666665,
+    "avg_rediscovery_reads": 0,
+    "tokens_per_reviewer_ready_run": 19398
+  },
+  "treatment": {
+    "reviewer_ready_rate": 0.6666666666666666,
+    "workflow_completed_rate": 0.6666666666666666,
+    "avg_total_tokens": 18829,
+    "avg_wall_clock_ms": 58117,
+    "avg_tool_call_count": 1.3333333333333333,
+    "avg_broad_tool_call_count": 1,
+    "avg_rediscovery_reads": 0,
+    "avg_handoff_store_count": 3.3333333333333335,
+    "avg_context_assemble_count": 3.3333333333333335,
+    "tokens_per_reviewer_ready_run": 23725.5
+  },
+  "delta": {
+    "reviewer_ready_gain": 0,
+    "workflow_completion_gain": 0,
+    "avg_token_delta": 1274,
+    "avg_rediscovery_delta": 0
+  }
+}

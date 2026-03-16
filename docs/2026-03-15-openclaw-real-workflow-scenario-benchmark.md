@@ -284,6 +284,29 @@ Interpretation:
 - the completion story remains strong with `ControlProfile` active
 - this slice is not an efficiency win; the cost is higher because treatment is consistently finishing the workflow
 
+### Post-main-merge revalidation: pairing / approval recovery
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
+
+Result (`3` repeats, `Aionis main` after the execution-continuity Phase 1 merge):
+
+- baseline `reviewer_ready_rate = 0.6667`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0.6667`
+- treatment `workflow_completed_rate = 0.6667`
+- baseline `avg_total_tokens = 17555`
+- treatment `avg_total_tokens = 18829`
+- baseline `avg_wall_clock_ms = 66750.67`
+- treatment `avg_wall_clock_ms = 58117`
+
+Interpretation:
+
+- this slice no longer crashes after `tools/select`-level `ControlProfile` filtering removed all candidates for the current tool
+- the post-main-merge treatment path is now stable on reviewer-ready completion
+- this should be read as a parity revalidation with faster runtime, not as a new completion or token headline
+
 ### Revalidated slice: service token drift repair
 
 Evidence:

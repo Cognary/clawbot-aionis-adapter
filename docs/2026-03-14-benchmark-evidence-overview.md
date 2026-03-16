@@ -110,6 +110,7 @@ Evidence:
 - [ControlProfile revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
 - [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
 - [Post-main-merge revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
+- [Post-main-merge revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
@@ -131,6 +132,7 @@ Interpretation:
 - the strongest three real-workflow slices have now also been refreshed with `ControlProfile` active on the real path, and all three remain positive on reviewer-ready completion
 - only dashboard auth drift currently retains both completion and efficiency wins after `ControlProfile` adoption; the other two refreshed slices should still be read as completion wins, not efficiency wins
 - after merging the execution-continuity Phase 1 foundation into `Aionis main`, dashboard auth drift remains positive on the actual runtime path: `0.3333 -> 0.6667` on reviewer-ready rate, with lower wall-clock but higher token spend
+- after the same `Aionis main` merge, pairing / approval recovery stays stable on reviewer-ready completion (`0.6667 -> 0.6667`) while treatment still finishes faster; this should be read as a parity revalidation, not a new uplift headline
 - the new execution-continuity contract has now been validated on four real Lite workflow shapes, not only in unit or integration tests
 - these are continuity wins, not token wins
 - after tightening the continuity-path A/B so packet mode no longer carries raw legacy handoff text, `execution_packet_v1` now also beats the older legacy continuity path on token and wall-clock for three repeated real Lite slices while keeping completion flat at `1.0`
