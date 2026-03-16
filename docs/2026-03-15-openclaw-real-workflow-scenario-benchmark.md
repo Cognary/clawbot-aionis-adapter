@@ -354,6 +354,29 @@ Interpretation:
 - it confirms the `handoff/store` transition revision fix removes the observed 500-path regression on the real Lite workflow
 - on this repaired run, completion stays flat while treatment is both cheaper and faster
 
+### Phase 2 handoff-transition repeated revalidation: dashboard auth drift
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316035944/summary.json)
+
+Result (`3` repeats, `Aionis main` after the `handoff/store -> execution_transitions_v1` revision-rebase fix):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 24717.67`
+- treatment `avg_total_tokens = 21235.67`
+- baseline `avg_wall_clock_ms = 101635.33`
+- treatment `avg_wall_clock_ms = 68210`
+
+Interpretation:
+
+- the repaired handoff-transition overlay is no longer just passing a single-run smoke; it now holds on a `3`-repeat strongest-slice real-workflow set
+- this refreshed slice is a completion win, token win, and wall-clock win
+- this is the strongest direct evidence so far that the Phase 2 handoff-transition path is safe on the real Lite workflow path
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:

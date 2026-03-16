@@ -16,6 +16,7 @@ Included here:
 10. post-merge parity checks where a strongest slice remains stable after runtime-surface changes, even if the new run no longer adds completion uplift
 11. Phase 2 state-first context revalidation runs that re-check the strongest slice after state-first context assembly lands on `Aionis main`
 12. Phase 2 handoff-transition single-run revalidation runs that verify the new `handoff/store -> execution_transitions_v1` overlay on the real Lite path
+13. Phase 2 handoff-transition repeated revalidation runs that confirm the repaired overlay remains positive under `3`-run strongest-slice real-workflow validation
 
 Not included here:
 
