@@ -19,7 +19,14 @@
           "scopeMode": "project",
           "strictToolBlocking": true,
           "replayDispatchEnabled": true,
-          "handoffFallbackEnabled": true
+          "handoffFallbackEnabled": true,
+          "maxSteps": 8,
+          "maxSameToolStreak": 2,
+          "maxDuplicateObservationStreak": 2,
+          "maxNoProgressStreak": 2,
+          "maxEstimatedTokenBurn": 12000,
+          "maxBroadTestInvocations": 1,
+          "maxBroadScanInvocations": 1
         }
       }
     }

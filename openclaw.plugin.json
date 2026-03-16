@@ -2,7 +2,7 @@
   "id": "openclaw-adapter",
   "name": "Aionis OpenClaw Adapter",
   "description": "Standalone OpenClaw adapter for Aionis tool-loop control, policy gating, replay escape, and handoff fallback.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -49,6 +49,8 @@
     "maxSameToolStreak": { "label": "Max Same Tool Streak", "advanced": true },
     "maxDuplicateObservationStreak": { "label": "Max Duplicate Observation Streak", "advanced": true },
     "maxNoProgressStreak": { "label": "Max No Progress Streak", "advanced": true },
-    "maxEstimatedTokenBurn": { "label": "Max Estimated Token Burn", "advanced": true }
+    "maxEstimatedTokenBurn": { "label": "Max Estimated Token Burn", "advanced": true },
+    "maxBroadTestInvocations": { "label": "Max Broad Test Invocations", "advanced": true },
+    "maxBroadScanInvocations": { "label": "Max Broad Scan Invocations", "advanced": true }
   }
 }

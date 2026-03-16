@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+
+Release-surface alignment for the current execution-continuity line.
+
+Included:
+
+1. split OpenClaw config guidance into minimal and advanced examples
+2. clarified that threshold knobs are advanced controls, not first-install requirements
+3. aligned the published adapter surface with the current Phase 2 install baseline
+
 ## 0.1.1
 
 Manifest and install-surface alignment release.

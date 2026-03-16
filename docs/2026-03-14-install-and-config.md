@@ -29,8 +29,8 @@ You need:
 ## Step 1: Start Aionis Lite
 
 ```bash
-npx @aionis/sdk@0.2.19 dev
-npx @aionis/sdk@0.2.19 health
+npx @aionis/sdk@0.2.20 dev
+npx @aionis/sdk@0.2.20 health
 ```
 
 Expected base URL:
@@ -40,8 +40,8 @@ Expected base URL:
 If you want a deeper check before wiring OpenClaw to it:
 
 ```bash
-npx @aionis/sdk@0.2.19 doctor
-npx @aionis/sdk@0.2.19 selfcheck
+npx @aionis/sdk@0.2.20 doctor
+npx @aionis/sdk@0.2.20 selfcheck
 ```
 
 ## Step 2: Install the Adapter into OpenClaw
@@ -68,6 +68,7 @@ What you should confirm:
 Reference example:
 
 - [examples/openclaw.json](../examples/openclaw.json)
+- [examples/openclaw.advanced.json](../examples/openclaw.advanced.json)
 
 Minimal configuration:
 
@@ -98,6 +99,18 @@ What these switches mean in practice:
 - `strictToolBlocking`: block obviously bad tool paths instead of only warning
 - `replayDispatchEnabled`: allow reusable work to escape into replay
 - `handoffFallbackEnabled`: preserve a structured continuation point when the right move is to stop
+
+Do not treat the threshold knobs as install requirements.
+
+These are advanced controls and should only be tuned later on your own slices:
+
+1. `maxSteps`
+2. `maxSameToolStreak`
+3. `maxDuplicateObservationStreak`
+4. `maxNoProgressStreak`
+5. `maxEstimatedTokenBurn`
+6. `maxBroadTestInvocations`
+7. `maxBroadScanInvocations`
 
 ## Step 4: Run a First Controlled Turn
 

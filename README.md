@@ -139,8 +139,8 @@ Public evidence files:
 ### 1. Start Aionis Lite
 
 ```bash
-npx @aionis/sdk@0.2.19 dev
-npx @aionis/sdk@0.2.19 health
+npx @aionis/sdk@0.2.20 dev
+npx @aionis/sdk@0.2.20 health
 ```
 
 Expected Aionis base URL:
@@ -161,9 +161,10 @@ You should see:
 
 ### 3. Add the Minimal OpenClaw Config
 
-Reference example:
+Reference examples:
 
 - [examples/openclaw.json](examples/openclaw.json)
+- [examples/openclaw.advanced.json](examples/openclaw.advanced.json)
 - [Install and Config Guide](docs/2026-03-14-install-and-config.md)
 
 ```json
@@ -187,6 +188,20 @@ Reference example:
   }
 }
 ```
+
+Use `examples/openclaw.json` first.
+
+Do not tune the threshold knobs on first install:
+
+1. `maxSteps`
+2. `maxSameToolStreak`
+3. `maxDuplicateObservationStreak`
+4. `maxNoProgressStreak`
+5. `maxEstimatedTokenBurn`
+6. `maxBroadTestInvocations`
+7. `maxBroadScanInvocations`
+
+Those are advanced controls for later slice-specific tuning, not required install-time setup.
 
 ### 4. Run a First Turn
 
