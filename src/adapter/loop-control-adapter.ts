@@ -20,6 +20,7 @@ import type {
 import { DEFAULT_THRESHOLDS, type AdapterConfig, type LoopStopReasonCode } from "../types/config.js";
 import { classifyBroadScan, classifyBroadTest, inferProgress, summarizeToolResult } from "./heuristics.js";
 import { createRunState, hashStable, LoopStateStore, type LoopRunState } from "./state.js";
+import { AionisHttpClientError } from "../client/aionis-http-client.js";
 
 export type AdapterDecision = {
   continue: boolean;
@@ -157,15 +158,26 @@ export class AionisLoopControlAdapter {
       });
     }
 
-    const decision = this.client.toolsSelect
-      ? await this.client.toolsSelect({
+    let decision: AionisToolDecision | undefined;
+    if (this.client.toolsSelect) {
+      try {
+        decision = await this.client.toolsSelect({
           scope: state.scope,
           runId: event.runId ?? ctx.runId ?? state.stateId,
           context,
           candidates,
           controlProfileV1: state.controlProfileV1,
-        })
-      : undefined;
+        }) ?? undefined;
+      } catch (error) {
+        if (error instanceof AionisHttpClientError && error.code === "no_tools_allowed") {
+          return {
+            block: true,
+            blockReason: "policy denied current tool and no alternative remained",
+          };
+        }
+        throw error;
+      }
+    }
     this.captureDecision(state, decision ?? undefined);
 
     if (decision?.selected_tool && decision.selected_tool !== event.toolName && this.config.strictToolBlocking) {

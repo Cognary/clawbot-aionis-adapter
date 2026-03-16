@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { AionisLoopControlAdapter, attachToOpenClawHost } from '../dist/index.js';
+import { AionisHttpClientError, AionisLoopControlAdapter, attachToOpenClawHost } from '../dist/index.js';
 
 class MockOpenClawHost {
   constructor() {
@@ -224,6 +224,30 @@ test('after_tool_call writes feedback and evidence', async () => {
   assert.equal(calls.toolsFeedback.length, 1);
   assert.equal(calls.write.length, 1);
   assert.equal(calls.toolsFeedback[0].selectedTool, 'rg');
+});
+
+test('before_tool_call turns no_tools_allowed into a controlled block', async () => {
+  const { client } = createFakeClient();
+  client.toolsSelect = async () => {
+    throw new AionisHttpClientError(
+      'no candidates remain after deny filters',
+      400,
+      'no_tools_allowed',
+      { error: 'no_tools_allowed' },
+    );
+  };
+
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const ctx = { agentId: 'agent-no-tools', sessionId: 'sess-no-tools', sessionKey: 'sess-key-no-tools', workspaceDir: '/repo/click', runId: 'run-no-tools', toolName: 'broad-auth-scan', toolCallId: 'call-no-tools' };
+  const event = { toolName: 'broad-auth-scan', params: { q: 'auth mismatch' }, runId: 'run-no-tools', toolCallId: 'call-no-tools' };
+
+  const result = await host.emit('before_tool_call', event, ctx);
+
+  assert.equal(result?.block, true);
+  assert.equal(result?.blockReason, 'policy denied current tool and no alternative remained');
 });
 
 test('threshold stop prefers replay dispatch when a playbook hint is available', async () => {
