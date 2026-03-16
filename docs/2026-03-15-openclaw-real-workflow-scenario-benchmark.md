@@ -331,6 +331,29 @@ Interpretation:
 - this refreshed slice is a completion win, but not an efficiency win
 - that keeps the overall Phase 2 strongest-slice story positive on reviewer-ready completion across all three slices, while leaving the efficiency story mixed on the third slice
 
+### Phase 2 handoff-transition single-run revalidation: dashboard auth drift
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316035214/summary.json)
+
+Result (`1` repeat, `Aionis main` after the `handoff/store -> execution_transitions_v1` revision-rebase fix):
+
+- baseline `reviewer_ready_rate = 1`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 1`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 23870`
+- treatment `avg_total_tokens = 17533`
+- baseline `avg_wall_clock_ms = 96660`
+- treatment `avg_wall_clock_ms = 58810`
+
+Interpretation:
+
+- this is a single-run repair check, not a new publication-grade repeated set
+- it confirms the `handoff/store` transition revision fix removes the observed 500-path regression on the real Lite workflow
+- on this repaired run, completion stays flat while treatment is both cheaper and faster
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
