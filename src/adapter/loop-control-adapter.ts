@@ -14,7 +14,6 @@ import type {
   ControlProfileV1,
   AionisToolDecision,
   ExecutionPacketV1,
-  ExecutionStateRefV1,
   ExecutionStateV1,
   ReplayPlaybookHint,
 } from "../types/aionis.js";
@@ -163,20 +162,13 @@ export class AionisLoopControlAdapter {
     let decision: AionisToolDecision | undefined;
     if (this.client.toolsSelect) {
       try {
-        const executionStateRef = this.buildExecutionStateRef(state.executionStateV1);
         decision = await this.client.toolsSelect({
           scope: state.scope,
           runId: event.runId ?? ctx.runId ?? state.stateId,
           context,
           candidates,
+          executionStateV1: state.executionStateV1,
           controlProfileV1: state.controlProfileV1,
-          ...(executionStateRef
-            ? {
-                executionStateRefV1: executionStateRef,
-              }
-            : {
-                executionStateV1: state.executionStateV1,
-              }),
         }) ?? undefined;
       } catch (error) {
         if (error instanceof AionisHttpClientError && error.code === "no_tools_allowed") {
@@ -405,16 +397,6 @@ export class AionisLoopControlAdapter {
   private resolveContinuityHandoffText(event: BeforeAgentStartEvent): string | null {
     if (this.resolveContinuityPacket(event) || this.resolveContinuityState(event)) return null;
     return event.continuity?.handoffText ?? null;
-  }
-
-  private buildExecutionStateRef(state: ExecutionStateV1 | undefined): ExecutionStateRefV1 | undefined {
-    const stateId = typeof state?.state_id === "string" ? state.state_id.trim() : "";
-    const scope = typeof state?.scope === "string" ? state.scope.trim() : "";
-    if (!stateId || !scope) return undefined;
-    return {
-      state_id: stateId,
-      scope,
-    };
   }
 
 
