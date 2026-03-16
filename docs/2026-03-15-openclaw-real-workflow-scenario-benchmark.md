@@ -377,6 +377,29 @@ Interpretation:
 - this refreshed slice is a completion win, token win, and wall-clock win
 - this is the strongest direct evidence so far that the Phase 2 handoff-transition path is safe on the real Lite workflow path
 
+### Phase 2 tools/select state-aware repeated revalidation: dashboard auth drift
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316050335/summary.json)
+
+Result (`3` repeats, `Aionis main` after `tools/select` started consuming `execution_state_v1` directly):
+
+- baseline `reviewer_ready_rate = 0.6667`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0.6667`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 18936.67`
+- treatment `avg_total_tokens = 28186.67`
+- baseline `avg_wall_clock_ms = 83000.67`
+- treatment `avg_wall_clock_ms = 94629`
+
+Interpretation:
+
+- this new runtime surface is positive on reviewer-ready completion for the strongest slice
+- it is not currently an efficiency win
+- the right reading is `completion-only win`, not a broader claim that the new state-aware `tools/select` path already lowers cost
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
