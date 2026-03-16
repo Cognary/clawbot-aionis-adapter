@@ -71,6 +71,7 @@ export class AionisLoopControlAdapter {
   }
 
   async beforeAgentStart(event: BeforeAgentStartEvent, ctx: OpenClawAgentRunContext): Promise<BeforeAgentStartResult | undefined> {
+    if (!this.isEnabled()) return undefined;
     const state = this.ensureState({
       prompt: event.prompt,
       agentId: ctx.agentId,
@@ -85,22 +86,27 @@ export class AionisLoopControlAdapter {
     if (!this.client.contextAssemble) return undefined;
 
     const candidates = this.extractCandidateTools(event.messages);
-    const out = await this.client.contextAssemble({
-      scope: state.scope,
-      queryText: event.prompt,
-      context: {
-        source: "openclaw-adapter.before_agent_start",
-        agent_id: ctx.agentId,
-        session_key: ctx.sessionKey,
-        session_id: ctx.sessionId,
-        trigger: ctx.trigger,
-        continuity_handoff_text: this.resolveContinuityHandoffText(event),
-        control_profile: state.controlProfileV1?.profile ?? null,
-      },
-      toolCandidates: candidates,
-      executionStateV1: this.resolveContinuityState(event),
-      executionPacketV1: this.resolveContinuityPacket(event),
-    });
+    let out;
+    try {
+      out = await this.client.contextAssemble({
+        scope: state.scope,
+        queryText: event.prompt,
+        context: {
+          source: "openclaw-adapter.before_agent_start",
+          agent_id: ctx.agentId,
+          session_key: ctx.sessionKey,
+          session_id: ctx.sessionId,
+          trigger: ctx.trigger,
+          continuity_handoff_text: this.resolveContinuityHandoffText(event),
+          control_profile: state.controlProfileV1?.profile ?? null,
+        },
+        toolCandidates: candidates,
+        executionStateV1: this.resolveContinuityState(event),
+        executionPacketV1: this.resolveContinuityPacket(event),
+      });
+    } catch {
+      return undefined;
+    }
 
     const merged = out?.layered_context?.merged_text?.trim();
     const decision = out?.tools ?? undefined;
@@ -110,6 +116,7 @@ export class AionisLoopControlAdapter {
   }
 
   async beforeToolCall(event: BeforeToolCallEvent, ctx: OpenClawToolCallContext): Promise<BeforeToolCallResult | undefined> {
+    if (!this.isEnabled()) return undefined;
     const state = this.ensureState({
       agentId: ctx.agentId,
       sessionKey: ctx.sessionKey,
@@ -152,11 +159,15 @@ export class AionisLoopControlAdapter {
     } satisfies Record<string, unknown>;
 
     if (this.client.rulesEvaluate) {
-      await this.client.rulesEvaluate({
-        scope: state.scope,
-        context,
-        candidates,
-      });
+      try {
+        await this.client.rulesEvaluate({
+          scope: state.scope,
+          context,
+          candidates,
+        });
+      } catch {
+        // Fail open: Aionis control-plane errors must not abort the host run.
+      }
     }
 
     let decision: AionisToolDecision | undefined;
@@ -172,12 +183,9 @@ export class AionisLoopControlAdapter {
         }) ?? undefined;
       } catch (error) {
         if (error instanceof AionisHttpClientError && error.code === "no_tools_allowed") {
-          return {
-            block: true,
-            blockReason: "policy denied current tool and no alternative remained",
-          };
+          return this.makeStopResult(state, "policy_denied_only_path", event, ctx);
         }
-        throw error;
+        return undefined;
       }
     }
     this.captureDecision(state, decision ?? undefined);
@@ -193,6 +201,7 @@ export class AionisLoopControlAdapter {
   }
 
   async afterToolCall(event: AfterToolCallEvent, ctx: OpenClawToolCallContext): Promise<void> {
+    if (!this.isEnabled()) return;
     const state = this.ensureState({
       agentId: ctx.agentId,
       sessionKey: ctx.sessionKey,
@@ -214,40 +223,49 @@ export class AionisLoopControlAdapter {
     state.estimatedTokenBurn += Math.max(1, Math.ceil(summary.length / 4));
 
     if (this.client.toolsFeedback) {
-      await this.client.toolsFeedback({
-        scope: state.scope,
-        runId: event.runId ?? ctx.runId,
-        decisionId: state.lastDecisionId,
-        decisionUri: state.lastDecisionUri,
-        context: {
-          source: "openclaw-adapter.after_tool_call",
-          progress,
-          duration_ms: event.durationMs ?? null,
-          error: event.error ?? null,
-        },
-        candidates: [event.toolName],
-        selectedTool: event.toolName,
-        outcome: event.error ? "negative" : progress ? "positive" : "neutral",
-        note: progress ? "tool call made progress" : "tool call made no clear progress",
-        inputText: summary,
-      });
+      try {
+        await this.client.toolsFeedback({
+          scope: state.scope,
+          runId: event.runId ?? ctx.runId,
+          decisionId: state.lastDecisionId,
+          decisionUri: state.lastDecisionUri,
+          context: {
+            source: "openclaw-adapter.after_tool_call",
+            progress,
+            duration_ms: event.durationMs ?? null,
+            error: event.error ?? null,
+          },
+          candidates: [event.toolName],
+          selectedTool: event.toolName,
+          outcome: event.error ? "negative" : progress ? "positive" : "neutral",
+          note: progress ? "tool call made progress" : "tool call made no clear progress",
+          inputText: summary,
+        });
+      } catch {
+        // Fail open: evidence capture must not abort the host run.
+      }
     }
 
     if (this.client.write) {
-      await this.client.write({
-        scope: state.scope,
-        inputText: `${event.toolName}: ${summary}`,
-        metadata: {
-          source: "openclaw-adapter.after_tool_call",
-          run_id: event.runId ?? ctx.runId,
-          tool_call_id: event.toolCallId ?? ctx.toolCallId,
-          duration_ms: event.durationMs ?? null,
-        },
-      });
+      try {
+        await this.client.write({
+          scope: state.scope,
+          inputText: `${event.toolName}: ${summary}`,
+          metadata: {
+            source: "openclaw-adapter.after_tool_call",
+            run_id: event.runId ?? ctx.runId,
+            tool_call_id: event.toolCallId ?? ctx.toolCallId,
+            duration_ms: event.durationMs ?? null,
+          },
+        });
+      } catch {
+        // Fail open: persistence errors must not abort the host run.
+      }
     }
   }
 
   async agentEnd(event: AgentEndEvent, ctx: OpenClawAgentRunContext): Promise<void> {
+    if (!this.isEnabled()) return;
     const state = this.findState({ sessionId: ctx.sessionId, sessionKey: ctx.sessionKey }) ?? this.ensureState({
       agentId: ctx.agentId,
       sessionKey: ctx.sessionKey,
@@ -257,17 +275,21 @@ export class AionisLoopControlAdapter {
 
     if (!event.success && this.config.handoffFallbackEnabled && this.client.handoffStore && !state.handoffTriggered) {
       state.handoffTriggered = true;
-      await this.client.handoffStore({
-        scope: state.scope,
-        anchor: `openclaw-loop-${state.stateId}`,
-        filePath: ctx.workspaceDir ?? "workspace",
-        summary: `OpenClaw run stopped: ${state.forcedStopReason ?? "agent_end_failure"}`,
-        handoffText: `Resume from degraded run. reason=${state.forcedStopReason ?? "agent_end_failure"}`,
-        repoRoot: ctx.workspaceDir ?? null,
-        handoffKind: "task_handoff",
-        title: "OpenClaw degraded run handoff",
-        risk: event.error ?? null,
-      });
+      try {
+        await this.client.handoffStore({
+          scope: state.scope,
+          anchor: `openclaw-loop-${state.stateId}`,
+          filePath: ctx.workspaceDir ?? "workspace",
+          summary: `OpenClaw run stopped: ${state.forcedStopReason ?? "agent_end_failure"}`,
+          handoffText: `Resume from degraded run. reason=${state.forcedStopReason ?? "agent_end_failure"}`,
+          repoRoot: ctx.workspaceDir ?? null,
+          handoffKind: "task_handoff",
+          title: "OpenClaw degraded run handoff",
+          risk: event.error ?? null,
+        });
+      } catch {
+        // Fail open: degraded-run handoff should not crash the host shutdown path.
+      }
     }
   }
 
@@ -416,8 +438,13 @@ export class AionisLoopControlAdapter {
     }) ?? undefined;
   }
 
+  private isEnabled(): boolean {
+    return this.config.thresholds.enabled !== false;
+  }
+
   private checkThresholds(state: LoopRunState): LoopStopReasonCode | undefined {
     const t = this.effectiveThresholds(state);
+    if (!t.enabled) return undefined;
     if (state.stepCount > t.maxSteps) return "max_steps_exceeded";
     if (state.sameToolStreak > t.maxSameToolStreak) return "same_tool_streak_exceeded";
     if (state.duplicateObservationStreak > t.maxDuplicateObservationStreak) return "duplicate_observation_exceeded";
@@ -457,45 +484,53 @@ export class AionisLoopControlAdapter {
     const replayHint = this.resolveReplayHint(state, event, ctx);
     if (replayHint && this.config.replayDispatchEnabled && this.client.replayPlaybookCandidate && this.client.replayPlaybookDispatch && !state.replayDispatchAttempted) {
       state.replayDispatchAttempted = true;
-      const candidateResult = await this.client.replayPlaybookCandidate({
-        scope: state.scope,
-        playbookId: replayHint.playbookId,
-        version: replayHint.version,
-        deterministicGate: replayHint.deterministicGate,
-      });
-      if (candidateResult?.candidate?.eligible_for_deterministic_replay) {
-        await this.client.replayPlaybookDispatch({
+      try {
+        const candidateResult = await this.client.replayPlaybookCandidate({
           scope: state.scope,
           playbookId: replayHint.playbookId,
           version: replayHint.version,
-          params: {
-            source: "openclaw-adapter.loop-control",
-            reason,
-            ...(replayHint.params ?? {}),
-          },
-          mode: replayHint.mode ?? candidateResult.candidate.recommended_mode,
-          maxSteps: replayHint.maxSteps,
           deterministicGate: replayHint.deterministicGate,
         });
-        state.forcedStopReason = "replay_dispatch_selected";
-        return { block: true, blockReason: "replay dispatch selected" };
+        if (candidateResult?.candidate?.eligible_for_deterministic_replay) {
+          await this.client.replayPlaybookDispatch({
+            scope: state.scope,
+            playbookId: replayHint.playbookId,
+            version: replayHint.version,
+            params: {
+              source: "openclaw-adapter.loop-control",
+              reason,
+              ...(replayHint.params ?? {}),
+            },
+            mode: replayHint.mode ?? candidateResult.candidate.recommended_mode,
+            maxSteps: replayHint.maxSteps,
+            deterministicGate: replayHint.deterministicGate,
+          });
+          state.forcedStopReason = "replay_dispatch_selected";
+          return { block: true, blockReason: "replay dispatch selected" };
+        }
+      } catch {
+        // Fail open to the next stop path.
       }
     }
 
     if (this.config.handoffFallbackEnabled && this.client.handoffStore && !state.handoffTriggered) {
       state.handoffTriggered = true;
-      await this.client.handoffStore({
-        scope: state.scope,
-        anchor: `openclaw-loop-${state.stateId}`,
-        filePath: ctx.workspaceDir ?? "workspace",
-        summary: `Forced loop stop: ${reason}`,
-        handoffText: `The run was stopped before ${event.toolName}. reason=${reason}. Resume from current workspace state with a narrower tool path.`,
-        repoRoot: ctx.workspaceDir ?? null,
-        handoffKind: "task_handoff",
-        title: "OpenClaw loop-control handoff",
-      });
-      state.forcedStopReason = "handoff_store_selected";
-      return { block: true, blockReason: "handoff stored after loop-control stop" };
+      try {
+        await this.client.handoffStore({
+          scope: state.scope,
+          anchor: `openclaw-loop-${state.stateId}`,
+          filePath: ctx.workspaceDir ?? "workspace",
+          summary: `Forced loop stop: ${reason}`,
+          handoffText: `The run was stopped before ${event.toolName}. reason=${reason}. Resume from current workspace state with a narrower tool path.`,
+          repoRoot: ctx.workspaceDir ?? null,
+          handoffKind: "task_handoff",
+          title: "OpenClaw loop-control handoff",
+        });
+        state.forcedStopReason = "handoff_store_selected";
+        return { block: true, blockReason: "handoff stored after loop-control stop" };
+      } catch {
+        // Fail closed locally, but do not let Aionis transport failure crash the host.
+      }
     }
 
     return { block: true, blockReason: reason };

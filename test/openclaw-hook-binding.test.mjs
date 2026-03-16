@@ -227,7 +227,7 @@ test('after_tool_call writes feedback and evidence', async () => {
 });
 
 test('before_tool_call turns no_tools_allowed into a controlled block', async () => {
-  const { client } = createFakeClient();
+  const { client, calls } = createFakeClient();
   client.toolsSelect = async () => {
     throw new AionisHttpClientError(
       'no candidates remain after deny filters',
@@ -247,7 +247,8 @@ test('before_tool_call turns no_tools_allowed into a controlled block', async ()
   const result = await host.emit('before_tool_call', event, ctx);
 
   assert.equal(result?.block, true);
-  assert.equal(result?.blockReason, 'policy denied current tool and no alternative remained');
+  assert.equal(result?.blockReason, 'handoff stored after loop-control stop');
+  assert.equal(calls.handoffStore.length, 1);
 });
 
 test('threshold stop prefers replay dispatch when a playbook hint is available', async () => {
@@ -317,4 +318,72 @@ test('before_agent_start resets execution-local loop streaks across agents', asy
   const result = await host.emit('before_tool_call', { ...event, runId: 'run-b', toolCallId: 'call-b' }, agentTwoCtx);
 
   assert.equal(result?.block, undefined);
+});
+
+test('enabled=false disables loop-control blocking and Aionis hot-path calls', async () => {
+  const { client, calls } = createFakeClient();
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client, {
+    thresholds: {
+      enabled: false,
+      maxSteps: 0,
+      maxSameToolStreak: 0,
+      maxDuplicateObservationStreak: 0,
+      maxNoProgressStreak: 0,
+      maxEstimatedTokenBurn: 0,
+      maxBroadTestInvocations: 0,
+      maxBroadScanInvocations: 0,
+    },
+  });
+  attachToOpenClawHost(host, adapter);
+
+  const ctx = { agentId: 'agent-disabled', sessionId: 'sess-disabled', sessionKey: 'sess-key-disabled', workspaceDir: '/repo/click', trigger: 'user', runId: 'run-disabled', toolName: 'rg', toolCallId: 'call-disabled' };
+  const beforeStart = await host.emit('before_agent_start', { prompt: 'disabled path', messages: [{ toolName: 'rg' }] }, ctx);
+  const beforeTool = await host.emit('before_tool_call', { toolName: 'rg', params: { q: 'OptionParser' }, runId: 'run-disabled', toolCallId: 'call-disabled' }, ctx);
+  await host.emit('after_tool_call', { toolName: 'rg', params: { q: 'OptionParser' }, runId: 'run-disabled', toolCallId: 'call-disabled', result: { matches: [] }, durationMs: 10 }, ctx);
+
+  assert.equal(beforeStart, undefined);
+  assert.equal(beforeTool, undefined);
+  assert.equal(calls.contextAssemble.length, 0);
+  assert.equal(calls.rulesEvaluate.length, 0);
+  assert.equal(calls.toolsSelect.length, 0);
+  assert.equal(calls.toolsFeedback.length, 0);
+  assert.equal(calls.write.length, 0);
+});
+
+test('adapter fails open when Aionis hot-path calls throw', async () => {
+  const { client, calls } = createFakeClient();
+  client.contextAssemble = async () => {
+    throw new Error('context assemble down');
+  };
+  client.rulesEvaluate = async () => {
+    throw new Error('rules evaluate down');
+  };
+  client.toolsSelect = async () => {
+    throw new Error('tools select down');
+  };
+  client.toolsFeedback = async () => {
+    throw new Error('tools feedback down');
+  };
+  client.write = async () => {
+    throw new Error('write down');
+  };
+  client.handoffStore = async () => {
+    throw new Error('handoff down');
+  };
+
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const runCtx = { agentId: 'agent-fail-open', sessionId: 'sess-fail-open', sessionKey: 'sess-key-fail-open', workspaceDir: '/repo/click', trigger: 'user' };
+  const start = await host.emit('before_agent_start', { prompt: 'fail open path', messages: [{ toolName: 'rg' }] }, runCtx);
+  const toolCtx = { ...runCtx, runId: 'run-fail-open', toolName: 'rg', toolCallId: 'call-fail-open' };
+  const beforeTool = await host.emit('before_tool_call', { toolName: 'rg', params: { q: 'OptionParser' }, runId: 'run-fail-open', toolCallId: 'call-fail-open' }, toolCtx);
+  await host.emit('after_tool_call', { toolName: 'rg', params: { q: 'OptionParser' }, runId: 'run-fail-open', toolCallId: 'call-fail-open', result: { matches: ['click/parser.py:42'] }, durationMs: 12 }, toolCtx);
+  await host.emit('agent_end', { success: false, error: 'degraded run' }, runCtx);
+
+  assert.equal(start, undefined);
+  assert.equal(beforeTool, undefined);
+  assert.equal(calls.contextAssemble.length, 0);
 });
