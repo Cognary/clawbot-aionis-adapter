@@ -329,6 +329,29 @@ Interpretation:
 - this slice also remains positive with `ControlProfile` active
 - like pairing / approval recovery, it is currently a completion win rather than an efficiency win
 
+### Post-main-merge revalidation: service token drift repair
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316013610/summary.json)
+
+Result (`3` repeats, `Aionis main` after the execution-continuity Phase 1 merge):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 0.6667`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 0.6667`
+- baseline `avg_total_tokens = 18427`
+- treatment `avg_total_tokens = 23863.67`
+- baseline `avg_wall_clock_ms = 77895`
+- treatment `avg_wall_clock_ms = 73946.67`
+
+Interpretation:
+
+- this slice remains positive on reviewer-ready completion after the `Aionis main` merge
+- treatment is slightly faster on wall-clock
+- this is not a token win, so it remains a completion-first post-merge revalidation
+
 ## Interpretation
 
 The original real-workflow publication set is best read as **continuity wins**, not token wins.

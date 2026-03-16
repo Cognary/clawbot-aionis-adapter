@@ -141,6 +141,7 @@ Evidence:
 - [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
 - [Post-main-merge revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
 - [Post-main-merge revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
+- [Post-main-merge revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316013610/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
 - [Repeated continuity A/B: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315103311/summary.json)
 - [Repeated continuity A/B: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315104415/summary.json)
@@ -161,6 +162,7 @@ Headline results:
   - service token drift repair: `0 -> 0.6667`
   - post-main-merge dashboard auth drift: `0.3333 -> 0.6667` with lower wall-clock but higher token
   - post-main-merge pairing / approval recovery: `0.6667 -> 0.6667` with lower wall-clock but higher token
+  - post-main-merge service token drift repair: `0 -> 0.6667` with lower wall-clock but higher token
 
 What this proves:
 
@@ -173,6 +175,7 @@ What this proves:
 - after `ControlProfile` adoption, the strongest real-workflow story remains positive on all three strongest slices
 - after merging the execution-continuity Phase 1 foundation into `Aionis main`, dashboard auth drift still remains positive on reviewer-ready completion
 - after the same `Aionis main` merge, pairing / approval recovery remains stable on reviewer-ready completion and improves wall-clock, but does not add new completion uplift
+- after the same `Aionis main` merge, service token drift repair remains positive on reviewer-ready completion and improves wall-clock, but does not become a token win
 - the efficiency story after `ControlProfile` adoption is mixed:
   - dashboard auth drift remains both a completion and efficiency win
   - pairing / approval recovery and service token drift repair remain completion wins, but not efficiency wins
