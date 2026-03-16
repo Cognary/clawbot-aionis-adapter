@@ -424,6 +424,30 @@ Interpretation:
 - this new runtime surface is again a completion-only win, not an efficiency win
 - together with dashboard auth drift, this is enough to say the new state-aware `tools/select` path is no longer a single-slice signal
 
+### Phase 2 tools/select state-aware repeated revalidation: service token drift repair
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316053718/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260316053718/cases.jsonl)
+
+Result (`3` repeats, `Aionis main` with `tools/select` consuming `execution_state_v1` directly):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 0.3333`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 0.3333`
+- baseline `avg_total_tokens = 14376.67`
+- treatment `avg_total_tokens = 23844.33`
+- baseline `avg_wall_clock_ms = 55854.67`
+- treatment `avg_wall_clock_ms = 76087`
+
+Interpretation:
+
+- the third strongest real-workflow slice also stays positive after the new state-aware `tools/select` path landed
+- this third result is weaker than the first two and should be treated as a supporting completion slice, not a new headline repeated win
+- the `tools/select` state-aware surface therefore now has a strongest-three-slice family that is uniformly positive on completion, but only the first two slices are strong enough to carry the headline claim
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:

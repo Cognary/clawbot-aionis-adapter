@@ -75,6 +75,7 @@ Headline results:
 - **Phase 2 tools/select state-aware repeated revalidation on the real Lite path (3 repeats)**:
   - dashboard auth drift: baseline `reviewer_ready_rate = 0.6667`, treatment `reviewer_ready_rate = 1`, but with higher average total tokens from `18936.67` to `28186.67` and higher wall-clock from `83000.67ms` to `94629ms`
   - pairing / approval recovery: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`, but with higher average total tokens from `18493` to `22063.33` and higher wall-clock from `78439.33ms` to `80485.33ms`
+  - service token drift repair: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.3333`, but with higher average total tokens from `14376.67` to `23844.33` and higher wall-clock from `55854.67ms` to `76087ms` (`supporting completion slice`)
 - **Repeated continuity A/B on the real Lite path (`legacy` vs `execution_packet_v1`)**:
   - dashboard auth drift: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24750.67` to `22974`
   - pairing / approval recovery: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `22704` to `22091.33`
@@ -121,6 +122,7 @@ Public evidence files:
 - [Phase 2 handoff-transition repeated revalidation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260316035944/summary.json)
 - [Phase 2 tools/select state-aware repeated revalidation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260316050335/summary.json)
 - [Phase 2 tools/select state-aware repeated revalidation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260316051831/summary.json)
+- [Phase 2 tools/select state-aware repeated revalidation: service token drift repair (real Lite, supporting completion slice)](evidence/openclaw-real-workflow-scenario/20260316053718/summary.json)
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
