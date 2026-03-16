@@ -308,6 +308,29 @@ Interpretation:
 - this refreshed slice is a completion win, token win, and wall-clock win
 - together with dashboard auth drift, this gives Phase 2 two strongest-slice revalidations that are positive on both completion and efficiency
 
+### Phase 2 state-first context revalidation: service token drift repair
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316031511/summary.json)
+
+Result (`3` repeats, `Aionis main` with state-first context assembly active):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 17245.67`
+- treatment `avg_total_tokens = 25099.67`
+- baseline `avg_wall_clock_ms = 66586`
+- treatment `avg_wall_clock_ms = 78718.67`
+
+Interpretation:
+
+- the third strongest real-workflow slice also remains positive after the Phase 2 state-first context path landed on `Aionis main`
+- this refreshed slice is a completion win, but not an efficiency win
+- that keeps the overall Phase 2 strongest-slice story positive on reviewer-ready completion across all three slices, while leaving the efficiency story mixed on the third slice
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
