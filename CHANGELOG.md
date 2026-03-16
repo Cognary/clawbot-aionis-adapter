@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3
+
+Reliability hardening release for the real OpenClaw runtime path.
+
+Included:
+
+1. fail-open handling for Aionis transport failures on hot hooks so OpenClaw runs do not abort on Aionis-side timeouts or transient errors
+2. a real `enabled=false` off switch that disables loop-control blocking and Aionis hot-path hook calls
+3. policy-denied single-tool paths now route through the controlled replay/handoff stop path instead of stopping at a bare deny block
+
 ## 0.1.2
 
 Release-surface alignment for the current execution-continuity line.

@@ -12,6 +12,12 @@ What Aionis adds on top of OpenClaw:
 - **handoff fallback** so failed or interrupted runs preserve a usable continuation point
 - **loop control** so tool churn, duplicate observations, and no-progress streaks get stopped before they burn more time and tokens
 
+Runtime safety notes on the current release line:
+
+- Aionis transport failures on hot hooks now degrade open instead of aborting the host run
+- `enabled=false` is a real off switch for loop-control behavior
+- deny-only policy outcomes now go through the same controlled replay/handoff stop path as other loop-control stops
+
 This is not a generic memory plugin. It is an **execution-control adapter** for OpenClaw.
 
 ## Why It Matters
