@@ -98,6 +98,7 @@ export type AionisLoopControlClient = {
     runId: string;
     context: Record<string, unknown>;
     candidates: string[];
+    executionStateV1?: ExecutionStateV1;
     controlProfileV1?: ControlProfileV1;
   }) => Promise<AionisToolDecision | null | undefined>;
   toolsDecision?: (args: {

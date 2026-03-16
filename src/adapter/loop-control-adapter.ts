@@ -79,6 +79,7 @@ export class AionisLoopControlAdapter {
       workspaceDir: ctx.workspaceDir,
     });
     this.resetExecutionWindow(state, ctx.agentId, event.prompt);
+    state.executionStateV1 = this.resolveContinuityState(event);
     state.controlProfileV1 = this.resolveContinuityControlProfile(event);
 
     if (!this.client.contextAssemble) return undefined;
@@ -166,6 +167,7 @@ export class AionisLoopControlAdapter {
           runId: event.runId ?? ctx.runId ?? state.stateId,
           context,
           candidates,
+          executionStateV1: state.executionStateV1,
           controlProfileV1: state.controlProfileV1,
         }) ?? undefined;
       } catch (error) {
@@ -348,6 +350,7 @@ export class AionisLoopControlAdapter {
     state.lastDecisionId = undefined;
     state.lastDecisionUri = undefined;
     state.lastSelectedTool = undefined;
+    state.executionStateV1 = undefined;
     state.controlProfileV1 = undefined;
     state.forcedStopReason = undefined;
     state.handoffTriggered = false;

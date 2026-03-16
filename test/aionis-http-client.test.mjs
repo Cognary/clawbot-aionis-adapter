@@ -123,6 +123,15 @@ test('http client includes continuity-delivered control profile in tools/select 
       runId: 'run-1',
       context: { source: 'test-tools-select' },
       candidates: ['broad-auth-scan', 'read-dashboard-doc'],
+      executionStateV1: {
+        state_id: 'state-1',
+        scope: 'openclaw:test',
+        task_brief: 'Repair dashboard auth drift',
+        current_stage: 'triage',
+        active_role: 'triage',
+        owned_files: ['docs/dashboard.md'],
+        pending_validations: ['verify dashboard auth flow'],
+      },
       controlProfileV1: {
         version: 1,
         profile: 'triage',
@@ -142,6 +151,8 @@ test('http client includes continuity-delivered control profile in tools/select 
     assert.equal(requests.length, 1);
     assert.equal(requests[0].body.context.control_profile_v1.profile, 'triage');
     assert.equal(requests[0].body.context.control_profile_v1.allow_broad_scan, false);
+    assert.equal(requests[0].body.execution_state_v1.current_stage, 'triage');
+    assert.equal(requests[0].body.execution_state_v1.active_role, 'triage');
     assert.deepEqual(requests[0].body.candidates, ['broad-auth-scan', 'read-dashboard-doc']);
   });
 });
