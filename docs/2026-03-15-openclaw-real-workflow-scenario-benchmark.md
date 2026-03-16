@@ -285,6 +285,29 @@ Interpretation:
 - this refreshed slice is a completion win, token win, and wall-clock win
 - this is the first real-workflow revalidation that reflects the new state-first context assembly path rather than the older packet-input path alone
 
+### Phase 2 state-first context revalidation: pairing / approval recovery
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316030711/summary.json)
+
+Result (`3` repeats, `Aionis main` with state-first context assembly active):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 19066.33`
+- treatment `avg_total_tokens = 16862.67`
+- baseline `avg_wall_clock_ms = 76917`
+- treatment `avg_wall_clock_ms = 55271.67`
+
+Interpretation:
+
+- the second strongest real-workflow slice also stays strongly positive after the Phase 2 state-first context path landed on `Aionis main`
+- this refreshed slice is a completion win, token win, and wall-clock win
+- together with dashboard auth drift, this gives Phase 2 two strongest-slice revalidations that are positive on both completion and efficiency
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
