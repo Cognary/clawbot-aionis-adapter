@@ -5,429 +5,337 @@ import { TerminalDemo } from "../components/terminal-demo";
 const navItems = [
   { href: "#features", label: "Features" },
   { href: "#platforms", label: "Platforms" },
-  { href: "#proof", label: "Proof" },
-  { href: "#safety", label: "Safety" },
+  { href: "#security", label: "Security" },
   { href: "#faq", label: "FAQ" },
 ];
 
-const heroStats = [
-  { label: "OpenClaw path", value: "Real runtime", note: "Not a mock harness." },
-  { label: "Published adapter", value: "0.1.3", note: "Current npm release." },
-  { label: "Published SDK", value: "0.2.20", note: "Local Lite bootstrap path." },
+const commandCards = [
+  {
+    title: "Bootstrap Lite",
+    command: "npx @aionis/sdk@0.2.20 dev",
+    note: "No local Aionis repo required for the first run.",
+  },
+  {
+    title: "Install the adapter",
+    command: "openclaw plugins install @aionis/openclaw-adapter",
+    note: "Current published release: 0.1.3",
+  },
 ];
 
-const pillarCards = [
+const highlightCards = [
   {
-    title: "Stop tool-loop churn",
-    body: "Suppress broad scans, broad tests, and repeated no-progress tool paths before they burn more steps and tokens.",
+    label: "Dashboard auth drift",
+    value: "0.6667 -> 1",
+    body: "Repeated reviewer-ready uplift on the strongest public OpenClaw workflow slice.",
   },
   {
-    title: "Preserve execution continuity",
-    body: "Start from recovered task state, not from a blank prompt that has to rediscover the repo and re-derive the plan.",
+    label: "Pairing / approval recovery",
+    value: "0 -> 1",
+    body: "Second strongest repeated slice with positive completion uplift on the real Lite path.",
   },
   {
-    title: "Exit through a controlled path",
-    body: "When the run should stop, replay and handoff preserve a usable continuation instead of letting the agent drift into failure.",
+    label: "Runtime safety",
+    value: "Fail-open",
+    body: "Hot-path Aionis failures degrade open, deny-only policy uses controlled fallback, and `enabled=false` is a real off switch.",
   },
 ];
 
 const featureCards = [
   {
-    step: "01",
-    title: "Run-start context assembly",
-    body: "Aionis prepares a compact execution view before the first expensive turn, so OpenClaw starts from what already happened.",
+    title: "Execution context at run start",
+    body: "Aionis assembles compact execution state before OpenClaw starts burning model tokens on repo rediscovery.",
   },
   {
-    step: "02",
-    title: "Pre-tool policy gating",
-    body: "The adapter asks Aionis for tool policy before costly actions run, which lets it deny broad or obviously degraded paths.",
+    title: "Policy gating before expensive tools",
+    body: "Broad scans, broad tests, and repeated no-progress paths can be denied before they execute.",
   },
   {
-    step: "03",
-    title: "Replay dispatch",
-    body: "Reusable work can escape into replay instead of forcing the model to improvise from scratch on every similar task.",
+    title: "Replay dispatch when work is reusable",
+    body: "If the run matches a known path, the adapter can escape into replay instead of improvising from scratch.",
   },
   {
-    step: "04",
-    title: "Handoff fallback",
-    body: "If the right move is to stop, the adapter keeps a clean continuation point instead of dropping state on the floor.",
+    title: "Handoff fallback when the run should stop",
+    body: "Degraded runs preserve a usable continuation point instead of losing the exact state needed to continue later.",
   },
 ];
 
 const platformCards = [
   {
-    title: "No local Aionis repo required",
-    body: "Users can bootstrap Lite directly with `npx @aionis/sdk@0.2.20 dev` and connect OpenClaw without cloning the core repo.",
-    kicker: "Fastest path",
+    title: "OpenClaw-first wedge",
+    body: "This product is intentionally narrow: execution control for OpenClaw, not a generic workflow engine or generic memory plugin.",
   },
   {
-    title: "Built for OpenClaw",
-    body: "The product wedge is explicit: execution control for OpenClaw, not a generic plugin trying to do every agent job at once.",
-    kicker: "Primary integration",
+    title: "Shared Lite runtime",
+    body: "TypeScript, Python, and OpenClaw all connect to the same Lite runtime started from `@aionis/sdk`.",
   },
   {
-    title: "SDK-backed runtime",
-    body: "TypeScript and Python SDKs both target the same local Lite runtime, so install paths do not split into separate bootstraps.",
-    kicker: "Shared runtime",
+    title: "Fast install path",
+    body: "Users can start Lite with one command, install the adapter, and run a first controlled turn without cloning the core repo.",
   },
   {
-    title: "Works from local to self-hosted",
-    body: "Start on Lite, keep the same control model, and move to broader Aionis deployment surfaces only when the user actually needs them.",
-    kicker: "Upgrade path",
+    title: "Benchmarked public claims",
+    body: "The strongest story is reviewer-ready completion and continuity on real workflow slices, not vague agent quality claims.",
   },
 ];
 
-const proofCards = [
+const securityCards = [
   {
-    label: "Dashboard auth drift",
-    value: "0.6667 -> 1",
-    body: "Strongest real-workflow reviewer-ready slice on the current release line.",
+    title: "Host-first failure model",
+    body: "Transport or schema failures on Aionis hot hooks do not need to abort the OpenClaw run. The adapter now degrades open by default on those paths.",
   },
   {
-    label: "Pairing / approval recovery",
-    value: "0 -> 1",
-    body: "Repeated real-workflow uplift on a second strongest slice.",
+    title: "Controlled deny path",
+    body: "When policy denies the current tool and no alternative remains, the adapter now routes through replay or handoff fallback instead of turning denial into a client error.",
   },
   {
-    label: "Continuity packet A/B",
-    value: "1 -> 1",
-    body: "Packet continuity matches legacy completion while lowering cost on core repeated slices.",
-  },
-  {
-    label: "Reliability path",
-    value: "Fail-open",
-    body: "Transport failures now degrade open, deny-only policy goes through controlled fallback, and `enabled=false` is a real off switch.",
-  },
-];
-
-const safetyCards = [
-  {
-    title: "Aionis failures do not take OpenClaw down",
-    body: "Hot-path transport errors now degrade open instead of aborting the host run. That keeps the adapter in the control plane, not the blast radius.",
-  },
-  {
-    title: "Policy denies are controlled, not random",
-    body: "If a tool is denied and no safe alternative remains, the adapter now routes through the same replay or handoff stop path instead of throwing.",
-  },
-  {
-    title: "Operators can really turn it off",
-    body: "The `enabled=false` switch now disables loop control and hot-path Aionis behavior, which matters for rollout and incident handling.",
+    title: "Rollout-friendly controls",
+    body: "Operators can disable loop control with `enabled=false` and know that the switch actually disables the behavior.",
   },
 ];
 
 const faqItems = [
   {
-    question: "Do I need a local Aionis repo to use this?",
+    question: "Do I need the Aionis repo on my machine?",
     answer:
-      "No. The recommended path is `npx @aionis/sdk@0.2.20 dev`, which bootstraps local Lite without requiring a source checkout first.",
+      "No. The supported first-run path is `npx @aionis/sdk@0.2.20 dev`, which bootstraps Lite without requiring a local Aionis checkout.",
   },
   {
-    question: "What do I actually install?",
+    question: "What should I install as a new OpenClaw user?",
     answer:
-      "Users install `@aionis/openclaw-adapter@0.1.3` into OpenClaw and run Lite with `@aionis/sdk@0.2.20`. That is the primary supported path.",
+      "Run Lite with `@aionis/sdk@0.2.20`, then install `@aionis/openclaw-adapter@0.1.3` into OpenClaw and use the minimal adapter config first.",
   },
   {
-    question: "What is the strongest public claim today?",
+    question: "What is the strongest thing this product proves today?",
     answer:
-      "Aionis improves execution continuity and reviewer-ready completion on current OpenClaw slices by adding policy gating, replay, handoff, and externalized context.",
+      "It improves execution continuity and reviewer-ready completion on current OpenClaw slices by adding run-start context, policy gating, replay dispatch, and handoff fallback.",
   },
   {
-    question: "Is this just another memory plugin?",
+    question: "Is this mainly a token-saving product?",
     answer:
-      "No. The product is positioned as an execution-control layer for OpenClaw. Memory matters only insofar as it helps the run stay on the right path.",
+      "No. Completion and control come first. Token reduction matters only when it does not come at the cost of reviewer-ready completion.",
   },
-];
-
-const quickstartLines = [
-  "$ npx @aionis/sdk@0.2.20 dev",
-  "$ npx @aionis/sdk@0.2.20 health --base-url http://127.0.0.1:3321",
-  "$ openclaw plugins install @aionis/openclaw-adapter",
-  "$ openclaw agent --local --message \"inspect and proceed carefully\" --json",
-];
-
-const externalLinks = [
-  { href: "https://www.npmjs.com/package/@aionis/openclaw-adapter", label: "npm" },
-  { href: "https://www.npmjs.com/package/@aionis/sdk", label: "SDK" },
-  { href: "https://github.com/Cognary/clawbot-aionis-adapter", label: "GitHub" },
 ];
 
 export default function HomePage() {
   return (
     <>
-      <div className="pageNoise" aria-hidden />
-      <main className="siteShell">
-        <Reveal>
-          <header className="topbar">
-            <a className="brandmark" href="#home">
-              <span className="brandDot" />
-              <span>Aionis for OpenClaw</span>
+      <main className="page">
+        <nav className="navBar">
+          <div className="container navInner">
+            <a href="#top" className="brand">
+              <span className="brandText">AIONIS</span>
+              <span className="brandAccent">/OpenClaw</span>
             </a>
-            <nav className="nav">
+            <div className="navLinks">
               {navItems.map((item) => (
                 <a key={item.href} href={item.href}>
                   {item.label}
                 </a>
               ))}
-            </nav>
+            </div>
             <a
-              className="navCta"
+              className="navButton"
               href="https://www.npmjs.com/package/@aionis/openclaw-adapter"
               target="_blank"
               rel="noreferrer"
             >
-              Install adapter
+              Install
             </a>
-          </header>
-        </Reveal>
-
-        <section id="home" className="heroSection">
-          <div className="heroCopy">
-            <Reveal>
-              <p className="sectionEyebrow">Execution control for OpenClaw</p>
-            </Reveal>
-            <Reveal delay={0.03}>
-              <h1>
-                Turn OpenClaw from an unbounded tool loop into a controlled execution system.
-              </h1>
-            </Reveal>
-            <Reveal delay={0.06}>
-              <p className="heroText">
-                <strong>@aionis/openclaw-adapter</strong> adds policy gating, replay dispatch,
-                handoff fallback, and recovered execution context around real OpenClaw runtime
-                paths. The product wedge is narrow by design: better continuity, safer control,
-                and higher reviewer-ready completion.
-              </p>
-            </Reveal>
-            <Reveal delay={0.09}>
-              <div className="heroActions">
-                <a className="primaryButton" href="#quickstart">
-                  Start in 3 minutes
-                </a>
-                <a className="ghostButton" href="#proof">
-                  See proof
-                </a>
-                {externalLinks.map((item) => (
-                  <a key={item.label} className="ghostButton" href={item.href} target="_blank" rel="noreferrer">
-                    {item.label}
-                  </a>
-                ))}
-              </div>
-            </Reveal>
-            <Reveal delay={0.12}>
-              <div className="heroStats">
-                {heroStats.map((item) => (
-                  <article key={item.label} className="statCard">
-                    <span>{item.label}</span>
-                    <strong>{item.value}</strong>
-                    <p>{item.note}</p>
-                  </article>
-                ))}
-              </div>
-            </Reveal>
           </div>
+        </nav>
 
-          <Reveal delay={0.08} variant="scale">
-            <aside className="heroConsole">
-              <div className="miniTagRow">
-                <span>OpenClaw plugin</span>
-                <span>Adapter 0.1.3</span>
-                <span>SDK 0.2.20</span>
-              </div>
-              <TerminalDemo />
-            </aside>
-          </Reveal>
+        <section id="top" className="hero">
+          <div className="container heroShell">
+            <div className="heroCopy">
+              <Reveal>
+                <p className="eyebrow">Execution control for OpenClaw</p>
+              </Reveal>
+              <Reveal delay={0.03}>
+                <h1 className="title">
+                  <span className="titleLine">Make OpenClaw finish</span>
+                  <span className="titleMuted">on the right path.</span>
+                </h1>
+              </Reveal>
+              <Reveal delay={0.06}>
+                <p className="subtitle">
+                  <strong>@aionis/openclaw-adapter</strong> gives OpenClaw run-start context,
+                  tool policy gating, replay dispatch, and handoff fallback so the runtime stops
+                  behaving like an unbounded tool loop and starts behaving like a controlled
+                  execution system.
+                </p>
+              </Reveal>
+
+              <Reveal delay={0.09}>
+                <div className="ctaGrid">
+                  {commandCards.map((item) => (
+                    <article key={item.title} className="ctaCard surfaceCard">
+                      <p className="ctaLabel">{item.title}</p>
+                      <code>{item.command}</code>
+                      <p className="ctaNote">{item.note}</p>
+                    </article>
+                  ))}
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.12}>
+                <div className="heroHighlights">
+                  {highlightCards.map((item) => (
+                    <article key={item.label} className="highlightCard surfaceCard">
+                      <span className="highlightLabel">{item.label}</span>
+                      <strong>{item.value}</strong>
+                      <p>{item.body}</p>
+                    </article>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+          </div>
         </section>
 
-        <section className="pillarsSection">
-          {pillarCards.map((item, idx) => (
-            <Reveal key={item.title} delay={0.04 + idx * 0.04}>
-              <article className="pillarCard">
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </article>
-            </Reveal>
-          ))}
-        </section>
-
-        <section id="features" className="contentSection">
-          <Reveal>
-            <p className="sectionEyebrow">Features</p>
-            <div className="sectionHeadingRow">
-              <h2>A control architecture around the run, not another plugin that only adds storage.</h2>
-              <p>
-                The page structure is simple because the product story should be simple: control the
-                tool loop, keep state recoverable, and provide a deterministic way to stop or
+        <section id="features">
+          <div className="container">
+            <Reveal>
+              <p className="sectionKicker">Features</p>
+              <h2 className="sectionTitle">A control layer around the run, not another plugin that only stores state.</h2>
+              <p className="sectionDesc">
+                The product story should be narrow and concrete: reduce uncontrolled tool-loop
+                churn, preserve recoverable state, and give OpenClaw a deterministic way to stop or
                 continue.
               </p>
+            </Reveal>
+            <div className="featureGrid">
+              {featureCards.map((item, idx) => (
+                <Reveal key={item.title} delay={0.04 + idx * 0.04}>
+                  <article className="featureCard surfaceCard">
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </article>
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
-          <div className="featureGrid">
-            {featureCards.map((item, idx) => (
-              <Reveal key={item.title} delay={0.05 + idx * 0.04}>
-                <article className="featurePanel">
-                  <span className="stepBadge">{item.step}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </article>
-              </Reveal>
-            ))}
           </div>
         </section>
 
-        <section id="platforms" className="contentSection splitSection">
-          <Reveal>
-            <div className="splitCopy">
-              <p className="sectionEyebrow">Platforms</p>
-              <h2>One product path, multiple ways to enter it.</h2>
-              <p>
-                The primary user journey is now stable: bootstrap Lite with the SDK, install the
-                OpenClaw adapter, and keep the same runtime underneath TypeScript, Python, and
-                OpenClaw workflows.
-              </p>
-            </div>
-          </Reveal>
-          <div className="platformGrid">
-            {platformCards.map((item, idx) => (
-              <Reveal key={item.title} delay={0.05 + idx * 0.04} variant="scale">
-                <article className="platformCard">
-                  <span>{item.kicker}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        <section id="proof" className="contentSection proofSection">
-          <Reveal>
-            <p className="sectionEyebrow">Proof</p>
-            <div className="sectionHeadingRow">
-              <h2>The public claim is reviewer-ready completion and continuity, not vague agent quality.</h2>
-              <p>
-                The strongest evidence comes from real OpenClaw workflow slices on the Lite path.
-                This site should sell exactly what is proven and no more.
-              </p>
-            </div>
-          </Reveal>
-          <div className="proofGridNew">
-            {proofCards.map((item, idx) => (
-              <Reveal key={item.label} delay={0.05 + idx * 0.04}>
-                <article className="proofMetricCard">
-                  <span>{item.label}</span>
-                  <strong>{item.value}</strong>
-                  <p>{item.body}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={0.18} variant="scale">
-            <div className="benchmarkShell">
-              <BenchmarkTerminal />
-            </div>
-          </Reveal>
-        </section>
-
-        <section id="safety" className="contentSection safetySection">
-          <Reveal>
-            <p className="sectionEyebrow">Safety and reliability</p>
-            <div className="sectionHeadingRow">
-              <h2>Execution control only works if it fails safely under pressure.</h2>
-              <p>
-                This release line explicitly prioritizes host safety: hot-path errors degrade open,
-                deny-only policy decisions follow a controlled fallback path, and operators can
-                disable loop control when they need to.
-              </p>
-            </div>
-          </Reveal>
-          <div className="safetyGrid">
-            {safetyCards.map((item, idx) => (
-              <Reveal key={item.title} delay={0.05 + idx * 0.04}>
-                <article className="safetyCard">
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        <section id="quickstart" className="contentSection quickstartSectionNew">
-          <Reveal>
-            <p className="sectionEyebrow">Quickstart</p>
-            <div className="sectionHeadingRow">
-              <h2>Users can start Lite without a local Aionis repo, then connect OpenClaw in one pass.</h2>
-              <p>
-                The shortest supported path is intentionally narrow. Install the SDK, start Lite,
-                install the adapter, and run the first controlled turn.
-              </p>
-            </div>
-          </Reveal>
-          <div className="quickstartGrid">
-            <Reveal delay={0.04}>
-              <article className="checklistCard">
-                <ol>
-                  <li>Run `npx @aionis/sdk@0.2.20 dev`</li>
-                  <li>Check `health` on `http://127.0.0.1:3321`</li>
-                  <li>Install `@aionis/openclaw-adapter@0.1.3` in OpenClaw</li>
-                  <li>Use the minimal config before touching advanced thresholds</li>
-                </ol>
-              </article>
+        <section id="platforms">
+          <div className="container splitSection">
+            <Reveal>
+              <div className="splitCopy">
+                <p className="sectionKicker">Platforms</p>
+                <h2 className="sectionTitle">One supported path: Lite first, OpenClaw first, install friction low.</h2>
+                <p className="sectionDesc">
+                  The recommended user journey is stable now: start Lite with the SDK, install the
+                  adapter into OpenClaw, and keep the same runtime across TypeScript, Python, and
+                  OpenClaw workflows.
+                </p>
+              </div>
             </Reveal>
             <Reveal delay={0.08} variant="scale">
-              <article className="codePanel">
-                <div className="codeHead">
-                  <span className="dot" />
-                  <span className="dot" />
-                  <span className="dot" />
-                  <strong>3-minute setup</strong>
-                </div>
-                <pre>
-                  {quickstartLines.map((line) => (
-                    <span key={line}>{line}</span>
-                  ))}
-                </pre>
-              </article>
+              <div className="terminalWrap">
+                <TerminalDemo />
+              </div>
             </Reveal>
           </div>
-        </section>
-
-        <section id="faq" className="contentSection faqSection">
-          <Reveal>
-            <p className="sectionEyebrow">FAQ</p>
-            <div className="sectionHeadingRow">
-              <h2>Answer the install and trust questions directly.</h2>
-              <p>
-                If a user cannot understand what to install, why it is safe, and what it really
-                improves, the site is not doing its job.
-              </p>
-            </div>
-          </Reveal>
-          <div className="faqList">
-            {faqItems.map((item, idx) => (
-              <Reveal key={item.question} delay={0.05 + idx * 0.04}>
-                <article className="faqCard">
-                  <h3>{item.question}</h3>
-                  <p>{item.answer}</p>
+          <div className="container platformGrid">
+            {platformCards.map((item, idx) => (
+              <Reveal key={item.title} delay={0.05 + idx * 0.03}>
+                <article className="platformCard surfaceCard">
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
                 </article>
               </Reveal>
             ))}
           </div>
         </section>
 
-        <section className="finalCallout">
-          <Reveal>
-            <p className="sectionEyebrow">The pitch</p>
-            <h2>Aionis for OpenClaw is not about making the model “smarter”. It is about making the run finish on the right path.</h2>
-            <div className="heroActions">
-              <a className="primaryButton" href="https://www.npmjs.com/package/@aionis/openclaw-adapter" target="_blank" rel="noreferrer">
-                Install adapter
-              </a>
-              <a className="ghostButton" href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-install-and-config.md" target="_blank" rel="noreferrer">
-                Read install guide
-              </a>
+        <section id="proof">
+          <div className="container">
+            <Reveal>
+              <p className="sectionKicker">Proof</p>
+              <h2 className="sectionTitle">The public story is completion and continuity on real OpenClaw slices.</h2>
+              <p className="sectionDesc">
+                The strongest evidence is not abstract. It comes from repeated real-workflow slices
+                on the Lite path, and from explicit reliability fixes on the adapter hot path.
+              </p>
+            </Reveal>
+            <Reveal delay={0.12} variant="scale">
+              <div className="benchmarkWrap">
+                <BenchmarkTerminal />
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="security">
+          <div className="container">
+            <Reveal>
+              <p className="sectionKicker">Security and reliability</p>
+              <h2 className="sectionTitle">Control only matters if the host stays safe when control-plane calls fail.</h2>
+              <p className="sectionDesc">
+                This release line fixes the dangerous edges: fail-open hot hooks, controlled
+                fallback on deny-only tool policy, and a real off switch for operators.
+              </p>
+            </Reveal>
+            <div className="securityGrid">
+              {securityCards.map((item, idx) => (
+                <Reveal key={item.title} delay={0.05 + idx * 0.04}>
+                  <article className="securityCard surfaceCard">
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </article>
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
+          </div>
+        </section>
+
+        <section className="quickstartSection">
+          <div className="container quickstartShell surfaceCard">
+            <Reveal>
+              <p className="sectionKicker">Quickstart</p>
+              <h2 className="sectionTitle">Start Lite, install the adapter, run the first controlled turn.</h2>
+              <p className="sectionDesc">
+                The first install should be simple. Use the minimal adapter config first. Do not
+                tune advanced thresholds until you have your own slices to validate.
+              </p>
+              <div className="heroActions">
+                <a
+                  className="primaryAction"
+                  href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/docs/2026-03-14-install-and-config.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read install guide
+                </a>
+                <a
+                  className="secondaryAction"
+                  href="https://github.com/Cognary/clawbot-aionis-adapter/blob/aionis/bootstrap-v1/examples/openclaw.json"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Minimal config
+                </a>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="faq">
+          <div className="container">
+            <Reveal>
+              <p className="sectionKicker">FAQ</p>
+              <h2 className="sectionTitle">Answer the install and trust questions directly.</h2>
+            </Reveal>
+            <div className="faqGrid">
+              {faqItems.map((item, idx) => (
+                <Reveal key={item.question} delay={0.05 + idx * 0.03}>
+                  <article className="faqCard surfaceCard">
+                    <h3>{item.question}</h3>
+                    <p>{item.answer}</p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </section>
       </main>
     </>
