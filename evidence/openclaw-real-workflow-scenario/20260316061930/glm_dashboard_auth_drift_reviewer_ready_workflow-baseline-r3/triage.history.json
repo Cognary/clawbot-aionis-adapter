@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "toolName": "read-ui-gateway",
+    "summary": "import { buildDeviceAuthPayload } from \"../../../src/gateway/device-auth.js\"; import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES, type GatewayClientMode, type GatewayClientName, } from \"../../../src/gateway/protocol/cli",
+    "observationHash": "cf2409dbaf5f43b9a0bb2bbb4c56ff3f18f1d561"
+  },
+  {
+    "step": 2,
+    "toolName": "read-auth-doc",
+    "summary": "--- summary: \"Model authentication: OAuth, API keys, and setup-token\" read_when: - Debugging model auth or OAuth expiry - Documenting authentication or credential storage title: \"Authentication\" --- # Authentication Open",
+    "observationHash": "5cb9d03815624f006379eac91d130a3946a2d7a2"
+  }
+]

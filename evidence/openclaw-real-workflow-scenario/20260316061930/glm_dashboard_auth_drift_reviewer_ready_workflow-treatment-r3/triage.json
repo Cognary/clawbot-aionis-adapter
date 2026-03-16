@@ -1,0 +1,13 @@
+{
+  "issue_hypothesis": "The Control UI dashboard experiences authentication drift (AUTH_TOKEN_MISMATCH or unauthorized behavior) after a restart or token rotation due to a desynchronization between the cached device token state, likely managed or influenced by `buildDeviceAuthPayload` in `device-auth.js`, and the shared gateway's current authentication token flow. This suggests that the UI's device-specific authentication mechanism is not correctly invalidating or refreshing its tokens against the central gateway's state.",
+  "auth_boundary": "The authentication boundary lies between the UI's cached device-specific authentication token state (as handled by `device-auth.js`) and the broader, shared authentication token management system of the gateway, particularly where `ui/src/ui/gateway.ts` interacts with both.",
+  "target_files": [
+    "ui/src/ui/gateway.ts",
+    "src/gateway/device-auth.js",
+    "src/gateway/protocol/cli"
+  ],
+  "evidence_points": [
+    "The `ui/src/ui/gateway.ts` file imports `buildDeviceAuthPayload` from `src/gateway/device-auth.js`, directly linking the UI's gateway interactions to device-specific authentication logic.",
+    "The `ui/src/ui/gateway.ts` file also imports `GATEWAY_CLIENT_MODES`, `GATEWAY_CLIENT_NAMES`, `GatewayClientMode`, and `GatewayClientName` from `src/gateway/protocol/cli`, indicating its reliance on defined gateway client protocols for authentication and communication."
+  ]
+}

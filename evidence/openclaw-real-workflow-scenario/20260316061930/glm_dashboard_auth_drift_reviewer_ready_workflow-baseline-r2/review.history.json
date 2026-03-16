@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "toolName": "read-workflow-artifacts",
+    "summary": "--- orchestrator --- { \"workflow_plan\": [ { \"stage\": \"1. Reproduce & Collect Evidence\", \"description\": \"Trigger Gateway dashboard (Control UI) restart and token rotation scenarios. Monitor 'connect' responses for 'error.",
+    "observationHash": "2f0d11a22e4a798131a45cb25f7ed81e58fb3f98"
+  },
+  {
+    "step": 2,
+    "toolName": "read-workflow-artifacts",
+    "summary": "--- orchestrator --- { \"workflow_plan\": [ { \"stage\": \"1. Reproduce & Collect Evidence\", \"description\": \"Trigger Gateway dashboard (Control UI) restart and token rotation scenarios. Monitor 'connect' responses for 'error.",
+    "observationHash": "2f0d11a22e4a798131a45cb25f7ed81e58fb3f98"
+  }
+]

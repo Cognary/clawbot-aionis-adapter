@@ -1,0 +1,63 @@
+{
+  "workflow_plan": {
+    "stage_1_deep_dive_ui_auth_logic": {
+      "goal": "Understand the full lifecycle of authentication tokens within the Control UI and its communication with the Gateway. Pinpoint where tokens are stored, validated, refreshed, and how AUTH_TOKEN_MISMATCH is triggered.",
+      "actions": [
+        "Analyze `ui/src/ui/gateway.ts` for token handling, storage (e.g., local storage, session storage), API calls, and error handling related to authentication.",
+        "Review `docs/gateway/troubleshooting.md` for common auth issues and recommended solutions, especially regarding token invalidation or session management.",
+        "Cross-reference `docs/web/control-ui.md` for explicit statements on token persistence and session management, building on initial scan results."
+      ],
+      "expected_output": "A clear description of the auth flow, identifying potential points of failure during gateway restart or token rotation."
+    },
+    "stage_2_pinpoint_auth_boundary_root_cause": {
+      "goal": "Determine if the AUTH_TOKEN_MISMATCH originates from the client-side UI (e.g., stale token in browser storage, incorrect refresh logic) or the server-side Gateway (e.g., immediate invalidation of old tokens, lack of grace period).",
+      "actions": [
+        "Formulate specific hypotheses based on Stage 1 findings (e.g., 'UI doesn't clear token on gateway restart,' 'Gateway invalidates tokens too aggressively').",
+        "Analyze how the UI handles different HTTP status codes (e.g., 401 Unauthorized) from the Gateway and its token refresh/re-authentication strategy."
+      ],
+      "expected_output": "Identification of the most likely auth boundary (client vs. server) and the specific mechanism causing the drift (e.g., UI not reacting to token expiry, Gateway not accepting refreshed tokens)."
+    },
+    "stage_3_propose_smallest_safe_remediation": {
+      "goal": "Develop a focused, minimal change to address the identified root cause, prioritizing safety and ease of rollback.",
+      "actions": [
+        "Based on Stage 2, propose a specific code change (e.g., in `ui/src/ui/gateway.ts` to handle token expiry/refresh, or a gateway configuration change to adjust token validity/refresh behavior).",
+        "Consider implications for user experience (e.g., forced re-login vs. silent refresh) and security."
+      ],
+      "expected_output": "A concise remediation direction, potentially pseudocode or a configuration snippet, with a rationale for its safety and minimal impact."
+    },
+    "stage_4_define_focused_validation_rollback": {
+      "goal": "Create clear steps to validate the fix and provide instructions for rollback.",
+      "actions": [
+        "Define specific test cases covering gateway restart and token rotation scenarios, including expected successful outcomes and error handling.",
+        "Outline the exact steps to revert the proposed remediation, ensuring a clear path back to the previous state."
+      ],
+      "expected_output": "A list of focused validation steps and clear, actionable rollback instructions."
+    },
+    "stage_5_reviewer_ready_summary": {
+      "goal": "Consolidate all findings, remediation, validation, and rollback into a comprehensive, easy-to-understand summary suitable for technical review.",
+      "actions": [
+        "Synthesize information from all previous stages into a structured document."
+      ],
+      "expected_output": "A reviewer-ready summary detailing the investigation, root cause, proposed remediation, validation steps, and rollback notes."
+    }
+  },
+  "target_surface": {
+    "codebase": [
+      "ui/src/ui/gateway.ts (client-side token management, API interaction, error handling)",
+      "Gateway authentication service/module (server-side token validation, session management, token issuance/refresh logic)"
+    ],
+    "configuration": [
+      "Gateway authentication settings (e.g., token expiry, session timeout, refresh token policies)"
+    ],
+    "documentation": [
+      "docs/web/control-ui.md (UI-specific auth behavior, token persistence)",
+      "docs/gateway/troubleshooting.md (server-side auth issues, common fixes, session management)"
+    ]
+  },
+  "exit_criteria": [
+    "The specific auth boundary (client-side UI or server-side Gateway) and the mechanism causing AUTH_TOKEN_MISMATCH or unauthorized behavior after restart/token rotation are clearly identified and documented.",
+    "The smallest safe remediation direction is clearly articulated, including its scope and potential impact.",
+    "Focused validation steps are outlined to confirm the remediation's effectiveness and lack of regressions.",
+    "A comprehensive summary document is prepared, detailing the investigation, root cause, proposed remediation, validation steps, and rollback instructions, suitable for immediate review by a technical stakeholder."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "remediation_direction": "The remediation will focus on synchronizing the cached device token state in the UI with the shared gateway's current authentication token flow. This involves enhancing the token invalidation and refresh logic within `ui/src/ui/gateway.ts` to gracefully handle `AUTH_TOKEN_MISMATCH` or unauthorized responses, potentially by triggering a re-authentication flow or requesting a new token. Concurrently, `src/gateway/device-auth.js` will be updated, specifically around `buildDeviceAuthPayload`, to ensure device tokens are correctly invalidated or refreshed on the gateway side following a restart or central token rotation. If necessary, `src/gateway/protocol/cli` will be updated to facilitate communication of token state changes from the gateway to the UI.",
+  "target_files": [
+    "ui/src/ui/gateway.ts",
+    "src/gateway/device-auth.js",
+    "src/gateway/protocol/cli"
+  ],
+  "validation_plan": [
+    "1. Initial Login: Verify successful login to the Control UI dashboard.",
+    "2. Gateway Restart Test: Log in to the UI, then restart the gateway service. Attempt to perform an authenticated action in the UI. Expected: UI should automatically re-authenticate, prompt for re-authentication, or gracefully recover without `AUTH_TOKEN_MISMATCH` or unauthorized errors.",
+    "3. Token Rotation Test: Log in to the UI, then trigger a manual token rotation on the gateway (or simulate the event). Attempt to perform an authenticated action in the UI. Expected: UI should recover gracefully, similar to the gateway restart scenario.",
+    "4. Error Handling Verification: Ensure that `AUTH_TOKEN_MISMATCH` or unauthorized errors are handled gracefully, leading to a clear re-authentication prompt or automatic token refresh, rather than a broken UI state."
+  ],
+  "rollback_notes": "To roll back, revert all changes made to `ui/src/ui/gateway.ts`, `src/gateway/device-auth.js`, and `src/gateway/protocol/cli` to their state prior to this remediation. This action will restore the previous authentication behavior, including the known authentication drift issue after restarts or token rotations."
+}

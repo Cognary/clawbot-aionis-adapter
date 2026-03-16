@@ -1,0 +1,66 @@
+{
+  "workflow_plan": [
+    {
+      "stage": "1. Deep Dive & Auth Boundary Identification",
+      "goal": "Understand the full authentication flow, token lifecycle, and identify the precise point (auth boundary) where drift occurs after restart/token rotation.",
+      "actions": [
+        "Thoroughly analyze `docs/web/dashboard.md` for authentication modes, token handling, session management, and configuration.",
+        "Examine `docs/gateway/troubleshooting.md` for existing `AUTH_TOKEN_MISMATCH` or unauthorized error patterns and suggested diagnostics.",
+        "Review `ui/src/ui/gateway.ts` to understand client-side token storage, refresh mechanisms, API calls, and error handling related to authentication.",
+        "Map out the interaction between the UI and the Gateway's authentication endpoints, focusing on token issuance, validation, and invalidation."
+      ],
+      "expected_output": "A detailed understanding of the auth flow, a hypothesis for the auth boundary causing the drift, and potential root causes."
+    },
+    {
+      "stage": "2. Root Cause Analysis & Remediation Formulation",
+      "goal": "Pinpoint the exact root cause of the auth drift and propose the smallest safe remediation.",
+      "actions": [
+        "Validate the auth boundary hypothesis from Stage 1.",
+        "Identify specific code sections or configuration parameters responsible for the drift (e.g., incorrect token expiration, missing token refresh logic, server-side session invalidation without client notification, client-side caching issues).",
+        "Formulate a precise, minimal remediation direction (e.g., a specific configuration change, a targeted code fix in `ui/src/ui/gateway.ts` or a related backend service, an operational procedure)."
+      ],
+      "expected_output": "Confirmed root cause, a proposed 'smallest safe remediation direction'."
+    },
+    {
+      "stage": "3. Validation Definition",
+      "goal": "Define clear, focused validation steps to confirm the remediation's effectiveness and safety.",
+      "actions": [
+        "Design test cases covering dashboard restart scenarios.",
+        "Design test cases covering token rotation scenarios.",
+        "Ensure validation checks for successful authentication and the absence of `AUTH_TOKEN_MISMATCH` or unauthorized errors.",
+        "Consider edge cases or negative tests if applicable."
+      ],
+      "expected_output": "A detailed, actionable validation plan."
+    },
+    {
+      "stage": "4. Reviewer-Ready Summary & Rollback Notes",
+      "goal": "Compile all findings into a comprehensive, reviewer-ready packet.",
+      "actions": [
+        "Summarize the problem, identified auth boundary, root cause, proposed remediation, and validation plan.",
+        "Include clear, concise rollback instructions for the proposed remediation.",
+        "Ensure the summary is self-contained and provides all necessary context for a reviewer."
+      ],
+      "expected_output": "A complete reviewer-ready summary document with rollback notes."
+    }
+  ],
+  "target_surface": {
+    "primary_code_config": [
+      "ui/src/ui/gateway.ts",
+      "Gateway authentication configuration (as described in documentation)"
+    ],
+    "documentation": [
+      "docs/web/dashboard.md",
+      "docs/gateway/troubleshooting.md"
+    ],
+    "auth_boundary_focus": "The specific logical point in the system where authentication tokens are validated against current session state, and where the discrepancy arises after restart/rotation (e.g., Gateway's auth service, UI's token management)."
+  },
+  "exit_criteria": {
+    "overall_task_completion": "A reviewer-ready summary with rollback notes is generated, addressing the investigation, identification of auth boundary, remediation direction, and validation plan.",
+    "stage_specific_criteria": [
+      "Stage 1: A clear hypothesis for the auth boundary and potential root causes is established.",
+      "Stage 2: The root cause is confirmed, and a 'smallest safe remediation direction' is proposed.",
+      "Stage 3: A detailed, actionable validation plan is defined.",
+      "Stage 4: A comprehensive, self-contained reviewer-ready summary with rollback notes is produced."
+    ]
+  }
+}

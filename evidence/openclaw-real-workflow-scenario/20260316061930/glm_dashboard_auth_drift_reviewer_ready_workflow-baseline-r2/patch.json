@@ -1,0 +1,12 @@
+{
+  "remediation_direction": "Implement robust error handling for `AUTH_TOKEN_MISMATCH` within `ui/src/ui/gateway.ts`. Upon receiving this error, the client should: 1. Clear any existing invalid device token from client-side storage. 2. Attempt to re-initialize or refresh the device token using the existing `buildDeviceAuthPayload` mechanism. 3. If token refresh fails or is not possible, trigger a full re-authentication flow, potentially by redirecting the user to the login page or prompting for credentials.",
+  "target_files": [
+    "ui/src/ui/gateway.ts"
+  ],
+  "validation_plan": [
+    "Manually invalidate the client-side device token (e.g., clear local storage entry) while the UI is running and observe if `AUTH_TOKEN_MISMATCH` is handled gracefully, leading to token refresh or re-authentication prompt.",
+    "Restart the UI application after invalidating the token and verify that it correctly re-establishes authentication without persistent unauthorized state.",
+    "Simulate a server-side token rotation/invalidation (if possible) and observe the client's recovery mechanism, ensuring the dashboard remains accessible after a brief re-authentication."
+  ],
+  "rollback_notes": "Revert changes made to `ui/src/ui/gateway.ts` to restore the previous token handling logic."
+}

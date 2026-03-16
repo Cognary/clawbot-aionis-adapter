@@ -1,0 +1,40 @@
+{
+  "workflow_plan": {
+    "stage_1_diagnosis_and_boundary_identification": {
+      "objective": "Pinpoint the specific auth boundary and conditions leading to AUTH_TOKEN_MISMATCH or unauthorized behavior.",
+      "steps": [
+        "Analyze `connect` responses for `error.details.code` matching `AUTH_TOKEN_MISMATCH` after Control UI restart or token rotation.",
+        "Trace the lifecycle of authentication tokens (issuance, validation, refresh, invalidation) across the Gateway and Control UI components.",
+        "Identify specific components or layers (e.g., UI session management, Gateway token validation, token cache) that might hold stale or mismatched authentication state."
+      ]
+    },
+    "stage_2_root_cause_and_remediation_design": {
+      "objective": "Determine the root cause of auth drift and propose the smallest safe remediation.",
+      "steps": [
+        "Based on Stage 1, identify the precise mechanism causing the auth drift (e.g., UI not refreshing token post-restart, Gateway cache not invalidating tokens correctly).",
+        "Design the smallest safe remediation direction, focusing on minimal impact (e.g., explicit token refresh on UI initialization, improved session invalidation logic, targeted cache clearing)."
+      ]
+    },
+    "stage_3_validation_and_documentation": {
+      "objective": "Define focused validation and prepare a reviewer-ready summary with rollback notes.",
+      "steps": [
+        "Define focused validation steps to confirm the remediation resolves the auth drift under restart and token rotation scenarios.",
+        "Prepare a reviewer-ready summary detailing the identified auth boundary, root cause, proposed remediation, validation steps, and clear rollback instructions."
+      ]
+    }
+  },
+  "target_surface": [
+    "Control UI Dashboard (browser-side session and token handling)",
+    "Gateway (backend authentication, token validation, and session management logic)",
+    "Authentication token lifecycle (issuance, refresh, invalidation)",
+    "Error responses, specifically `connect` responses with `error.details.code` (e.g., `AUTH_TOKEN_MISMATCH`)"
+  ],
+  "exit_criteria": [
+    "The specific auth boundary causing `AUTH_TOKEN_MISMATCH` or unauthorized behavior is clearly identified and documented.",
+    "The root cause of the auth drift after restart or token rotation is precisely determined.",
+    "The smallest safe remediation direction is proposed and clearly articulated.",
+    "Focused validation steps are defined to confirm the remediation's effectiveness.",
+    "A reviewer-ready summary is provided, including the problem, root cause, remediation, validation, and rollback notes.",
+    "The auth drift issue is no longer reproducible after applying the proposed remediation and passing validation."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "verdict": "pass",
+  "reviewer_ready_packet": {
+    "issue_hypothesis": "The Control UI dashboard experiences authentication drift after restart or token rotation due to the UI continuing to send stale cached device tokens. This leads to `AUTH_TOKEN_MISMATCH` or unauthorized (401) responses from the gateway, requiring a robust token invalidation and refresh mechanism in the UI.",
+    "target_files": [
+      "ui/src/ui/gateway.ts",
+      "docs/web/dashboard.md",
+      "docs/gateway/troubleshooting.md"
+    ],
+    "remediation_direction": "Modify `ui/src/ui/gateway.ts` to implement a robust token invalidation and refresh mechanism. Specifically, when the UI receives an `AUTH_TOKEN_MISMATCH` or an unauthorized (e.g., 401) response from the gateway, the cached device token in the UI's local storage should be cleared, and a re-authentication flow should be initiated (e.g., redirect to login or trigger a token refresh request). This ensures the UI does not continue to send stale tokens.",
+    "validation_plan": "1. Log in to the dashboard and verify successful access. 2. Simulate token expiration or rotation on the backend (e.g., restart the gateway, manually invalidate the token). 3. Observe the UI behavior: verify that upon receiving an `AUTH_TOKEN_MISMATCH` or 401 response, the UI clears the local storage token and initiates a re-authentication flow (e.g., redirects to the login page). 4. Re-authenticate and verify that dashboard access is restored. 5. Ensure that normal, valid rendering behavior is not negatively impacted by the changes.",
+    "rollback_notes": "To roll back, revert changes made to `ui/src/ui/gateway.ts`, `docs/web/dashboard.md`, and `docs/gateway/troubleshooting.md`. Ensure that no valid rendering behavior is weakened during the rollback process.",
+    "reviewer_verdict": "pass"
+  },
+  "rationale": "The reviewer-ready packet has been successfully assembled using the `accepted_hypothesis`, `modified_file` list, and `rollback_notes` from the carryover context. All required fields for the `reviewer_ready_packet` are populated, and the `validation_plan` is derived directly from the proposed remediation and problem statement."
+}

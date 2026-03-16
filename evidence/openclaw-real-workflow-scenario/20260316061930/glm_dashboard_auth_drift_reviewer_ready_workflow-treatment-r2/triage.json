@@ -1,0 +1,14 @@
+{
+  "issue_hypothesis": "The Control UI dashboard experiences authentication drift (AUTH_TOKEN_MISMATCH or unauthorized behavior) after a restart or token rotation due to a mismatch between the cached device token state, managed by `device-auth.js`, and the shared gateway authentication token flow, as handled by `ui/src/ui/gateway.ts` and defined by `gateway/protocol/cli`.",
+  "auth_boundary": "The critical auth boundary lies between the UI's mechanism for building and managing device-specific authentication payloads (likely involving local storage or session state for tokens) and the gateway's expectation of a valid, current shared authentication token. This boundary is specifically observed in `ui/src/ui/gateway.ts` where `buildDeviceAuthPayload` is used in conjunction with gateway client protocol definitions.",
+  "target_files": [
+    "ui/src/ui/gateway.ts",
+    "src/gateway/device-auth.js",
+    "src/gateway/protocol/cli"
+  ],
+  "evidence_points": [
+    "The `ui/src/ui/gateway.ts` file imports `buildDeviceAuthPayload` from `src/gateway/device-auth.js`, indicating the UI's direct involvement in constructing device-specific authentication payloads, which are part of the 'cached device token state'.",
+    "The `ui/src/ui/gateway.ts` file also imports `GATEWAY_CLIENT_MODES`, `GATEWAY_CLIENT_NAMES`, `GatewayClientMode`, and `GatewayClientName` from `src/gateway/protocol/cli`, demonstrating its interaction with the 'shared gateway auth token flow' protocol.",
+    "The convergence of device-specific authentication payload building and gateway client protocol definitions within `ui/src/ui/gateway.ts` highlights this file as the primary point of interaction for the identified auth boundary."
+  ]
+}

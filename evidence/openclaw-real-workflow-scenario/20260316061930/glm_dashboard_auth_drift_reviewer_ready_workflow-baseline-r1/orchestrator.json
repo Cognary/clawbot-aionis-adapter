@@ -1,0 +1,43 @@
+{
+  "workflow_plan": [
+    {
+      "stage": "Initial Information Gathering",
+      "description": "Understand the documented and implemented authentication behavior, focusing on restart, token rotation, and recovery mechanisms.",
+      "steps": [
+        "Read dashboard documentation for auth behavior and unauthorized recovery using 'read-dashboard-doc'.",
+        "Read UI gateway client auth and reconnect logic using 'read-ui-gateway'.",
+        "Read troubleshooting page for AUTH_TOKEN_MISMATCH and unauthorized drift using 'read-troubleshooting'."
+      ]
+    },
+    {
+      "stage": "Analysis and Root Cause Identification",
+      "description": "Synthesize information from initial gathering to identify discrepancies and pinpoint the most likely auth boundary causing the drift.",
+      "steps": [
+        "Compare documented behavior with client-side logic and known troubleshooting patterns.",
+        "If initial analysis is insufficient, perform a broad scan for auth drift terms across docs, UI code, tests, and changelog using 'broad-auth-scan' to gather more context."
+      ]
+    },
+    {
+      "stage": "Remediation and Validation Definition",
+      "description": "Based on the identified root cause, define a minimal remediation and focused validation steps.",
+      "steps": [
+        "Formulate the smallest safe remediation direction.",
+        "Define focused validation steps to confirm the remediation addresses the auth drift."
+      ]
+    },
+    {
+      "stage": "Final Summary and Rollback",
+      "description": "Prepare a comprehensive summary for review, including rollback instructions.",
+      "steps": [
+        "Draft a reviewer-ready summary with the identified issue, remediation, validation plan, and rollback notes."
+      ]
+    }
+  ],
+  "target_surface": "Control UI dashboard authentication mechanism, specifically focusing on behavior after restart or token rotation, client-side (UI gateway) and server-side (dashboard) auth logic, and known issues like AUTH_TOKEN_MISMATCH or unauthorized behavior.",
+  "exit_criteria": [
+    "Identification of the most likely auth boundary causing AUTH_TOKEN_MISMATCH or unauthorized behavior.",
+    "A concrete, smallest safe remediation direction.",
+    "Clearly defined, focused validation steps.",
+    "A reviewer-ready summary including the identified issue, remediation, validation, and rollback notes."
+  ]
+}

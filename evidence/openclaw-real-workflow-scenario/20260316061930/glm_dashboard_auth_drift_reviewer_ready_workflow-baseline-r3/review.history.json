@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "toolName": "read-workflow-artifacts",
+    "summary": "--- orchestrator --- { \"workflow_plan\": { \"stage_1_diagnosis_and_boundary_identification\": { \"objective\": \"Pinpoint the specific auth boundary and conditions leading to AUTH_TOKEN_MISMATCH or unauthorized behavior.\", \"st",
+    "observationHash": "60c7db38d42bdfa6aa8bd3d6398c887182115e64"
+  },
+  {
+    "step": 2,
+    "toolName": "read-workflow-artifacts",
+    "summary": "--- orchestrator --- { \"workflow_plan\": { \"stage_1_diagnosis_and_boundary_identification\": { \"objective\": \"Pinpoint the specific auth boundary and conditions leading to AUTH_TOKEN_MISMATCH or unauthorized behavior.\", \"st",
+    "observationHash": "60c7db38d42bdfa6aa8bd3d6398c887182115e64"
+  }
+]

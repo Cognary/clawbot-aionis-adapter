@@ -1,0 +1,33 @@
+{
+  "remediation_direction": "Implement robust error handling in `ui/src/ui/gateway.ts` to specifically catch `AUTH_TOKEN_MISMATCH` or generic unauthorized responses. Upon detection, the UI should invalidate its current authentication token and initiate a fresh authentication flow. This ensures that the UI's cached token state is always synchronized with the gateway's expectations, resolving drift issues after backend restarts or token rotations. This may involve adding a token invalidation method to `src/gateway/device-auth.js` if `ui/src/ui/gateway.ts` directly interacts with it, or simply clearing the token managed by `ui/src/ui/gateway.ts`.",
+  "target_files": [
+    "ui/src/ui/gateway.ts",
+    "src/gateway/device-auth.js",
+    "src/gateway/protocol/cli"
+  ],
+  "validation_plan": {
+    "scenario_1_backend_restart": {
+      "steps": [
+        "Log in to the Control UI dashboard.",
+        "Restart the backend gateway service.",
+        "Attempt to perform an action in the UI that requires authentication (e.g., navigate to a protected page, trigger an API call)."
+      ],
+      "expected_result": "The UI should either seamlessly re-authenticate or prompt for re-login, and then function correctly without `AUTH_TOKEN_MISMATCH` or unauthorized errors."
+    },
+    "scenario_2_token_rotation_simulation": {
+      "steps": [
+        "Log in to the Control UI dashboard.",
+        "Manually invalidate or rotate the active authentication token on the backend (e.g., via CLI or admin interface, or by simulating token expiry/invalidation).",
+        "Attempt to perform an action in the UI that requires authentication."
+      ],
+      "expected_result": "The UI should handle the invalidated token gracefully, leading to re-authentication or re-login, and then normal operation without `AUTH_TOKEN_MISMATCH` or unauthorized errors."
+    },
+    "scenario_3_normal_operation_negative_test": {
+      "steps": [
+        "Log in and use the UI normally without any restarts or token rotations."
+      ],
+      "expected_result": "No unexpected re-authentication prompts or errors; existing valid sessions should not be prematurely invalidated."
+    }
+  },
+  "rollback_notes": "Revert all changes made to `ui/src/ui/gateway.ts`, `src/gateway/device-auth.js`, and `src/gateway/protocol/cli` related to this remediation. This will restore the previous authentication handling behavior, potentially reintroducing the authentication drift issue."
+}

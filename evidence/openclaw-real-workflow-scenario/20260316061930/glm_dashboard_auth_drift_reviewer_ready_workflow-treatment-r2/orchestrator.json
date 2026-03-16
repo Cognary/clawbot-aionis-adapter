@@ -1,0 +1,41 @@
+{
+  "workflow_plan": [
+    {
+      "stage": "1. Investigate Auth Boundaries and Token Handling",
+      "description": "Deep dive into the Control UI's authentication mechanisms, focusing on how tokens are issued, stored, refreshed, and validated across restarts or token rotations. Specifically examine 'auth mode' and 'secure context assumptions' from troubleshooting. Analyze `ui/src/ui/gateway.ts` for client-side auth logic and its interaction with the gateway. Correlate findings with `AUTH_TOKEN_MISMATCH` or unauthorized behavior.",
+      "focus_areas": [
+        "docs/web/dashboard.md (auth modes, session management)",
+        "docs/gateway/troubleshooting.md (auth mode, secure context, URL validation)",
+        "ui/src/ui/gateway.ts (client-side token handling, API calls)",
+        "Gateway authentication service/middleware logic (conceptual)"
+      ]
+    },
+    {
+      "stage": "2. Identify Root Cause and Propose Remediation",
+      "description": "Pinpoint the most likely auth boundary causing the drift (e.g., client-side token expiration/invalidation, gateway session invalidation, backend token refresh issues). Based on the root cause, prepare the smallest safe remediation direction, which could involve configuration adjustments, minor code changes, or specific operational procedures.",
+      "deliverables": [
+        "Identified auth boundary",
+        "Smallest safe remediation direction"
+      ]
+    },
+    {
+      "stage": "3. Define Validation and Document Reviewer-Ready Summary",
+      "description": "Define focused validation steps to confirm the remediation effectively resolves the auth drift without introducing regressions. Compile a reviewer-ready summary that includes the identified problem, root cause, proposed remediation, validation steps, and clear rollback notes.",
+      "deliverables": [
+        "Focused validation steps",
+        "Reviewer-ready summary with rollback notes"
+      ]
+    }
+  ],
+  "target_surface": [
+    "Gateway authentication layer (configuration, code)",
+    "Control UI client-side authentication logic (`ui/src/ui/gateway.ts`)",
+    "Relevant documentation: `docs/web/dashboard.md`, `docs/gateway/troubleshooting.md`"
+  ],
+  "exit_criteria": [
+    "The most likely auth boundary causing AUTH_TOKEN_MISMATCH or unauthorized behavior is identified.",
+    "The smallest safe remediation direction is prepared.",
+    "Focused validation steps for the remediation are defined.",
+    "A reviewer-ready summary, including rollback notes, is provided."
+  ]
+}

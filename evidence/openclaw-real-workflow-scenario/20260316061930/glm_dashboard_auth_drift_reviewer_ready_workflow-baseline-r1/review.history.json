@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "toolName": "read-workflow-artifacts",
+    "summary": "--- orchestrator --- { \"workflow_plan\": [ { \"stage\": \"Initial Information Gathering\", \"description\": \"Understand the documented and implemented authentication behavior, focusing on restart, token rotation, and recovery m",
+    "observationHash": "1faa11dff358f19876cd77fe2dd7fd5f8d2ee649"
+  },
+  {
+    "step": "feedback-2",
+    "toolName": "stage-feedback",
+    "summary": "Finish rejected: artifact too weak or missing required fields.",
+    "observationHash": "1df6244e7fca9b88e1437836f94622b6066e7739"
+  }
+]

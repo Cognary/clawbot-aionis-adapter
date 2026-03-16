@@ -1,0 +1,16 @@
+{
+  "verdict": "pass",
+  "reviewer_ready_packet": {
+    "issue_hypothesis": "The Control UI dashboard experiences authentication drift, manifesting as AUTH_TOKEN_MISMATCH or unauthorized behavior, particularly after backend restarts or token rotations. This occurs because the UI's cached authentication token state becomes out of sync with the gateway's expectations, leading to invalid token usage without a proper re-authentication trigger.",
+    "target_files": [
+      "ui/src/ui/gateway.ts",
+      "src/gateway/device-auth.js",
+      "src/gateway/protocol/cli"
+    ],
+    "remediation_direction": "Implement robust error handling within `ui/src/ui/gateway.ts` to specifically detect and respond to `AUTH_TOKEN_MISMATCH` errors or generic unauthorized (e.g., 401) responses. Upon detection, the UI should programmatically invalidate its current authentication token and initiate a fresh authentication flow (e.g., redirect to login). This ensures the UI's cached token state is synchronized with the gateway. This may involve adding a token invalidation method to `src/gateway/device-auth.js` if `ui/src/ui/gateway.ts` directly manages or interacts with it, or simply clearing the token managed internally by `ui/src/ui/gateway.ts`.",
+    "validation_plan": "1. Simulate a backend restart or manual token rotation on the gateway. 2. Access the Control UI dashboard and attempt an action that requires authentication. 3. Verify that the UI correctly catches the `AUTH_TOKEN_MISMATCH` or unauthorized response. 4. Confirm that the UI invalidates its token and initiates a fresh authentication flow (e.g., redirects to the login page). 5. Successfully re-authenticate and verify that the dashboard functions normally without further authentication issues.",
+    "rollback_notes": "If the proposed changes introduce new authentication failures, prevent users from logging in, or create an infinite login loop, revert the modifications made to `ui/src/ui/gateway.ts` and any related changes in `src/gateway/device-auth.js`. The previous state, while having drift issues, allowed eventual re-authentication, whereas a broken re-authentication mechanism would be a critical regression.",
+    "reviewer_verdict": "pass"
+  },
+  "rationale": "The reviewer-ready packet is complete and addresses all required components as per the current agent goal and carryover context. The issue hypothesis, target files, remediation direction, validation plan, and rollback notes are clearly defined and consistent with the task brief."
+}
