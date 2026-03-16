@@ -13,6 +13,12 @@ export type ExecutionStateV1 = {
   [key: string]: unknown;
 };
 
+export type ExecutionStateRefV1 = {
+  state_id?: string;
+  scope?: string;
+  [key: string]: unknown;
+};
+
 export type ExecutionPacketV1 = {
   state_id?: string;
   stage?: string;
@@ -99,6 +105,7 @@ export type AionisLoopControlClient = {
     context: Record<string, unknown>;
     candidates: string[];
     executionStateV1?: ExecutionStateV1;
+    executionStateRefV1?: ExecutionStateRefV1;
     controlProfileV1?: ControlProfileV1;
   }) => Promise<AionisToolDecision | null | undefined>;
   toolsDecision?: (args: {

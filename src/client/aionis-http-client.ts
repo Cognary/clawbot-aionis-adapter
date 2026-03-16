@@ -147,6 +147,7 @@ export class AionisHttpLoopControlClient implements AionisLoopControlClient {
     context: Record<string, unknown>;
     candidates: string[];
     executionStateV1?: Record<string, unknown>;
+    executionStateRefV1?: Record<string, unknown>;
     controlProfileV1?: ControlProfileV1;
   }): Promise<AionisToolDecision | null> {
     const payload = await this.post<Record<string, unknown>>("/v1/memory/tools/select", this.withIdentity(args.scope, {
@@ -156,6 +157,7 @@ export class AionisHttpLoopControlClient implements AionisLoopControlClient {
         ...(args.controlProfileV1 ? { control_profile_v1: args.controlProfileV1 } : {}),
       },
       execution_state_v1: args.executionStateV1,
+      execution_state_ref_v1: args.executionStateRefV1,
       candidates: args.candidates,
       strict: true,
     }));

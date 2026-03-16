@@ -209,6 +209,54 @@ test('control profile tightens loop thresholds after continuity recovery', async
   assert.match(String(second?.blockReason ?? ''), /same_tool_streak_exceeded|handoff stored after loop-control stop/);
 });
 
+test('before_tool_call sends execution_state_ref to tools/select when continuity state has identity', async () => {
+  const { client, calls } = createFakeClient();
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const runCtx = { agentId: 'agent-1', sessionId: 'sess-ref-1', sessionKey: 'sess-key-ref-1', workspaceDir: '/repo/click', trigger: 'resume' };
+  await host.emit(
+    'before_agent_start',
+    {
+      prompt: 'resume reviewer-ready workflow',
+      messages: [{ toolName: 'rg' }],
+      continuity: {
+        control_profile_v1: {
+          version: 1,
+          profile: 'triage',
+          max_same_tool_streak: 2,
+          max_no_progress_streak: 3,
+          max_duplicate_observation_streak: 3,
+          max_steps: 8,
+          allow_broad_scan: false,
+          allow_broad_test: false,
+          escalate_on_blocker: true,
+          reviewer_ready_required: false,
+        },
+        execution_state_v1: {
+          state_id: 'state-auth-1',
+          scope: 'aionis://handoff/auth-anchor',
+          current_stage: 'triage',
+          active_role: 'triage',
+        },
+      },
+    },
+    runCtx,
+  );
+
+  const toolCtx = { ...runCtx, runId: 'run-ref-1', toolName: 'rg', toolCallId: 'call-ref-1' };
+  await host.emit('before_tool_call', { toolName: 'rg', params: { q: 'dashboard auth' }, runId: 'run-ref-1', toolCallId: 'call-ref-1' }, toolCtx);
+
+  assert.equal(calls.toolsSelect.length, 1);
+  assert.deepEqual(calls.toolsSelect[0].executionStateRefV1, {
+    state_id: 'state-auth-1',
+    scope: 'aionis://handoff/auth-anchor',
+  });
+  assert.equal(calls.toolsSelect[0].executionStateV1, undefined);
+  assert.equal(calls.toolsSelect[0].controlProfileV1?.profile, 'triage');
+});
+
 test('after_tool_call writes feedback and evidence', async () => {
   const { client, calls } = createFakeClient();
   const host = new MockOpenClawHost();
