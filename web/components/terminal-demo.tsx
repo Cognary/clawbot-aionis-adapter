@@ -3,13 +3,13 @@
 import { motion } from "framer-motion";
 
 const lines = [
-  "$ npx @aionis/sdk@0.2.19 dev",
+  "$ npx @aionis/sdk@0.2.20 dev",
   "$ openclaw plugins install @aionis/openclaw-adapter",
   "$ openclaw agent --local --message \"inspect and proceed carefully\" --json",
   "[aionis] context assembled",
   "[aionis] broad search blocked -> focused path",
-  "[aionis] feedback persisted",
-  "[aionis] handoff ready if run degrades",
+  "[aionis] deny-only path -> controlled fallback",
+  "[aionis] fail-open safety active on hot hooks",
   "status: controlled_execution",
 ];
 

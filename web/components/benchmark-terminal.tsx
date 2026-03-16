@@ -4,56 +4,54 @@ type Scenario = {
   treatmentCompleted: string;
   baselineTokens?: number;
   treatmentTokens?: number;
-  baselineHandoffs?: number;
-  treatmentHandoffs?: number;
+  baselineLatency?: number;
+  treatmentLatency?: number;
   outcome: string;
 };
 
 const scenarios: Scenario[] = [
   {
-    name: "issue-10864",
-    baselineCompleted: "0/3",
-    treatmentCompleted: "3/3",
-    baselineHandoffs: 0,
-    treatmentHandoffs: 4,
-    outcome: "completion-uplift",
+    name: "dashboard-auth-drift",
+    baselineCompleted: "0.6667",
+    treatmentCompleted: "1.0",
+    baselineLatency: 83000,
+    treatmentLatency: 94629,
+    outcome: "reviewer_ready_uplift",
   },
   {
-    name: "auth-drift",
-    baselineCompleted: "0/3",
-    treatmentCompleted: "3/3",
-    baselineHandoffs: 0,
-    treatmentHandoffs: 4,
-    outcome: "continuity-win",
+    name: "pairing-approval-recovery",
+    baselineCompleted: "0.0",
+    treatmentCompleted: "1.0",
+    baselineLatency: 78439,
+    treatmentLatency: 80485,
+    outcome: "reviewer_ready_uplift",
   },
   {
-    name: "markdown-fallback",
-    baselineCompleted: "1/3",
-    treatmentCompleted: "3/3",
-    baselineHandoffs: 0,
-    treatmentHandoffs: 4,
-    outcome: "supporting-slice",
+    name: "continuity-packet-ab",
+    baselineCompleted: "1.0",
+    treatmentCompleted: "1.0",
+    baselineTokens: 24750,
+    treatmentTokens: 22974,
+    outcome: "cost_lower_at_equal_completion",
   },
   {
-    name: "glm5-token",
-    baselineCompleted: "stable",
-    treatmentCompleted: "stable",
-    baselineTokens: 4319,
-    treatmentTokens: 4287,
-    outcome: "runtime-backed",
+    name: "runtime-safety",
+    baselineCompleted: "crash-risk",
+    treatmentCompleted: "controlled",
+    outcome: "fail_open_and_fallback",
   },
 ];
 
 function scenarioLines(scenario: Scenario): string[] {
   const lines = [
     `$ openclaw adapter bench --case ${scenario.name} --json`,
-    `[baseline] completed=${scenario.baselineCompleted}`,
-    `[treatment] completed=${scenario.treatmentCompleted}`,
+    `[baseline] reviewer_ready=${scenario.baselineCompleted}`,
+    `[treatment] reviewer_ready=${scenario.treatmentCompleted}`,
   ];
 
-  if (typeof scenario.baselineHandoffs === "number" && typeof scenario.treatmentHandoffs === "number") {
+  if (typeof scenario.baselineLatency === "number" && typeof scenario.treatmentLatency === "number") {
     lines.push(
-      `[continuity] baseline_handoffs=${scenario.baselineHandoffs} treatment_handoffs=${scenario.treatmentHandoffs}`,
+      `[wall_clock_ms] baseline=${scenario.baselineLatency} treatment=${scenario.treatmentLatency}`,
     );
   }
 
@@ -91,8 +89,8 @@ export function BenchmarkTerminal() {
       </pre>
       <div className="benchMeta">
         <span>cases: {scenarios.length}</span>
-        <span>control: openclaw-adapter</span>
-        <span>evidence: public</span>
+        <span>control: execution-control adapter</span>
+        <span>evidence: public real slices</span>
       </div>
     </div>
   );
