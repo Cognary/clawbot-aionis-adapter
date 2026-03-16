@@ -18,7 +18,6 @@ Included here:
 12. Phase 2 handoff-transition single-run revalidation runs that verify the new `handoff/store -> execution_transitions_v1` overlay on the real Lite path
 13. Phase 2 handoff-transition repeated revalidation runs that confirm the repaired overlay remains positive under `3`-run strongest-slice real-workflow validation
 14. Phase 2 `tools/select` state-aware repeated revalidation runs that confirm direct `execution_state_v1` consumption remains positive across the strongest three-slice family, with two strong completion wins and one supporting completion slice
-15. Phase 2 `tools/select` state-ref repeated revalidation run that confirms the first cost-oriented tightening remains positive on the strongest slice while lowering token spend and wall-clock
 
 Not included here:
 

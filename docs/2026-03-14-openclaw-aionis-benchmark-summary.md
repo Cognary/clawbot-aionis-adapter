@@ -146,7 +146,6 @@ Evidence:
 - [Phase 2 tools/select state-aware repeated revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316050335/summary.json)
 - [Phase 2 tools/select state-aware repeated revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316051831/summary.json)
 - [Phase 2 tools/select state-aware repeated revalidation: service token drift repair (real Lite, supporting completion slice)](../evidence/openclaw-real-workflow-scenario/20260316053718/summary.json)
-- [Phase 2 tools/select state-ref cost revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316061930/summary.json)
 - [Post-main-merge revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
 - [Post-main-merge revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316013610/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
@@ -174,7 +173,6 @@ Headline results:
   - Phase 2 tools/select state-aware dashboard auth drift: `0.6667 -> 1`, but with higher token and higher wall-clock
   - Phase 2 tools/select state-aware pairing / approval recovery: `0 -> 1`, but with higher token and slightly higher wall-clock
   - Phase 2 tools/select state-aware service token drift repair: `0 -> 0.3333`, with higher token and higher wall-clock (`supporting completion slice`)
-  - Phase 2 tools/select state-ref dashboard auth drift: `0 -> 0.6667`, while lowering average token spend and wall-clock
   - post-main-merge pairing / approval recovery: `0.6667 -> 0.6667` with lower wall-clock but higher token
   - post-main-merge service token drift repair: `0 -> 0.6667` with lower wall-clock but higher token
 
@@ -190,7 +188,7 @@ What this proves:
 - after merging the execution-continuity Phase 1 foundation into `Aionis main`, dashboard auth drift still remains positive on reviewer-ready completion
 - after the same `Aionis main` merge, pairing / approval recovery remains stable on reviewer-ready completion and improves wall-clock, but does not add new completion uplift
 - after the same `Aionis main` merge, service token drift repair remains positive on reviewer-ready completion and improves wall-clock, but does not become a token win
-- after the newer Phase 2 `tools/select` state-aware rollout, dashboard auth drift and pairing / approval recovery both remain positive on reviewer-ready completion as strong completion wins, while service token drift repair remains positive only as a supporting completion slice; that first rollout was still cost-additive, but the follow-up `execution_state_ref_v1` tightening has now produced the first strongest-slice result that is positive on both completion and cost
+- after the newer Phase 2 `tools/select` state-aware rollout, dashboard auth drift and pairing / approval recovery both remain positive on reviewer-ready completion as strong completion wins, while service token drift repair remains positive only as a supporting completion slice; this runtime surface currently adds cost instead of reducing it
 - the efficiency story after `ControlProfile` adoption is mixed:
   - dashboard auth drift remains both a completion and efficiency win
   - pairing / approval recovery and service token drift repair remain completion wins, but not efficiency wins

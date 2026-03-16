@@ -448,29 +448,6 @@ Interpretation:
 - this third result is weaker than the first two and should be treated as a supporting completion slice, not a new headline repeated win
 - the `tools/select` state-aware surface therefore now has a strongest-three-slice family that is uniformly positive on completion, but only the first two slices are strong enough to carry the headline claim
 
-### Phase 2 tools/select state-ref cost revalidation: dashboard auth drift
-
-Evidence:
-
-- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316061930/summary.json)
-- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260316061930/cases.jsonl)
-
-Result (`3` repeats, `Aionis main` after the adapter switched `tools/select` from full `execution_state_v1` payloads to `execution_state_ref_v1` plus explicit `control_profile_v1`):
-
-- baseline `reviewer_ready_rate = 0`
-- treatment `reviewer_ready_rate = 0.6667`
-- baseline `workflow_completed_rate = 0`
-- treatment `workflow_completed_rate = 0.6667`
-- baseline `avg_total_tokens = 23370.33`
-- treatment `avg_total_tokens = 21824.67`
-- baseline `avg_wall_clock_ms = 95874.33`
-- treatment `avg_wall_clock_ms = 69418.33`
-
-Interpretation:
-
-- this is the first cost-oriented tightening on the `tools/select` state-aware surface that remains positive on reviewer-ready completion while also lowering average token spend and wall-clock
-- the right reading is still narrow: it proves the strongest slice can benefit from `execution_state_ref_v1` on the real path, not that the entire `tools/select` surface is already efficiency-positive across all slices
-
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
