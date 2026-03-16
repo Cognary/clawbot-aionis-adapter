@@ -5,35 +5,35 @@
 }
 
 :root {
-  color-scheme: light;
-  --bg-deep: #f7f7f6;
-  --bg-elevated: rgba(255, 255, 255, 0.92);
-  --bg-card: rgba(255, 255, 255, 0.94);
-  --bg-terminal: #ffffff;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --border: rgba(17, 17, 17, 0.08);
-  --border-strong: rgba(17, 17, 17, 0.16);
-  --text: #111111;
-  --text-dim: #666666;
-  --text-soft: #8a8a8a;
-  --text-hero-muted: rgba(17, 17, 17, 0.44);
-  --accent: #626262;
-  --accent-soft: rgba(17, 17, 17, 0.08);
-  --white-soft: #111111;
-  --surface-gradient-start: rgba(255, 255, 255, 0.98);
-  --surface-gradient-end: rgba(250, 250, 250, 0.98);
-  --surface-shadow: 0 20px 44px rgba(0, 0, 0, 0.05);
-  --surface-shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.04);
-  --surface-inset: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  --button-bg: rgba(255, 255, 255, 0.96);
-  --button-hover-bg: rgba(255, 255, 255, 1);
-  --button-active-bg: rgba(17, 17, 17, 0.05);
-  --button-active-border: rgba(17, 17, 17, 0.12);
+  color-scheme: dark;
+  --bg-deep: #090909;
+  --bg-mid: #0f0f10;
+  --bg-elevated: #0d0d0d;
+  --bg-card: rgba(255, 255, 255, 0.035);
+  --bg-terminal: #101010;
+  --nav-bg: rgba(10, 10, 10, 0.92);
+  --border: rgba(255, 255, 255, 0.085);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --text: #f4f4f1;
+  --text-dim: #ababab;
+  --text-soft: #777777;
+  --text-hero-muted: rgba(255, 255, 255, 0.62);
+  --accent: #d8d8d3;
+  --accent-soft: rgba(255, 255, 255, 0.12);
+  --white-soft: #f4f4f1;
+  --surface-gradient-start: rgba(255, 255, 255, 0.042);
+  --surface-gradient-end: rgba(255, 255, 255, 0.016);
+  --surface-shadow: 0 16px 42px rgba(0, 0, 0, 0.22);
+  --surface-shadow-soft: 0 9px 24px rgba(0, 0, 0, 0.2);
+  --surface-inset: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --button-bg: rgba(255, 255, 255, 0.04);
+  --button-hover-bg: rgba(255, 255, 255, 0.08);
+  --button-active-bg: rgba(255, 255, 255, 0.08);
+  --button-active-border: rgba(255, 255, 255, 0.3);
   --font-display: var(--font-dm-sans), "DM Sans", sans-serif;
   --font-body: var(--font-dm-sans), "DM Sans", sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", monospace;
-  --max-w: 1180px;
-  --content-rail: 768px;
+  --max-w: 880px;
 }
 
 html {
@@ -44,6 +44,10 @@ body {
   min-height: 100vh;
   font-family: var(--font-body);
   background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(circle at 50% -12%, rgba(255, 255, 255, 0.06), transparent 28%),
+    radial-gradient(circle at 0% 22%, rgba(255, 255, 255, 0.025), transparent 22%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 52%, var(--bg-deep) 100%);
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -89,17 +93,17 @@ code {
 .container {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
 
 section {
-  padding: 5.5rem 0;
+  padding: 5rem 0;
 }
 
 .surfaceCard {
   background: linear-gradient(180deg, var(--surface-gradient-start), var(--surface-gradient-end));
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: 0.9rem;
   box-shadow: var(--surface-inset), var(--surface-shadow);
 }
 
@@ -110,6 +114,7 @@ section {
   backdrop-filter: blur(14px);
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
 .navInner {
@@ -145,6 +150,24 @@ section {
 
 .navLinks a {
   color: inherit;
+  position: relative;
+}
+
+.navLinks a:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.45rem;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.42);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.18s ease;
+}
+
+.navLinks a:hover:after {
+  transform: scaleX(1);
 }
 
 .navButton,
@@ -160,30 +183,32 @@ section {
   background: var(--button-bg);
   color: var(--text);
   box-shadow: var(--surface-inset), var(--surface-shadow-soft);
+  font-weight: 500;
+  transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .navButton:hover,
 .primaryAction:hover,
 .secondaryAction:hover {
   background: var(--button-hover-bg);
+  border-color: var(--button-active-border);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .hero {
   display: flex;
   align-items: center;
   min-height: calc(100dvh - 70px);
-  padding: clamp(2.25rem, 5vh, 5rem) 0 clamp(1.6rem, 3.4vh, 3rem);
+  padding: clamp(2rem, 4.6vh, 4.2rem) 0 clamp(1.4rem, 3vh, 2.6rem);
 }
 
 .heroShell {
   width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .heroCopy {
-  width: min(100%, var(--content-rail));
-  margin: 0 auto;
+  width: 100%;
 }
 
 .eyebrow,
@@ -204,9 +229,10 @@ section {
 
 .title {
   font-size: clamp(3.125rem, 4.7vw, 3.75rem);
-  line-height: 1.08;
-  max-width: 9.4ch;
-  margin-bottom: 1rem;
+  line-height: 1.02;
+  max-width: 10ch;
+  margin-bottom: 0.9rem;
+  text-wrap: balance;
 }
 
 .titleLine {
@@ -217,28 +243,30 @@ section {
 .titleMuted {
   display: block;
   color: var(--text-hero-muted);
-  margin-top: 0.06em;
+  margin-top: 0.1em;
 }
 
 .subtitle {
   font-size: clamp(1.0625rem, 1.4vw, 1.125rem);
   color: var(--text-dim);
-  max-width: 576px;
-  line-height: 1.79;
-  margin-bottom: 1.5rem;
+  max-width: 520px;
+  line-height: 1.74;
+  margin-bottom: 1.35rem;
 }
 
 .ctaGrid {
-  width: min(100%, var(--content-rail));
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.85rem;
-  margin-bottom: 0.9rem;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
 }
 
 .ctaCard {
-  padding: 1rem 1rem 1.05rem;
-  min-height: 138px;
+  padding: 0.95rem 0.95rem 1rem;
+  min-height: 132px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
+    linear-gradient(180deg, var(--surface-gradient-start), var(--surface-gradient-end));
 }
 
 .ctaCard code {
@@ -258,18 +286,28 @@ section {
 .heroHighlights {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.85rem;
-  width: min(100%, var(--content-rail));
+  gap: 0.8rem;
 }
 
 .highlightCard {
-  padding: 1rem 1rem 1.05rem;
+  padding: 0.95rem 0.95rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.highlightCard:before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.45), transparent 72%);
 }
 
 .highlightCard strong {
   display: block;
   margin: 0.55rem 0 0.4rem;
-  font-size: 1.35rem;
+  font-size: 1.28rem;
 }
 
 .highlightCard p,
@@ -283,12 +321,15 @@ section {
 
 .sectionTitle {
   font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.7rem;
+  max-width: 11ch;
+  text-wrap: balance;
 }
 
 .sectionDesc {
-  max-width: 720px;
-  font-size: 1.05rem;
+  max-width: 520px;
+  font-size: 1.02rem;
+  line-height: 1.72;
 }
 
 .featureGrid,
@@ -300,7 +341,7 @@ section {
 }
 
 .featureGrid {
-  margin-top: 1.6rem;
+  margin-top: 1.4rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -308,28 +349,54 @@ section {
 .platformCard,
 .securityCard,
 .faqCard {
-  padding: 1.25rem;
+  padding: 1.15rem;
+}
+
+.ctaCard,
+.highlightCard,
+.featureCard,
+.platformCard,
+.securityCard,
+.faqCard,
+.quickstartShell,
+.demoTerminal,
+.benchTerminal {
+  transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ctaCard:hover,
+.highlightCard:hover,
+.featureCard:hover,
+.platformCard:hover,
+.securityCard:hover,
+.faqCard:hover,
+.quickstartShell:hover,
+.demoTerminal:hover,
+.benchTerminal:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
 }
 
 .featureCard h3,
 .platformCard h3,
 .securityCard h3,
 .faqCard h3 {
-  font-size: 1.3rem;
-  margin-bottom: 0.6rem;
+  font-size: 1.22rem;
+  margin-bottom: 0.5rem;
 }
 
 .splitSection {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: 1.2rem;
+  gap: 1rem;
   align-items: center;
 }
 
 .platformGrid,
 .securityGrid,
 .faqGrid {
-  margin-top: 1.4rem;
+  margin-top: 1.25rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -339,28 +406,31 @@ section {
 }
 
 .quickstartSection {
-  padding-top: 2rem;
+  padding-top: 1.65rem;
 }
 
 .quickstartShell {
-  padding: 1.6rem;
+  padding: 1.45rem;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.03), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
 }
 
 .heroActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.2rem;
+  gap: 0.7rem;
+  margin-top: 1.05rem;
 }
 
 .codeHead {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 0 14px;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text-dim);
 }
 
@@ -368,7 +438,7 @@ section {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.2);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .demoTerminal,
@@ -376,22 +446,23 @@ section {
 .benchTerminal {
   background: var(--bg-terminal);
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: 0.9rem;
   box-shadow: var(--surface-inset), var(--surface-shadow);
   overflow: hidden;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%);
 }
 
 .demoTerminal pre,
 .codePanel pre,
 .benchTerminal pre {
   margin: 0;
-  padding: 16px;
+  padding: 14px;
   display: grid;
-  gap: 8px;
+  gap: 7px;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 0.94rem;
-  line-height: 1.6;
+  font-size: 0.91rem;
+  line-height: 1.55;
 }
 
 .demoTerminal pre span,
@@ -412,9 +483,10 @@ section {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 0 16px 16px;
+  padding: 0 14px 14px;
   color: var(--text-dim);
-  font-size: 0.83rem;
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .typingCursor {
@@ -430,7 +502,7 @@ section {
 
 @media (max-width: 960px) {
   section {
-    padding: 4.5rem 0;
+    padding: 4.1rem 0;
   }
 
   .ctaGrid,
