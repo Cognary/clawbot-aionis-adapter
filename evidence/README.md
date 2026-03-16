@@ -17,7 +17,7 @@ Included here:
 11. Phase 2 state-first context revalidation runs that re-check the strongest slice after state-first context assembly lands on `Aionis main`
 12. Phase 2 handoff-transition single-run revalidation runs that verify the new `handoff/store -> execution_transitions_v1` overlay on the real Lite path
 13. Phase 2 handoff-transition repeated revalidation runs that confirm the repaired overlay remains positive under `3`-run strongest-slice real-workflow validation
-14. Phase 2 `tools/select` state-aware repeated revalidation runs that confirm direct `execution_state_v1` consumption remains positive on strongest-slice reviewer-ready completion
+14. Phase 2 `tools/select` state-aware repeated revalidation runs that confirm direct `execution_state_v1` consumption remains positive on the first two strongest reviewer-ready workflow slices
 
 Not included here:
 

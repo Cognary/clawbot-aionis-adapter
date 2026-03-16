@@ -400,6 +400,30 @@ Interpretation:
 - it is not currently an efficiency win
 - the right reading is `completion-only win`, not a broader claim that the new state-aware `tools/select` path already lowers cost
 
+### Phase 2 tools/select state-aware repeated revalidation: pairing / approval recovery
+
+Evidence:
+
+- [Summary JSON](../evidence/openclaw-real-workflow-scenario/20260316051831/summary.json)
+- [Cases JSONL](../evidence/openclaw-real-workflow-scenario/20260316051831/cases.jsonl)
+
+Result (`3` repeats, `Aionis main` with `tools/select` consuming `execution_state_v1` directly):
+
+- baseline `reviewer_ready_rate = 0`
+- treatment `reviewer_ready_rate = 1`
+- baseline `workflow_completed_rate = 0`
+- treatment `workflow_completed_rate = 1`
+- baseline `avg_total_tokens = 18493`
+- treatment `avg_total_tokens = 22063.33`
+- baseline `avg_wall_clock_ms = 78439.33`
+- treatment `avg_wall_clock_ms = 80485.33`
+
+Interpretation:
+
+- the second strongest real-workflow slice also stays positive after the new state-aware `tools/select` path landed
+- this new runtime surface is again a completion-only win, not an efficiency win
+- together with dashboard auth drift, this is enough to say the new state-aware `tools/select` path is no longer a single-slice signal
+
 ### Revalidated slice: pairing / approval recovery
 
 Evidence:
