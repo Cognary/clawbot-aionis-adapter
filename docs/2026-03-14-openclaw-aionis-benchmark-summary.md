@@ -140,6 +140,7 @@ Evidence:
 - [ControlProfile revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134050/summary.json)
 - [ControlProfile revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315134824/summary.json)
 - [Post-main-merge revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315143814/summary.json)
+- [Phase 2 state-first context revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316024722/summary.json)
 - [Post-main-merge revalidation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316012701/summary.json)
 - [Post-main-merge revalidation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316013610/summary.json)
 - [Repeated continuity A/B: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-continuity-ab/20260315102630/summary.json)
@@ -161,6 +162,7 @@ Headline results:
   - pairing / approval recovery: `0 -> 1`
   - service token drift repair: `0 -> 0.6667`
   - post-main-merge dashboard auth drift: `0.3333 -> 0.6667` with lower wall-clock but higher token
+  - Phase 2 state-first context dashboard auth drift: `0 -> 0.6667` with lower token and lower wall-clock
   - post-main-merge pairing / approval recovery: `0.6667 -> 0.6667` with lower wall-clock but higher token
   - post-main-merge service token drift repair: `0 -> 0.6667` with lower wall-clock but higher token
 

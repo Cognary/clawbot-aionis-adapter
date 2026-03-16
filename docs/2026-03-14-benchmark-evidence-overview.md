@@ -103,6 +103,7 @@ Evidence:
 - [Real workflow scenario summary: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315074101/summary.json)
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow continuity validation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
+- [Phase 2 state-first context revalidation: dashboard auth drift (real Lite)](../evidence/openclaw-real-workflow-scenario/20260316024722/summary.json)
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](../evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
@@ -133,6 +134,7 @@ Interpretation:
 - the strongest three real-workflow slices have now also been refreshed with `ControlProfile` active on the real path, and all three remain positive on reviewer-ready completion
 - only dashboard auth drift currently retains both completion and efficiency wins after `ControlProfile` adoption; the other two refreshed slices should still be read as completion wins, not efficiency wins
 - after merging the execution-continuity Phase 1 foundation into `Aionis main`, dashboard auth drift remains positive on the actual runtime path: `0.3333 -> 0.6667` on reviewer-ready rate, with lower wall-clock but higher token spend
+- after the new Phase 2 state-first context path landed on `Aionis main`, dashboard auth drift improved again on the actual runtime path: `0 -> 0.6667` on reviewer-ready rate, with lower token spend and lower wall-clock
 - after the same `Aionis main` merge, pairing / approval recovery stays stable on reviewer-ready completion (`0.6667 -> 0.6667`) while treatment still finishes faster; this should be read as a parity revalidation, not a new uplift headline
 - after the same `Aionis main` merge, service token drift repair remains positive on reviewer-ready completion (`0 -> 0.6667`) and slightly faster on wall-clock, but it is not a token win
 - the new execution-continuity contract has now been validated on four real Lite workflow shapes, not only in unit or integration tests

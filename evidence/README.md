@@ -14,6 +14,7 @@ Included here:
 8. controlled real-Lite revalidation runs for the strongest reviewer-ready workflow slices after `ControlProfile` adoption on the actual runtime path
 9. post-merge real-Lite stability checks that re-run the strongest slice after the corresponding Aionis kernel changes have landed on `main`
 10. post-merge parity checks where a strongest slice remains stable after runtime-surface changes, even if the new run no longer adds completion uplift
+11. Phase 2 state-first context revalidation runs that re-check the strongest slice after state-first context assembly lands on `Aionis main`
 
 Not included here:
 

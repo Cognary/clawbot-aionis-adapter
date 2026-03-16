@@ -179,13 +179,14 @@ function parseJsonObjectLoose(content) {
   throw lastError ?? new SyntaxError('model output is not valid JSON');
 }
 
-async function callModel(messages) {
+async function callModel(messages, timeoutMs = MODEL_REQUEST_TIMEOUT_MS) {
   let lastError = null;
   for (let attempt = 1; attempt <= MAX_MODEL_RETRIES; attempt += 1) {
     let timer = null;
     try {
+      const requestTimeoutMs = Math.max(1000, Math.min(Number(timeoutMs || MODEL_REQUEST_TIMEOUT_MS), MODEL_REQUEST_TIMEOUT_MS));
       const controller = new AbortController();
-      timer = setTimeout(() => controller.abort(), MODEL_REQUEST_TIMEOUT_MS);
+      timer = setTimeout(() => controller.abort(), requestTimeoutMs);
       const requestBody = {
         model: MODEL,
         temperature: 0,
@@ -239,6 +240,8 @@ async function executeShell(command, cwd) {
       cwd,
       env: { ...process.env, CI: '1' },
       maxBuffer: 10 * 1024 * 1024,
+      timeout: MODEL_REQUEST_TIMEOUT_MS,
+      killSignal: 'SIGKILL',
     });
     return { result: `${stdout}${stderr}`.trim() || 'ok' };
   } catch (error) {
@@ -247,6 +250,10 @@ async function executeShell(command, cwd) {
       result: `${error.stdout ?? ''}${error.stderr ?? ''}`.trim().slice(0, 4000),
     };
   }
+}
+
+function remainingTimeMs(startedAt, deadlineMs) {
+  return Math.max(0, deadlineMs - (Date.now() - startedAt));
 }
 
 async function postJson(baseUrl, routePath, body) {
@@ -801,7 +808,8 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
   const ctx = stageCtx(baseId, repoPath, agent.name);
   const startedAt = Date.now();
 
-  const hasTimedOut = () => (Date.now() - startedAt) > agentDeadlineMs;
+  const hasTimedOut = () => remainingTimeMs(startedAt, agentDeadlineMs) <= 0;
+  const timeRemaining = () => remainingTimeMs(startedAt, agentDeadlineMs);
 
   if (mode === 'treatment') {
     const startResult = await host.emit('before_agent_start', {
@@ -820,15 +828,22 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
       shouldInjectRawCarryover(mode, carryover) ? carryoverText(carryover) : '',
       startResult?.prependContext,
     ].filter(Boolean).join('\n');
+    if (hasTimedOut()) {
+      controlledStop = true;
+      stopReason = 'agent_timeout_exceeded';
+    }
   }
 
-  for (let step = 1; step <= Number(agent.max_steps ?? 1); step += 1) {
+  for (let step = 1; step <= Number(agent.max_steps ?? 1) && !controlledStop; step += 1) {
     if (hasTimedOut()) {
       controlledStop = true;
       stopReason = 'agent_timeout_exceeded';
       break;
     }
-    const { parsed, usage } = await callModel(buildMessages({ scenario, agent, toolset, history, carryover: injectedContext }));
+    const { parsed, usage } = await callModel(
+      buildMessages({ scenario, agent, toolset, history, carryover: injectedContext }),
+      timeRemaining(),
+    );
     tokenBreakdown.push({ step, ...usage, model_decision: parsed });
 
     if (parsed.action === 'finish') {
@@ -896,7 +911,10 @@ async function runAgent({ scenario, agent, mode, host, aionis, repoPath, runDir,
       controlledStop = true;
       stopReason = stopReason ?? 'agent_timeout_exceeded';
     } else {
-      const { parsed, usage } = await callModel(buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }));
+      const { parsed, usage } = await callModel(
+        buildSynthesisMessages({ scenario, agent, history, carryover: injectedContext }),
+        timeRemaining(),
+      );
       tokenBreakdown.push({ step: 'synthesis', ...usage, model_decision: parsed });
       if (parsed.action === 'finish' && validateArtifact(agent.name, parsed.artifact, scenario.expected)) {
         artifact = parsed.artifact;

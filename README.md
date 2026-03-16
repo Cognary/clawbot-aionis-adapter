@@ -64,6 +64,8 @@ Headline results:
   - pairing / approval recovery with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
   - service token drift repair with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
   - markdown parser fallback with recovered `execution_packet_v1`: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 1`
+- **Phase 2 state-first context revalidation on the real Lite path (3 repeats)**:
+  - dashboard auth drift: baseline `reviewer_ready_rate = 0`, treatment `reviewer_ready_rate = 0.6667`, with lower average total tokens from `24005.33` to `21859` and lower wall-clock from `98846.67ms` to `74957.33ms`
 - **Repeated continuity A/B on the real Lite path (`legacy` vs `execution_packet_v1`)**:
   - dashboard auth drift: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `24750.67` to `22974`
   - pairing / approval recovery: completion stays `1 -> 1`, while packet continuity lowers average total tokens from `22704` to `22091.33`
@@ -103,6 +105,7 @@ Public evidence files:
 - [Real workflow scenario summary: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315074101/summary.json)
 - [Real workflow scenario summary: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315072548/summary.json)
 - [Real workflow continuity validation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260315090950/summary.json)
+- [Phase 2 state-first context revalidation: dashboard auth drift (real Lite)](evidence/openclaw-real-workflow-scenario/20260316024722/summary.json)
 - [Real workflow continuity validation: pairing / approval recovery (real Lite)](evidence/openclaw-real-workflow-scenario/20260315091709/summary.json)
 - [Real workflow continuity validation: service token drift repair (real Lite)](evidence/openclaw-real-workflow-scenario/20260315092312/summary.json)
 - [Real workflow continuity validation: markdown parser fallback (real Lite)](evidence/openclaw-real-workflow-scenario/20260315093238/summary.json)
