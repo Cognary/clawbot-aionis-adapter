@@ -42,7 +42,7 @@
     "scopeMode": { "label": "Scope Mode", "help": "project is recommended" },
     "scopePrefix": { "label": "Scope Prefix" },
     "replayPlaybookId": { "label": "Replay Playbook ID", "help": "Optional deterministic replay escape hatch" },
-    "strictToolBlocking": { "label": "Strict Tool Blocking" },
+      "strictToolBlocking": { "label": "Strict Tool Blocking", "help": "Advanced. Off by default; when enabled, tools/select mismatches can block the current tool." },
     "replayDispatchEnabled": { "label": "Replay Dispatch Enabled" },
     "handoffFallbackEnabled": { "label": "Handoff Fallback Enabled" },
     "maxSteps": { "label": "Max Steps", "advanced": true },

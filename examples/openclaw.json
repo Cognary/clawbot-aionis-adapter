@@ -17,7 +17,7 @@
           "tenantId": "default",
           "actor": "openclaw",
           "scopeMode": "project",
-          "strictToolBlocking": true,
+          "strictToolBlocking": false,
           "replayDispatchEnabled": true,
           "handoffFallbackEnabled": true
         }

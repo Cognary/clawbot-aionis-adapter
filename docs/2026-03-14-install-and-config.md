@@ -84,7 +84,7 @@ Minimal configuration:
           "tenantId": "default",
           "actor": "openclaw",
           "scopeMode": "project",
-          "strictToolBlocking": true,
+          "strictToolBlocking": false,
           "replayDispatchEnabled": true,
           "handoffFallbackEnabled": true
         }
@@ -96,7 +96,7 @@ Minimal configuration:
 
 What these switches mean in practice:
 
-- `strictToolBlocking`: block obviously bad tool paths instead of only warning
+- `strictToolBlocking`: advanced; off by default so `tools/select` stays shadow-only unless you explicitly opt into enforcement
 - `replayDispatchEnabled`: allow reusable work to escape into replay
 - `handoffFallbackEnabled`: preserve a structured continuation point when the right move is to stop
 

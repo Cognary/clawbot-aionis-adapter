@@ -101,7 +101,7 @@ function createAdapter(client, overrides = {}) {
     replayHintResolver: overrides.replayHintResolver,
     replayDispatchEnabled: overrides.replayDispatchEnabled ?? true,
     handoffFallbackEnabled: overrides.handoffFallbackEnabled ?? true,
-    strictToolBlocking: overrides.strictToolBlocking ?? true,
+    strictToolBlocking: overrides.strictToolBlocking ?? false,
   });
 }
 
@@ -224,6 +224,51 @@ test('after_tool_call writes feedback and evidence', async () => {
   assert.equal(calls.toolsFeedback.length, 1);
   assert.equal(calls.write.length, 1);
   assert.equal(calls.toolsFeedback[0].selectedTool, 'rg');
+});
+
+test('tools/select mismatch is shadow-only by default', async () => {
+  const { client, calls } = createFakeClient();
+  client.toolsSelect = async (args) => {
+    calls.toolsSelect.push(args);
+    return { selected_tool: 'read-source-focused-v2', decision_id: 'dec-shadow', decision_uri: 'aionis://decision/shadow' };
+  };
+
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client);
+  attachToOpenClawHost(host, adapter);
+
+  const ctx = { agentId: 'agent-shadow', sessionId: 'sess-shadow', sessionKey: 'sess-key-shadow', workspaceDir: '/repo/click', runId: 'run-shadow', toolName: 'read-markdown-impl', toolCallId: 'call-shadow' };
+  const result = await host.emit(
+    'before_tool_call',
+    { toolName: 'read-markdown-impl', params: { path: 'README.md' }, runId: 'run-shadow', toolCallId: 'call-shadow' },
+    ctx,
+  );
+
+  assert.equal(result, undefined);
+  assert.equal(calls.toolsSelect.length, 1);
+});
+
+test('strictToolBlocking=true still blocks mismatched selected tool', async () => {
+  const { client, calls } = createFakeClient();
+  client.toolsSelect = async (args) => {
+    calls.toolsSelect.push(args);
+    return { selected_tool: 'read-source-focused-v2', decision_id: 'dec-enforce', decision_uri: 'aionis://decision/enforce' };
+  };
+
+  const host = new MockOpenClawHost();
+  const adapter = createAdapter(client, { strictToolBlocking: true });
+  attachToOpenClawHost(host, adapter);
+
+  const ctx = { agentId: 'agent-enforce', sessionId: 'sess-enforce', sessionKey: 'sess-key-enforce', workspaceDir: '/repo/click', runId: 'run-enforce', toolName: 'read-markdown-impl', toolCallId: 'call-enforce' };
+  const result = await host.emit(
+    'before_tool_call',
+    { toolName: 'read-markdown-impl', params: { path: 'README.md' }, runId: 'run-enforce', toolCallId: 'call-enforce' },
+    ctx,
+  );
+
+  assert.equal(result?.block, true);
+  assert.equal(result?.blockReason, 'policy selected read-source-focused-v2 instead of read-markdown-impl');
+  assert.equal(calls.toolsSelect.length, 1);
 });
 
 test('before_tool_call turns no_tools_allowed into a controlled block', async () => {

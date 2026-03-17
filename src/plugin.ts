@@ -78,7 +78,7 @@ function resolveConfig(rawCfg: Record<string, unknown>): AdapterConfig & { baseU
       maxBroadTestInvocations: asNumber(rawCfg.maxBroadTestInvocations, 1),
       maxBroadScanInvocations: asNumber(rawCfg.maxBroadScanInvocations, 1),
     },
-    strictToolBlocking: asBoolean(rawCfg.strictToolBlocking, true),
+    strictToolBlocking: asBoolean(rawCfg.strictToolBlocking, false),
     replayDispatchEnabled: asBoolean(rawCfg.replayDispatchEnabled, true),
     handoffFallbackEnabled: asBoolean(rawCfg.handoffFallbackEnabled, true),
   };

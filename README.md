@@ -185,7 +185,7 @@ Reference examples:
           "tenantId": "default",
           "actor": "openclaw",
           "scopeMode": "project",
-          "strictToolBlocking": true,
+          "strictToolBlocking": false,
           "replayDispatchEnabled": true,
           "handoffFallbackEnabled": true
         }
@@ -196,6 +196,9 @@ Reference examples:
 ```
 
 Use `examples/openclaw.json` first.
+
+`strictToolBlocking` is now off by default.
+That keeps `tools/select` in shadow/telemetry mode unless you explicitly opt into enforcement.
 
 Do not tune the threshold knobs on first install:
 

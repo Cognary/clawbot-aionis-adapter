@@ -41,7 +41,7 @@ export class AionisLoopControlAdapter {
     this.config = {
       ...config,
       thresholds: mergedThresholds,
-      strictToolBlocking: config.strictToolBlocking ?? true,
+      strictToolBlocking: config.strictToolBlocking ?? false,
       replayDispatchEnabled: config.replayDispatchEnabled ?? true,
       handoffFallbackEnabled: config.handoffFallbackEnabled ?? true,
     };
