@@ -152,12 +152,13 @@ jobs:
           npm run bench:real-workflow
 
       - name: Generate execution eval summary
+        working-directory: aionis
         shell: bash
         run: |
           set -euo pipefail
-          latest_artifact="$(ls -1dt "$PWD"/artifacts/openclaw-real-workflow-scenario/* | head -n 1)"
+          latest_artifact="$(ls -1dt "$GITHUB_WORKSPACE"/artifacts/openclaw-real-workflow-scenario/* | head -n 1)"
           echo "LATEST_ARTIFACT=${latest_artifact}" >> "$GITHUB_ENV"
-          node --import=tsx ./aionis/scripts/eval/execution-eval.ts --artifact-dir "${latest_artifact}"
+          node --import=tsx ./scripts/eval/execution-eval.ts --artifact-dir "${latest_artifact}"
 
       - name: Gate on execution eval
         shell: bash
