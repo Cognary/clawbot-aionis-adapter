@@ -1,0 +1,234 @@
+name: Real Workflow Nightly Eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario_id:
+        description: "Strongest real workflow scenario id"
+        required: false
+        default: "glm_dashboard_auth_drift_reviewer_ready_workflow"
+        type: string
+      repeats:
+        description: "Benchmark repetitions"
+        required: false
+        default: "3"
+        type: string
+      model_provider:
+        description: "Model provider (gemini or glm)"
+        required: false
+        default: "gemini"
+        type: choice
+        options:
+          - gemini
+          - glm
+      model:
+        description: "Model name override"
+        required: false
+        default: "gemini-2.5-flash"
+        type: string
+      aionis_ref:
+        description: "Aionis git ref to checkout"
+        required: false
+        default: "main"
+        type: string
+      upload_artifacts:
+        description: "Upload benchmark and eval artifacts"
+        required: false
+        default: true
+        type: boolean
+      artifact_retention_days:
+        description: "Artifact retention days"
+        required: false
+        default: "14"
+        type: string
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: real-workflow-nightly-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nightly-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      SCENARIO_ID: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.scenario_id || 'glm_dashboard_auth_drift_reviewer_ready_workflow' }}
+      REPEATS: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.repeats || '3' }}
+      MODEL_PROVIDER: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.model_provider || 'gemini' }}
+      MODEL_NAME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.model || 'gemini-2.5-flash' }}
+      AIONIS_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.aionis_ref || 'main' }}
+      BENCH_AIONIS_BASE_URL: http://127.0.0.1:3321
+      BENCH_AGENT_TIMEOUT_MS: 120000
+      BENCH_ARM_TIMEOUT_MS: 420000
+      BENCH_CONTINUITY_MODE: packet
+      BENCH_ARM_SELECTION: both
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+      GLM_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+    steps:
+      - name: Checkout adapter
+        uses: actions/checkout@v5
+
+      - name: Checkout Aionis
+        uses: actions/checkout@v5
+        with:
+          repository: Cognary/Aionis
+          ref: ${{ env.AIONIS_REF }}
+          path: aionis
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            aionis/package-lock.json
+
+      - name: Install adapter deps
+        run: npm ci
+
+      - name: Install Aionis deps
+        working-directory: aionis
+        run: npm ci
+
+      - name: Build Aionis
+        working-directory: aionis
+        run: npm run build
+
+      - name: Start Aionis Lite
+        working-directory: aionis
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup bash scripts/start-lite.sh --port 3321 > /tmp/aionis-lite.log 2>&1 &
+          echo $! > /tmp/aionis-lite.pid
+
+      - name: Wait for Aionis Lite health
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for _ in {1..120}; do
+            if curl -fsS "${BENCH_AIONIS_BASE_URL}/health" >/dev/null 2>&1; then
+              ok=1
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$ok" -ne 1 ]]; then
+            echo "Aionis Lite did not become healthy" >&2
+            cat /tmp/aionis-lite.log >&2 || true
+            exit 1
+          fi
+          curl -fsS "${BENCH_AIONIS_BASE_URL}/health"
+
+      - name: Run strongest real workflow benchmark
+        shell: bash
+        env:
+          BENCH_SCENARIO_ID: ${{ env.SCENARIO_ID }}
+          BENCH_REPEATS: ${{ env.REPEATS }}
+          GEMINI_MODEL: ${{ env.MODEL_PROVIDER == 'gemini' && env.MODEL_NAME || '' }}
+          GLM_MODEL: ${{ env.MODEL_PROVIDER == 'glm' && env.MODEL_NAME || '' }}
+        run: |
+          set -euo pipefail
+          if [[ "${MODEL_PROVIDER}" == "gemini" ]]; then
+            if [[ -z "${GEMINI_API_KEY:-}" ]]; then
+              echo "Missing GEMINI_API_KEY secret" >&2
+              exit 1
+            fi
+          else
+            if [[ -z "${ZHIPU_API_KEY:-}" ]]; then
+              echo "Missing ZHIPU_API_KEY secret" >&2
+              exit 1
+            fi
+          fi
+          npm run bench:real-workflow
+
+      - name: Generate execution eval summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_artifact="$(ls -1dt "$PWD"/artifacts/openclaw-real-workflow-scenario/* | head -n 1)"
+          echo "LATEST_ARTIFACT=${latest_artifact}" >> "$GITHUB_ENV"
+          node --import=tsx ./aionis/scripts/eval/execution-eval.ts --artifact-dir "${latest_artifact}"
+
+      - name: Gate on execution eval
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval_json="${LATEST_ARTIFACT}/execution_eval_summary.json"
+          node - <<'NODE' "${eval_json}"
+          const fs = require('node:fs');
+          const file = process.argv[2];
+          const summary = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const baseline = summary.variants.baseline;
+          const treatment = summary.variants.treatment;
+          const failures = [];
+          if (treatment.result !== 'pass') failures.push('treatment_result_not_pass');
+          if (summary.delta.completion_gain < 0) failures.push('completion_regressed');
+          if (summary.delta.reviewer_readiness_gain < 0) failures.push('reviewer_readiness_regressed');
+          if (treatment.dimension_scores.completion < baseline.dimension_scores.completion) failures.push('treatment_completion_below_baseline');
+          if (treatment.dimension_scores.reviewer_readiness < baseline.dimension_scores.reviewer_readiness) failures.push('treatment_reviewer_readiness_below_baseline');
+          if (failures.length) {
+            console.error(JSON.stringify({ ok: false, failures, eval_json: file }, null, 2));
+            process.exit(1);
+          }
+          console.log(JSON.stringify({
+            ok: true,
+            eval_json: file,
+            completion_gain: summary.delta.completion_gain,
+            reviewer_readiness_gain: summary.delta.reviewer_readiness_gain,
+            continuity_gain: summary.delta.continuity_gain,
+            recovery_gain: summary.delta.recovery_gain,
+          }, null, 2));
+          NODE
+
+      - name: Publish execution eval to step summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval_md="${LATEST_ARTIFACT}/execution_eval_summary.md"
+          benchmark_json="${LATEST_ARTIFACT}/summary.json"
+          {
+            echo "## Strongest Real Workflow Nightly Eval"
+            echo
+            echo "- Scenario: \`${SCENARIO_ID}\`"
+            echo "- Repeats: \`${REPEATS}\`"
+            echo "- Provider: \`${MODEL_PROVIDER}\`"
+            echo "- Model: \`${MODEL_NAME}\`"
+            echo "- Artifact dir: \`${LATEST_ARTIFACT}\`"
+            echo
+            if [[ -f "${eval_md}" ]]; then
+              cat "${eval_md}"
+            else
+              echo "execution_eval_summary.md not found"
+            fi
+            echo
+            echo "## Raw Benchmark Summary"
+            echo
+            if [[ -f "${benchmark_json}" ]]; then
+              echo '```json'
+              cat "${benchmark_json}"
+              echo '```'
+            else
+              echo "summary.json not found"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload nightly benchmark artifacts
+        if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.upload_artifacts) }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: real-workflow-nightly-artifacts
+          path: |
+            artifacts/openclaw-real-workflow-scenario/
+            /tmp/aionis-lite.log
+          retention-days: ${{ fromJSON(github.event_name == 'workflow_dispatch' && github.event.inputs.artifact_retention_days || '14') }}
+          if-no-files-found: warn
