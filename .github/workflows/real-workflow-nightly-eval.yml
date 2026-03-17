@@ -61,6 +61,7 @@ jobs:
       MODEL_PROVIDER: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.model_provider || 'gemini' }}
       MODEL_NAME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.model || 'gemini-2.5-flash' }}
       AIONIS_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.aionis_ref || 'main' }}
+      LATEST_ARTIFACT: ""
       BENCH_AIONIS_BASE_URL: http://127.0.0.1:3321
       BENCH_AGENT_TIMEOUT_MS: 120000
       BENCH_ARM_TIMEOUT_MS: 420000
@@ -106,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          nohup bash scripts/start-lite.sh --port 3321 > /tmp/aionis-lite.log 2>&1 &
+          PORT=3321 nohup bash scripts/start-lite.sh > /tmp/aionis-lite.log 2>&1 &
           echo $! > /tmp/aionis-lite.pid
 
       - name: Wait for Aionis Lite health
@@ -194,8 +195,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          eval_md="${LATEST_ARTIFACT}/execution_eval_summary.md"
-          benchmark_json="${LATEST_ARTIFACT}/summary.json"
+          latest_artifact="${LATEST_ARTIFACT:-}"
+          eval_md="${latest_artifact}/execution_eval_summary.md"
+          benchmark_json="${latest_artifact}/summary.json"
           {
             echo "## Strongest Real Workflow Nightly Eval"
             echo
@@ -203,9 +205,9 @@ jobs:
             echo "- Repeats: \`${REPEATS}\`"
             echo "- Provider: \`${MODEL_PROVIDER}\`"
             echo "- Model: \`${MODEL_NAME}\`"
-            echo "- Artifact dir: \`${LATEST_ARTIFACT}\`"
+            echo "- Artifact dir: \`${latest_artifact:-not-generated}\`"
             echo
-            if [[ -f "${eval_md}" ]]; then
+            if [[ -n "${latest_artifact}" && -f "${eval_md}" ]]; then
               cat "${eval_md}"
             else
               echo "execution_eval_summary.md not found"
@@ -213,7 +215,7 @@ jobs:
             echo
             echo "## Raw Benchmark Summary"
             echo
-            if [[ -f "${benchmark_json}" ]]; then
+            if [[ -n "${latest_artifact}" && -f "${benchmark_json}" ]]; then
               echo '```json'
               cat "${benchmark_json}"
               echo '```'
